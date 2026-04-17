@@ -1,96 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Marcellus+SC&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* CLM Central Texas Commons — design system.
+   Editorial reading experience: cream page, mesquite ink, serifs only.
+   All colors HSL. */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Brand tokens — converted to HSL */
+    --cal: 42 47% 88%;              /* #EFE6D2 limestone cream */
+    --mesquite: 92 24% 25%;          /* #3E4F2F primary ink */
+    --ocre: 32 56% 51%;              /* #C68B3E accent / CTA */
+    --rojo: 0 61% 30%;               /* #7A1E1E Eucharistic */
+    --azul: 215 45% 31%;             /* #2B4872 Marian */
+    --piedra: 218 17% 35%;           /* #4A5568 secondary text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Shadcn semantic tokens — mapped to brand */
+    --background: 42 47% 88%;
+    --foreground: 92 24% 25%;
+    --card: 42 47% 92%;
+    --card-foreground: 92 24% 25%;
+    --popover: 42 47% 92%;
+    --popover-foreground: 92 24% 25%;
+    --primary: 92 24% 25%;
+    --primary-foreground: 42 47% 88%;
+    --secondary: 42 30% 80%;
+    --secondary-foreground: 92 24% 25%;
+    --muted: 42 30% 82%;
+    --muted-foreground: 218 17% 35%;
+    --accent: 32 56% 51%;
+    --accent-foreground: 42 47% 95%;
+    --destructive: 0 61% 30%;
+    --destructive-foreground: 42 47% 95%;
+    --border: 92 12% 60%;
+    --input: 92 12% 70%;
+    --ring: 32 56% 51%;
+    --radius: 0.25rem;
   }
 }
 
@@ -98,8 +47,75 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  html {
+    font-size: 18px;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Gentium Plus', Georgia, serif;
+    line-height: 1.65;
+    font-feature-settings: "kern", "liga", "onum";
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 500;
+    line-height: 1.2;
+    color: hsl(var(--mesquite));
+  }
+  .display-caps {
+    font-family: 'Marcellus SC', Georgia, serif;
+    letter-spacing: 0.08em;
+  }
+  .prose-body {
+    font-family: 'Gentium Plus', Georgia, serif;
+    line-height: 1.65;
+  }
+  /* Quiet, editorial link */
+  a {
+    color: hsl(var(--mesquite));
+    text-decoration-color: hsl(var(--ocre));
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: hsl(var(--ocre));
+  }
+}
+
+@layer components {
+  .container-prose {
+    @apply mx-auto px-6;
+    max-width: 680px;
+  }
+  .container-wide {
+    @apply mx-auto px-6;
+    max-width: 1100px;
+  }
+  .rule {
+    height: 1px;
+    background: hsl(var(--mesquite) / 0.18);
+  }
+  .seal {
+    border: 1px solid hsl(var(--mesquite) / 0.6);
+    border-radius: 9999px;
+  }
+}
+
+/* Leaflet container should not impose its own font */
+.leaflet-container {
+  font-family: 'Gentium Plus', Georgia, serif;
+  background: hsl(var(--cal));
+}
+/* Sepia tile feel without external tile server */
+.leaflet-tile-pane {
+  filter: sepia(0.55) saturate(0.7) brightness(0.97) contrast(0.95) hue-rotate(-8deg);
+}
+
+@layer utilities {
+  .fade-in {
+    animation: fade-in 0.5s ease-out both;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 }
