@@ -57,8 +57,8 @@ export const workshops: Workshop[] = [
   },
   {
     id: 'w-004',
-    hostId: 'm-001', // María Elena, milpa
-    iconSlug: 'la-milpa',
+    hostId: 'm-001', // María Elena, garden
+    iconSlug: 'las-yerbas',
     date: '2026-05-15T07:00:00-05:00',
     locationName: 'The Vásquez garden, Boerne',
     locationLatLon: [29.8034, -98.7412],
@@ -74,8 +74,8 @@ export const workshops: Workshop[] = [
   },
   {
     id: 'w-005',
-    hostId: 'm-009', // Catherine, soap
-    iconSlug: 'el-jabon',
+    hostId: 'm-009', // Catherine, soap (made with herbs)
+    iconSlug: 'las-yerbas',
     date: '2026-05-23T09:00:00-05:00',
     locationName: 'The Okonkwo kitchen, Fredericksburg',
     locationLatLon: [30.2752, -98.8720],

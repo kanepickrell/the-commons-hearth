@@ -25,7 +25,7 @@ export const members: Member[] = [
     name: 'María Elena Vásquez',
     parish: 'St. Peter the Apostle, Boerne',
     parishLatLon: [29.7947, -98.7320],
-    iconSlug: 'la-milpa',
+    iconSlug: 'las-yerbas',
     offering: {
       en: 'Gardening and permaculture — what actually grows in this soil.',
       es: 'La huerta y la permacultura — lo que de veras crece en esta tierra.',
@@ -194,7 +194,7 @@ export const members: Member[] = [
     name: "Catherine Okonkwo",
     parish: "St. Mary's, Fredericksburg",
     parishLatLon: [30.2752, -98.8720],
-    iconSlug: 'el-jabon',
+    iconSlug: 'la-conserva',
     offering: {
       en: 'Hot-process soap making — real soap from tallow, lye, and herbs.',
       es: 'El jabón de proceso en caliente — jabón de verdad, con sebo, lejía, y yerbas.',
@@ -216,7 +216,7 @@ export const members: Member[] = [
     name: 'Paul Eagan',
     parish: 'St. Anthony de Padua, San Antonio',
     parishLatLon: [29.4246, -98.4936],
-    iconSlug: 'las-yerbas',
+    iconSlug: 'la-conserva',
     offering: {
       en: "I'm new to homesteading — coffee roasting and raw kefir are what I have.",
       es: 'Soy nuevo en esto del rancho — el tostado de café y el kéfir crudo es lo que tengo.',

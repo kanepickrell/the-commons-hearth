@@ -71,7 +71,7 @@ export const witnessPosts: WitnessPost[] = [
     id: 'wt-006',
     workshopId: 'wk-past-006',
     hostId: 'm-001', // María Elena
-    iconSlug: 'la-milpa',
+    iconSlug: 'las-yerbas',
     date: '2026-02-21T00:00:00-05:00',
     body: {
       en: 'Soil prep day in Boerne. Seven of us turned two new beds and talked through what each family is planting this year.',

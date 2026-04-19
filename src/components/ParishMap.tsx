@@ -33,9 +33,9 @@ const groupParishes = (): ParishCluster[] => {
 
 const buildWorkshopIcon = (slug: keyof typeof iconMap) => {
   const meta = iconMap[slug];
-  const initials = meta.name.es.replace(/^(La |El |Las |Los )/, '').slice(0, 2).toUpperCase();
   // Map pins need a visual container so they read on top of map tiles.
   // Quiet cream disc with a mesquite hairline, icon centered inside.
+  // The icon inherits mesquite ink via `color` on the wrapper.
   const html = `
     <div style="
       width: 40px; height: 40px;
@@ -44,14 +44,13 @@ const buildWorkshopIcon = (slug: keyof typeof iconMap) => {
       border: 1px solid hsl(92 24% 25% / 0.4);
       border-radius: 9999px;
       box-shadow: 0 1px 2px rgba(62,79,47,0.18);
-      font-family: 'Marcellus SC', serif;
       color: hsl(92 24% 25%);
-      font-size: 10px;
-      letter-spacing: 0.05em;
       position: relative;
       overflow: hidden;
     ">
-      <img src="${meta.src}" alt="" style="width:32px;height:32px;object-fit:contain;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${initials}'}))"/>
+      <span style="display:inline-block;width:28px;height:28px;line-height:0;">
+        ${meta.svg}
+      </span>
     </div>`;
   return L.divIcon({
     html,

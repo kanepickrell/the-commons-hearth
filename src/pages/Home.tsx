@@ -16,7 +16,7 @@ const Home = () => {
   const charisms = [
     {
       label: s.sowerCharism,
-      slug: 'la-milpa' as const,
+      slug: 'las-yerbas' as const,
       blurb: {
         en: 'We teach what we know — in fields, kitchens, and workshops.',
         es: 'Enseñamos lo que sabemos — en el campo, la cocina, y el taller.',
@@ -40,7 +40,7 @@ const Home = () => {
     },
     {
       label: s.monstranceCharism,
-      slug: 'las-yerbas' as const,
+      slug: 'las-abejas' as const,
       blurb: {
         en: 'We offer the work back to the God who gave it.',
         es: 'Ofrecemos el trabajo al Dios que nos lo ha dado.',

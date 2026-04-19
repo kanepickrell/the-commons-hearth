@@ -4,7 +4,6 @@
 export type Bilingual = { en: string; es: string };
 
 export type IconSlug =
-  | 'la-milpa'
   | 'las-abejas'
   | 'la-gallina'
   | 'el-pan'
@@ -12,7 +11,6 @@ export type IconSlug =
   | 'la-cisterna'
   | 'la-azuela'
   | 'el-telar'
-  | 'el-jabon'
   | 'las-yerbas';
 
 export type Member = {
