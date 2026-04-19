@@ -34,31 +34,31 @@ const groupParishes = (): ParishCluster[] => {
 const buildWorkshopIcon = (slug: keyof typeof iconMap) => {
   const meta = iconMap[slug];
   const initials = meta.name.es.replace(/^(La |El |Las |Los )/, '').slice(0, 2).toUpperCase();
-  // HTML icon — uses the placeholder PNG with a typographic fallback baked in.
+  // Map pins need a visual container so they read on top of map tiles.
+  // Quiet cream disc with a mesquite hairline, icon centered inside.
   const html = `
     <div style="
-      width: 38px; height: 38px;
+      width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
       background: hsl(42 47% 92%);
-      border: 1.5px solid hsl(32 56% 51%);
+      border: 1px solid hsl(92 24% 25% / 0.4);
       border-radius: 9999px;
-      box-shadow: 0 1px 3px rgba(62,79,47,0.25);
+      box-shadow: 0 1px 2px rgba(62,79,47,0.18);
       font-family: 'Marcellus SC', serif;
       color: hsl(92 24% 25%);
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.05em;
       position: relative;
       overflow: hidden;
     ">
-      <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">${initials}</span>
-      <img src="${meta.src}" alt="" style="position:relative;width:30px;height:30px;object-fit:contain;" onerror="this.style.visibility='hidden'"/>
+      <img src="${meta.src}" alt="" style="width:32px;height:32px;object-fit:contain;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${initials}'}))"/>
     </div>`;
   return L.divIcon({
     html,
     className: 'clm-workshop-pin',
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
-    popupAnchor: [0, -16],
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -18],
   });
 };
 

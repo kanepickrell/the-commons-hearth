@@ -99,6 +99,12 @@ export const uiStrings = {
       es: 'Oh Dios, por la intercesión de San Isidro labrador, concédenos vencer todo sentimiento de soberbia, y servirte siempre con esa humildad que te agrada, por sus méritos y ejemplo. Amén.',
     },
   },
+  eyebrow: {
+    chapter:         { en: 'CENTRAL TEXAS CHAPTER', es: 'CAPÍTULO DEL CENTRO DE TEJAS' },
+    foundingMembers: { en: 'FOUNDING MEMBERS',      es: 'MIEMBROS FUNDADORES' },
+    theWorkshop:     { en: 'THE WORKSHOP',          es: 'EL TALLER' },
+    theWitness:      { en: 'THE WITNESS',           es: 'EL TESTIMONIO' },
+  },
   common: {
     backToOfrendas: { en: '← All offerings', es: '← Todas las ofrendas' },
     backToTalleres: { en: '← All workshops', es: '← Todos los talleres' },

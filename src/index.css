@@ -105,9 +105,19 @@
   font-family: 'Gentium Plus', Georgia, serif;
   background: hsl(var(--cal));
 }
-/* Sepia tile feel without external tile server */
+/* Gentle sepia tile feel — warm enough to sit in the palette, still readable */
 .leaflet-tile-pane {
-  filter: sepia(0.55) saturate(0.7) brightness(0.97) contrast(0.95) hue-rotate(-8deg);
+  filter: sepia(0.35) saturate(0.8) brightness(0.98) contrast(0.95);
+}
+/* Leaflet popup styling — match the chapter palette */
+.leaflet-popup-content-wrapper {
+  background: hsl(var(--cal));
+  border: 1px solid hsl(var(--mesquite) / 0.2);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(62, 79, 47, 0.15);
+}
+.leaflet-popup-tip {
+  background: hsl(var(--cal));
 }
 
 @layer utilities {
