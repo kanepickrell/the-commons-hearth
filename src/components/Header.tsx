@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath, switchLocalePath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
+import { AuthButton } from '@/components/AuthButton';
 
 export const Header = () => {
   const { locale, setLocale, t } = useLocale();
@@ -48,24 +49,28 @@ export const Header = () => {
           })}
         </nav>
 
-        <div className="font-caps text-sm tracking-wider">
-          <button
-            onClick={() => onToggle('en')}
-            className={`transition-colors ${locale === 'en' ? 'text-ocre' : 'text-mesquite/60 hover:text-mesquite'}`}
-            aria-pressed={locale === 'en'}
-            aria-label="English"
-          >
-            EN
-          </button>
-          <span className="mx-2 text-mesquite/40">|</span>
-          <button
-            onClick={() => onToggle('es')}
-            className={`transition-colors ${locale === 'es' ? 'text-ocre' : 'text-mesquite/60 hover:text-mesquite'}`}
-            aria-pressed={locale === 'es'}
-            aria-label="Español"
-          >
-            ES
-          </button>
+        <div className="flex items-center gap-4">
+          <AuthButton />
+
+          <div className="font-caps text-sm tracking-wider">
+            <button
+              onClick={() => onToggle('en')}
+              className={`transition-colors ${locale === 'en' ? 'text-ocre' : 'text-mesquite/60 hover:text-mesquite'}`}
+              aria-pressed={locale === 'en'}
+              aria-label="English"
+            >
+              EN
+            </button>
+            <span className="mx-2 text-mesquite/40">|</span>
+            <button
+              onClick={() => onToggle('es')}
+              className={`transition-colors ${locale === 'es' ? 'text-ocre' : 'text-mesquite/60 hover:text-mesquite'}`}
+              aria-pressed={locale === 'es'}
+              aria-label="Español"
+            >
+              ES
+            </button>
+          </div>
         </div>
       </div>
     </header>

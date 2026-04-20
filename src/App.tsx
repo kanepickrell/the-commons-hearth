@@ -13,6 +13,8 @@ import TallerDetail from "./pages/TallerDetail.tsx";
 import Testimonio from "./pages/Testimonio.tsx";
 import Santo from "./pages/Santo.tsx";
 import Bienvenido from "./pages/Bienvenido.tsx";
+import MiPerfil from "./pages/MiPerfil.tsx";
+import Mayordomo from "./pages/Mayordomo.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -46,6 +48,12 @@ const App = () => (
 
             <Route path={routes.bienvenido.es} element={<Bienvenido />} />
             <Route path={routes.bienvenido.en} element={<Bienvenido />} />
+
+            <Route path={routes.miPerfil.es} element={<MiPerfil />} />
+            <Route path={routes.miPerfil.en} element={<MiPerfil />} />
+
+            <Route path={routes.mayordomo.es} element={<Mayordomo />} />
+            <Route path={routes.mayordomo.en} element={<Mayordomo />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -12,7 +12,9 @@ export type RouteKey =
   | 'tallerDetail'
   | 'testimonio'
   | 'santo'
-  | 'bienvenido';
+  | 'bienvenido'
+  | 'miPerfil'
+  | 'mayordomo';
 
 export const routes: Record<RouteKey, { en: string; es: string }> = {
   home:          { en: '/',                   es: '/' },
@@ -23,6 +25,8 @@ export const routes: Record<RouteKey, { en: string; es: string }> = {
   testimonio:    { en: '/witness',            es: '/testimonio' },
   santo:         { en: '/patron',             es: '/santo' },
   bienvenido:    { en: '/welcome',            es: '/bienvenido' },
+  miPerfil:      { en: '/my-profile',         es: '/mi-perfil' },
+  mayordomo:     { en: '/stewardship',        es: '/mayordomo' },
 };
 
 export const buildPath = (key: RouteKey, locale: Locale, params: Record<string, string> = {}) => {

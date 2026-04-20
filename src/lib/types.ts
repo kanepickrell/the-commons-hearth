@@ -36,6 +36,30 @@ export type Workshop = {
   rsvpCount: number;
 };
 
+/**
+ * A concrete, countable output of a gathering. The count is the number;
+ * the unit is bilingual prose like "jars of jelly" / "frascos de jalea".
+ * Both `fruit.count` and the `count` value referenced in prose should
+ * agree — the Year Wheel will render the number on the rim.
+ */
+export type Fruit = {
+  count: number;
+  unit: Bilingual;
+};
+
+/**
+ * A skill-replication edge: person B learned this skill from person A at
+ * an earlier witness post, and taught it onward here. Presence of this
+ * field on a post means "this gathering replicated a skill" — the single
+ * most important event for a distributist chapter to record.
+ */
+export type Replicated = {
+  fromMemberId: string;
+  toMemberId: string;
+  skill: Bilingual;
+  learnedAtPostId: string;
+};
+
 export type WitnessPost = {
   id: string;
   workshopId: string;
@@ -44,6 +68,9 @@ export type WitnessPost = {
   body: Bilingual;
   photoUrl?: string;
   iconSlug: IconSlug;
+  fruit: Fruit;
+  replicated?: Replicated;
+  planned?: boolean;
 };
 
 export type Locale = 'en' | 'es';

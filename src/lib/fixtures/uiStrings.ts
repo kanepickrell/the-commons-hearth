@@ -16,9 +16,6 @@ export const uiStrings = {
     tagline: {
       en: 'Ordinary Catholic households, becoming producers — together, in Central Texas.',
       es: 'Familias católicas comunes, haciéndose productoras — juntas, en el centro de Tejas.',
-      // REVIEW: "Tejas" vs "Texas" — Tejano Spanish uses both. "Tejas" is the
-      // older Spanish-colonial form and fits this chapter's register. Reviewer
-      // should confirm.
     },
     sowerCharism:     { en: 'The Sower — Education',         es: 'El Sembrador — La Educación' },
     communityCharism: { en: 'The Community — Fellowship',    es: 'La Comunidad — La Hermandad' },
@@ -67,7 +64,30 @@ export const uiStrings = {
     upcoming:  { en: 'Upcoming gatherings', es: 'Próximas reuniones' },
   },
   witness: {
-    heading: { en: 'The Witness — what we have done together', es: 'El Testimonio — lo que hemos hecho juntos' },
+    eyebrow:   { en: 'THE WITNESS · A.D. 2026',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR 2026' },
+    heading:   { en: 'The year, as the chapter has lived it', es: 'El año, tal como el capítulo lo ha vivido' },
+    subhead:   { en: 'a wheel of months — click any wedge to look closer',
+                 es: 'una rueda de meses — toca cualquier sección para ver más' },
+    statGatherings:  { en: 'gatherings',  es: 'reuniones' },
+    statHosts:       { en: 'hosts',       es: 'anfitriones' },
+    statNeighbors:   { en: 'neighbors',   es: 'vecinos' },
+    statReplicated:  { en: 'replicated',  es: 'replicadas' },
+    viewingLabel:    { en: 'viewing',     es: 'mirando' },
+    metricGatherings:{ en: 'GATHERINGS',  es: 'REUNIONES' },
+    metricHeld:      { en: 'HELD + PLANNED', es: 'REALIZADAS + PLANEADAS' },
+    metricNeighbors: { en: 'NEIGHBORS',   es: 'VECINOS' },
+    metricHosts:     { en: 'HOSTS',       es: 'ANFITRIONES' },
+    feastLabel:      { en: 'FEAST',       es: 'FIESTA' },
+    replicatedLabel: { en: 'SKILL REPLICATED', es: 'HABILIDAD REPLICADA' },
+    plannedTag:      { en: 'PLANNED',     es: 'PLANEADO' },
+    emptyMonth:      { en: 'A quiet month is not a failed month.\nThe land has its seasons; so do we.',
+                       es: 'Un mes en silencio no es un mes fallido.\nLa tierra tiene sus estaciones; también nosotros.' },
+    hubLabel:        { en: 'YEAR OF OUR LORD', es: 'AÑO DEL SEÑOR' },
+    hubYear:         { en: '2026',        es: '2026' },
+    promptMetricGatherings: { en: 'Show me all the gatherings in',  es: 'Muéstrame todas las reuniones de' },
+    promptMetricNeighbors:  { en: 'Who came to the gatherings in',  es: '¿Quiénes vinieron a las reuniones de' },
+    promptMetricHosts:      { en: 'Which members hosted in',        es: '¿Qué miembros ofrecieron reuniones en' },
+    promptGathering:        { en: 'Tell me more about the gathering on', es: 'Cuéntame más sobre la reunión del' },
   },
   ofrendas: {
     heading:    { en: 'The Offering — our founding members', es: 'La Ofrenda — nuestros miembros fundadores' },
@@ -110,6 +130,22 @@ export const uiStrings = {
     backToTalleres: { en: '← All workshops', es: '← Todos los talleres' },
     members:        { en: 'members',         es: 'miembros' },
     member:         { en: 'member',          es: 'miembro' },
+  },
+  auth: {
+    signIn:         { en: 'Sign in',    es: 'Entrar' },
+    signOut:        { en: 'Sign out',   es: 'Salir' },
+    myProfile:      { en: 'My profile', es: 'Mi perfil' },
+    stewardship:    { en: 'Stewardship', es: 'Mayordomía' },
+    adminBadge:     { en: 'admin',      es: 'admin' },
+    memberFallback: { en: 'Member',     es: 'Miembro' },
+    pendingNotice:  { en: 'Your profile is awaiting approval.',
+                      es: 'Tu perfil espera aprobación.' },
+  },
+  months: {
+    es: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+    en: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    esShort: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+    enShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
   },
 };
 
