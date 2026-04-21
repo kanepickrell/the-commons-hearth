@@ -1,13 +1,13 @@
 // Bilingual route slugs. Both locale paths route to the same component.
-// Example: /ofrendas (es) and /offerings (en) both render the Ofrendas page.
-// The active language toggle just rewrites the URL via routesFor().
+// Example: /talleres (es) and /workshops (en) both render the Talleres page.
+// The active language toggle just rewrites the URL via switchLocalePath().
 
 import type { Locale } from '@/lib/types';
 
 export type RouteKey =
   | 'home'
-  | 'ofrendas'
-  | 'ofrendaDetail'
+  | 'vision'
+  | 'memberDetail'
   | 'talleres'
   | 'tallerDetail'
   | 'testimonio'
@@ -17,16 +17,16 @@ export type RouteKey =
   | 'mayordomo';
 
 export const routes: Record<RouteKey, { en: string; es: string }> = {
-  home:          { en: '/',                   es: '/' },
-  ofrendas:      { en: '/offerings',          es: '/ofrendas' },
-  ofrendaDetail: { en: '/offerings/:id',      es: '/ofrendas/:id' },
-  talleres:      { en: '/workshops',          es: '/talleres' },
-  tallerDetail:  { en: '/workshops/:id',      es: '/talleres/:id' },
-  testimonio:    { en: '/witness',            es: '/testimonio' },
-  santo:         { en: '/patron',             es: '/santo' },
-  bienvenido:    { en: '/welcome',            es: '/bienvenido' },
-  miPerfil:      { en: '/my-profile',         es: '/mi-perfil' },
-  mayordomo:     { en: '/stewardship',        es: '/mayordomo' },
+  home:          { en: '/',                es: '/' },
+  vision:        { en: '/vision',          es: '/vision' },
+  memberDetail:  { en: '/members/:id',     es: '/miembros/:id' },
+  talleres:      { en: '/workshops',       es: '/talleres' },
+  tallerDetail:  { en: '/workshops/:id',   es: '/talleres/:id' },
+  testimonio:    { en: '/witness',         es: '/testimonio' },
+  santo:         { en: '/patron',          es: '/santo' },
+  bienvenido:    { en: '/welcome',         es: '/bienvenido' },
+  miPerfil:      { en: '/my-profile',      es: '/mi-perfil' },
+  mayordomo:     { en: '/stewardship',     es: '/mayordomo' },
 };
 
 export const buildPath = (key: RouteKey, locale: Locale, params: Record<string, string> = {}) => {

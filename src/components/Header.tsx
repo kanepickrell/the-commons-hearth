@@ -10,7 +10,7 @@ export const Header = () => {
   const s = uiStrings.nav;
 
   const links = [
-    { to: buildPath('ofrendas',   locale), label: t(s.offerings) },
+    { to: buildPath('vision',     locale), label: t(s.vision) },
     { to: buildPath('talleres',   locale), label: t(s.workshops) },
     { to: buildPath('testimonio', locale), label: t(s.witness) },
     { to: buildPath('santo',      locale), label: t(s.patron) },
@@ -19,7 +19,6 @@ export const Header = () => {
   const onToggle = (next: 'en' | 'es') => {
     if (next === locale) return;
     setLocale(next);
-    // Rewrite the path so /ofrendas <-> /offerings stay in sync.
     const nextPath = switchLocalePath(pathname, next);
     if (nextPath !== pathname) {
       window.history.replaceState(null, '', nextPath);

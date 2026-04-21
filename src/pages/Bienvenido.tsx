@@ -1,20 +1,20 @@
 // src/pages/Bienvenido.tsx
-// Four-step onboarding wizard. Runs after first sign-in.
+// Six-step onboarding wizard. Runs after first sign-in, or whenever the
+// user re-enters via ?redo=1 to update their answers.
 //
 // Steps:
-//   1. Welcome card
-//   2. Display name + parish picker (required)
-//   3. Bio — "¿Qué ha puesto Dios en tus manos?" (required)
-//   4. Expertise badges — 8-craft grid (optional)
+//   0. Welcome card
+//   1. Display name + parish picker (required)
+//   2. Bio — "¿Qué ha puesto Dios en tus manos?" (required)
+//   3. Building — what am I working on right now? (optional)
+//   4. Learning — what do I want a teacher for? (optional)
+//   5. Expertise badges — 8-craft grid (optional)
 //
 // On completion, writes:
-//   - UPDATE profiles SET display_name, parish_id, bio, bio_language
-//   - DELETE expertise for this profile_id (so redo removes unchecks)
-//   - INSERT expertise rows for each currently-selected craft
+//   - UPDATE profiles SET display_name, parish_id, bio, bio_language,
+//     working_on, wants_to_learn
+//   - DELETE expertise for this profile_id, then INSERT current selections
 // Then redirects to /mi-perfil.
-//
-// A `?redo=1` query param lets the user explicitly re-enter the wizard
-// from MiPerfil without being bounced back by the completion guard.
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -39,11 +39,11 @@ const CRAFTS_V1: { slug: CraftSlug; iconPath: string; en: string; es: string }[]
   { slug: 'las-yerbas',  iconPath: '/src/assets/icons/las-yerbas.svg',  en: 'Herbs',      es: 'Las Yerbas' },
 ];
 
-// Simple case-insensitive, diacritic-insensitive match.
-// Members type "guadalupe" and should find "Our Lady of Guadalupe".
 function normalize(s: string): string {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
+
+const TOTAL_STEPS = 6;
 
 export default function Bienvenido() {
   const { user, profile, loading: authLoading, refreshProfile } = useAuth();
@@ -63,6 +63,8 @@ export default function Bienvenido() {
   const parishBoxRef = useRef<HTMLDivElement>(null);
 
   const [bio, setBio] = useState('');
+  const [workingOn, setWorkingOn] = useState('');
+  const [wantsToLearn, setWantsToLearn] = useState('');
   const [crafts, setCrafts] = useState<Set<CraftSlug>>(new Set());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,14 +72,13 @@ export default function Bienvenido() {
   const s = uiStrings.onboarding;
   const nav = uiStrings.nav;
 
-  // Guard: if not signed in, send home
   useEffect(() => {
     if (!authLoading && !user) {
       navigate(buildPath('home', locale));
     }
   }, [authLoading, user, navigate, locale]);
 
-  // Guard: if already completed, jump to profile — unless explicit redo
+  // If already onboarded and not explicitly redoing, jump to profile
   useEffect(() => {
     if (isRedo) return;
     if (!authLoading && profile && profile.parish_id && profile.bio) {
@@ -85,12 +86,14 @@ export default function Bienvenido() {
     }
   }, [authLoading, profile, navigate, locale, isRedo]);
 
-  // Pre-fill form with existing profile data
+  // Pre-fill from existing profile
   useEffect(() => {
     if (profile) {
       if (profile.display_name) setDisplayName(profile.display_name);
       if (profile.parish_id) setParishId(profile.parish_id);
       if (profile.bio) setBio(profile.bio);
+      if (profile.working_on) setWorkingOn(profile.working_on);
+      if (profile.wants_to_learn) setWantsToLearn(profile.wants_to_learn);
     }
   }, [profile]);
 
@@ -114,7 +117,7 @@ export default function Bienvenido() {
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // On redo, pre-select existing expertise
+  // Pre-select existing expertise on redo
   useEffect(() => {
     if (!isRedo || !user) return;
     (async () => {
@@ -174,6 +177,8 @@ export default function Bienvenido() {
 
     try {
       const trimmedBio = bio.trim();
+      const trimmedWorking = workingOn.trim();
+      const trimmedLearning = wantsToLearn.trim();
 
       const { error: profileErr } = await supabase
         .from('profiles')
@@ -182,12 +187,13 @@ export default function Bienvenido() {
           parish_id: parishId || null,
           bio: trimmedBio || null,
           bio_language: trimmedBio ? locale : null,
+          working_on: trimmedWorking || null,
+          wants_to_learn: trimmedLearning || null,
         })
         .eq('id', user.id);
 
       if (profileErr) throw profileErr;
 
-      // Replace expertise wholesale so unchecking removes rows.
       const { error: delErr } = await supabase
         .from('expertise')
         .delete()
@@ -207,7 +213,6 @@ export default function Bienvenido() {
       navigate(buildPath('miPerfil', locale));
     } catch (e) {
       console.error('Onboarding save failed:', e);
-      // Supabase errors are plain objects, not Error instances. Handle both.
       const message =
         e instanceof Error
           ? e.message
@@ -242,7 +247,7 @@ export default function Bienvenido() {
       <div className="container-narrow py-12 md:py-16">
         {/* Progress dots */}
         <div className="mb-8 flex items-center justify-center gap-3">
-          {[0, 1, 2, 3].map((i) => (
+          {Array.from({ length: TOTAL_STEPS }, (_, i) => (
             <span
               key={i}
               className={`h-2 w-2 rounded-full transition-colors ${
@@ -264,7 +269,7 @@ export default function Bienvenido() {
             </p>
             <h1 className="mb-6 font-heading text-4xl text-mesquite md:text-5xl">
               {isRedo
-                ? t({ en: 'Update your offering', es: 'Actualiza tu ofrenda' })
+                ? t({ en: 'Update your profile', es: 'Actualiza tu perfil' })
                 : t({ en: 'Welcome to the Commons', es: 'Bienvenido al Commons' })}
             </h1>
             <p className="mx-auto mb-10 max-w-xl font-serif text-lg leading-relaxed text-mesquite/80">
@@ -274,8 +279,8 @@ export default function Bienvenido() {
                     es: 'Edita lo que quieras. Rellenamos tus respuestas anteriores.',
                   })
                 : t({
-                    en: 'Three questions. They will help your neighbors find you, and you find them.',
-                    es: 'Tres preguntas. Te ayudarán a encontrar a tus vecinos, y a ellos a encontrarte.',
+                    en: 'A few questions. They will help your neighbors find you, and you find them.',
+                    es: 'Unas preguntas. Te ayudarán a encontrar a tus vecinos, y a ellos a encontrarte.',
                   })}
             </p>
             <button
@@ -321,7 +326,6 @@ export default function Bienvenido() {
                 {t(s.q3Help)}
               </p>
 
-              {/* Selected parish chip */}
               {selectedParish && !parishOpen && (
                 <div className="flex items-center justify-between rounded-sm border border-mesquite/30 bg-cal/50 px-3 py-2.5 font-serif text-lg text-mesquite">
                   <span>
@@ -342,7 +346,6 @@ export default function Bienvenido() {
                 </div>
               )}
 
-              {/* Search input + filtered results */}
               {(!selectedParish || parishOpen) && (
                 <div className="relative">
                   <input
@@ -391,19 +394,8 @@ export default function Bienvenido() {
             </div>
 
             <div className="flex items-center justify-between">
-              <button
-                onClick={() => setStep(0)}
-                className="font-serif text-sm text-mesquite/60 transition hover:text-mesquite"
-              >
-                ← {t({ en: 'Back', es: 'Atrás' })}
-              </button>
-              <button
-                onClick={() => setStep(2)}
-                disabled={!canAdvanceFromStep1}
-                className="inline-flex items-center gap-2 rounded-sm bg-ocre px-6 py-2.5 font-heading text-base text-cal transition hover:bg-mesquite disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {t(s.continue)}
-              </button>
+              <BackBtn onClick={() => setStep(0)} t={t} />
+              <NextBtn onClick={() => setStep(2)} disabled={!canAdvanceFromStep1} label={t(s.continue)} />
             </div>
           </div>
         )}
@@ -434,34 +426,84 @@ export default function Bienvenido() {
             </p>
 
             <div className="mt-8 flex items-center justify-between">
-              <button
-                onClick={() => setStep(1)}
-                className="font-serif text-sm text-mesquite/60 transition hover:text-mesquite"
-              >
-                ← {t({ en: 'Back', es: 'Atrás' })}
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                disabled={!canAdvanceFromStep2}
-                className="inline-flex items-center gap-2 rounded-sm bg-ocre px-6 py-2.5 font-heading text-base text-cal transition hover:bg-mesquite disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {t(s.continue)}
-              </button>
+              <BackBtn onClick={() => setStep(1)} t={t} />
+              <NextBtn onClick={() => setStep(3)} disabled={!canAdvanceFromStep2} label={t(s.continue)} />
             </div>
           </div>
         )}
 
-        {/* Step 3 — Crafts */}
+        {/* Step 3 — Building (working_on) */}
         {step === 3 && (
+          <div className="mx-auto max-w-xl">
+            <h2 className="mb-4 font-heading text-2xl text-mesquite md:text-3xl">
+              {t(s.qBuilding)}
+            </h2>
+            <p className="mb-6 font-serif text-base italic text-mesquite/70">
+              {t(s.qBuildingHelp)}
+            </p>
+
+            <textarea
+              value={workingOn}
+              onChange={(e) => setWorkingOn(e.target.value)}
+              rows={4}
+              className="w-full rounded-sm border border-mesquite/20 bg-cal/50 p-4 font-serif text-base leading-relaxed text-mesquite focus:border-mesquite focus:bg-cal focus:outline-none"
+              placeholder={t({
+                en: 'e.g. Splitting a strong hive this spring and mending a run of broken fence.',
+                es: 'ej. Dividiendo una colmena fuerte esta primavera y arreglando una cerca rota.',
+              })}
+            />
+
+            <p className="mt-2 font-serif text-xs italic text-mesquite/50">
+              {t({ en: 'Optional — leave blank if you want.', es: 'Opcional — déjalo en blanco si quieres.' })}
+            </p>
+
+            <div className="mt-8 flex items-center justify-between">
+              <BackBtn onClick={() => setStep(2)} t={t} />
+              <NextBtn onClick={() => setStep(4)} label={t(s.continue)} />
+            </div>
+          </div>
+        )}
+
+        {/* Step 4 — Learning (wants_to_learn) */}
+        {step === 4 && (
+          <div className="mx-auto max-w-xl">
+            <h2 className="mb-4 font-heading text-2xl text-mesquite md:text-3xl">
+              {t(s.qLearning)}
+            </h2>
+            <p className="mb-6 font-serif text-base italic text-mesquite/70">
+              {t(s.qLearningHelp)}
+            </p>
+
+            <textarea
+              value={wantsToLearn}
+              onChange={(e) => setWantsToLearn(e.target.value)}
+              rows={4}
+              className="w-full rounded-sm border border-mesquite/20 bg-cal/50 p-4 font-serif text-base leading-relaxed text-mesquite focus:border-mesquite focus:bg-cal focus:outline-none"
+              placeholder={t({
+                en: 'e.g. How to preserve this summer\u2019s tomatoes. Scratch sourdough.',
+                es: 'ej. Cómo conservar los tomates del verano. Masa madre desde cero.',
+              })}
+            />
+
+            <p className="mt-2 font-serif text-xs italic text-mesquite/50">
+              {t({ en: 'Optional — leave blank if you want.', es: 'Opcional — déjalo en blanco si quieres.' })}
+            </p>
+
+            <div className="mt-8 flex items-center justify-between">
+              <BackBtn onClick={() => setStep(3)} t={t} />
+              <NextBtn onClick={() => setStep(5)} label={t(s.continue)} />
+            </div>
+          </div>
+        )}
+
+        {/* Step 5 — Crafts */}
+        {step === 5 && (
           <div className="mx-auto max-w-2xl">
             <h2 className="mb-4 font-heading text-2xl text-mesquite md:text-3xl">
-              {t({ en: 'Your crafts', es: 'Tus oficios' })}
+              {t(s.qCraftsHeading)}
             </h2>
             <p className="mb-8 font-serif text-base italic text-mesquite/70">
-              {t({
-                en: 'Tap any skill you can teach. Leave them all unlit — you can add them later.',
-                es: 'Toca cualquier oficio que puedas enseñar. Puedes dejarlos todos apagados y agregarlos después.',
-              })}
+              {t(s.qCraftsHelp)}
             </p>
 
             <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -498,13 +540,7 @@ export default function Bienvenido() {
             )}
 
             <div className="flex items-center justify-between">
-              <button
-                onClick={() => setStep(2)}
-                className="font-serif text-sm text-mesquite/60 transition hover:text-mesquite"
-                disabled={saving}
-              >
-                ← {t({ en: 'Back', es: 'Atrás' })}
-              </button>
+              <BackBtn onClick={() => setStep(4)} t={t} disabled={saving} />
               <button
                 onClick={finish}
                 disabled={saving}
@@ -519,5 +555,30 @@ export default function Bienvenido() {
         )}
       </div>
     </Layout>
+  );
+}
+
+// Small helpers for the nav buttons — keeps the main flow readable
+function BackBtn({ onClick, t, disabled }: { onClick: () => void; t: (b: { en: string; es: string }) => string; disabled?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="font-serif text-sm text-mesquite/60 transition hover:text-mesquite disabled:opacity-40"
+    >
+      ← {t({ en: 'Back', es: 'Atrás' })}
+    </button>
+  );
+}
+
+function NextBtn({ onClick, label, disabled }: { onClick: () => void; label: string; disabled?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="inline-flex items-center gap-2 rounded-sm bg-ocre px-6 py-2.5 font-heading text-base text-cal transition hover:bg-mesquite disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {label}
+    </button>
   );
 }

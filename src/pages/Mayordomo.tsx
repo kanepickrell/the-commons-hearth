@@ -6,6 +6,7 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { toast } from '@/hooks/use-toast';
 import { Layout } from '@/components/Layout';
+import { ParishPocPanel } from '@/components/admin/ParishPocPanel';
 import type { Database } from '@/lib/database.types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -104,85 +105,97 @@ export default function Mayordomo() {
 
   return (
     <Layout>
-      <div className="container-wide py-12 md:py-16">
-        <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
-          {t({ en: 'STEWARDSHIP', es: 'MAYORDOMÍA' })}
-        </p>
+      <div className="container-wide py-12 md:py-16 space-y-16">
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 1: Pending approvals */}
+        {/* ------------------------------------------------------------------ */}
+        <section>
+          <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
+            {t({ en: 'STEWARDSHIP', es: 'MAYORDOMÍA' })}
+          </p>
 
-        <h1 className="mb-2 font-heading text-4xl text-mesquite md:text-5xl">
-          {t({ en: 'Pending approvals', es: 'Aprobaciones pendientes' })}
-        </h1>
+          <h1 className="mb-2 font-heading text-4xl text-mesquite md:text-5xl">
+            {t({ en: 'Pending approvals', es: 'Aprobaciones pendientes' })}
+          </h1>
 
-        <p className="mb-10 font-serif text-lg italic text-mesquite/70">
-          {t({
-            en: 'New members awaiting a steward\u2019s blessing.',
-            es: 'Nuevos miembros esperando la bendición del mayordomo.',
-          })}
-        </p>
-
-        {pending.length === 0 ? (
-          <div className="rounded-sm border border-mesquite/15 bg-cal/40 p-8 text-center">
-            <p className="font-serif text-lg italic text-mesquite/60">
-              {t({ en: 'Nothing waiting.', es: 'Nada pendiente.' })}
-            </p>
-          </div>
-        ) : (
-          <ul className="space-y-6">
-            {pending.map((p) => {
-              const currentAction = acting[p.id];
-              const busy = !!currentAction;
-              return (
-                <li key={p.id} className="rounded-sm border border-mesquite/20 bg-cal/60 p-6">
-                  <div className="mb-3 flex items-baseline justify-between gap-4">
-                    <h2 className="font-heading text-2xl text-mesquite">
-                      {p.display_name ?? t({ en: '(no name)', es: '(sin nombre)' })}
-                    </h2>
-                    <span className="font-mono text-xs text-mesquite/40">
-                      {new Date(p.created_at).toLocaleDateString(
-                        locale === 'es' ? 'es-MX' : 'en-US',
-                        { month: 'short', day: 'numeric', year: 'numeric' }
-                      )}
-                    </span>
-                  </div>
-
-                  {p.parish && (
-                    <p className="mb-3 font-serif text-sm italic text-mesquite/70">
-                      {p.parish.name}
-                      {p.parish.city ? ` · ${p.parish.city}` : ''}
-                    </p>
-                  )}
-
-                  {p.bio && (
-                    <p className="mb-5 whitespace-pre-wrap font-serif text-base leading-relaxed text-mesquite">
-                      {p.bio}
-                    </p>
-                  )}
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => act(p.id, 'approve')}
-                      disabled={busy}
-                      className="inline-flex items-center gap-2 rounded-sm bg-ocre px-5 py-2 font-heading text-sm text-cal transition hover:bg-mesquite disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {currentAction === 'approve'
-                        ? t({ en: 'Approving…', es: 'Aprobando…' })
-                        : t({ en: 'Approve', es: 'Aprobar' })}
-                    </button>
-                    <button
-                      onClick={() => act(p.id, 'reject')}
-                      disabled={busy}
-                      className="inline-flex items-center gap-2 rounded-sm border border-mesquite/30 px-5 py-2 font-heading text-sm text-mesquite transition hover:border-rojo hover:text-rojo disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {currentAction === 'reject'
-                        ? t({ en: 'Rejecting…', es: 'Rechazando…' })
-                        : t({ en: 'Reject', es: 'Rechazar' })}
-                    </button>
-                  </div>
-                </li>
-              );
+          <p className="mb-10 font-serif text-lg italic text-mesquite/70">
+            {t({
+              en: 'New members awaiting a steward\u2019s blessing.',
+              es: 'Nuevos miembros esperando la bendición del mayordomo.',
             })}
-          </ul>
-        )}
+          </p>
+
+          {pending.length === 0 ? (
+            <div className="rounded-sm border border-mesquite/15 bg-cal/40 p-8 text-center">
+              <p className="font-serif text-lg italic text-mesquite/60">
+                {t({ en: 'Nothing waiting.', es: 'Nada pendiente.' })}
+              </p>
+            </div>
+          ) : (
+            <ul className="space-y-6">
+              {pending.map((p) => {
+                const currentAction = acting[p.id];
+                const busy = !!currentAction;
+                return (
+                  <li key={p.id} className="rounded-sm border border-mesquite/20 bg-cal/60 p-6">
+                    <div className="mb-3 flex items-baseline justify-between gap-4">
+                      <h2 className="font-heading text-2xl text-mesquite">
+                        {p.display_name ?? t({ en: '(no name)', es: '(sin nombre)' })}
+                      </h2>
+                      <span className="font-mono text-xs text-mesquite/40">
+                        {new Date(p.created_at).toLocaleDateString(
+                          locale === 'es' ? 'es-MX' : 'en-US',
+                          { month: 'short', day: 'numeric', year: 'numeric' }
+                        )}
+                      </span>
+                    </div>
+
+                    {p.parish && (
+                      <p className="mb-3 font-serif text-sm italic text-mesquite/70">
+                        {p.parish.name}
+                        {p.parish.city ? ` · ${p.parish.city}` : ''}
+                      </p>
+                    )}
+
+                    {p.bio && (
+                      <p className="mb-5 whitespace-pre-wrap font-serif text-base leading-relaxed text-mesquite">
+                        {p.bio}
+                      </p>
+                    )}
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => act(p.id, 'approve')}
+                        disabled={busy}
+                        className="inline-flex items-center gap-2 rounded-sm bg-ocre px-5 py-2 font-heading text-sm text-cal transition hover:bg-mesquite disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {currentAction === 'approve'
+                          ? t({ en: 'Approving…', es: 'Aprobando…' })
+                          : t({ en: 'Approve', es: 'Aprobar' })}
+                      </button>
+                      <button
+                        onClick={() => act(p.id, 'reject')}
+                        disabled={busy}
+                        className="inline-flex items-center gap-2 rounded-sm border border-mesquite/30 px-5 py-2 font-heading text-sm text-mesquite transition hover:border-rojo hover:text-rojo disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {currentAction === 'reject'
+                          ? t({ en: 'Rejecting…', es: 'Rechazando…' })
+                          : t({ en: 'Reject', es: 'Rechazar' })}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 2: Parishes & POCs */}
+        {/* ------------------------------------------------------------------ */}
+        <section className="border-t border-mesquite/10 pt-12">
+          <ParishPocPanel />
+        </section>
       </div>
     </Layout>
   );

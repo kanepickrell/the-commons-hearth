@@ -1,12 +1,11 @@
-// src/pages/Ofrendas.tsx
-// Temporarily repurposed as the vision page while we're a small group.
-// When we have enough members to make a directory worthwhile, this will
-// split into two pages: the vision at /vision and the member list
-// back at /ofrendas.
+// src/pages/Vision.tsx
+// The founding vision of the chapter — four pillars, five-step cycle.
+// Previously lived at /ofrendas; renamed to /vision so the nav label
+// and the URL match.
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
 
-export default function Ofrendas() {
+export default function Vision() {
   const { t } = useLocale();
 
   const pillars = [
@@ -105,7 +104,6 @@ export default function Ofrendas() {
 
   return (
     <Layout>
-      {/* ── Hero ─────────────────────────────────────────── */}
       <section className="container-narrow flex flex-col items-center py-16 text-center md:py-24">
         <p className="display-caps mb-4 text-xs tracking-[0.2em] text-ocre">
           {t({ en: 'OUR VISION', es: 'NUESTRA VISIÓN' })}
@@ -127,7 +125,6 @@ export default function Ofrendas() {
         </p>
       </section>
 
-      {/* ── The Four Pillars ─────────────────────────────── */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-24">
         <div className="container-narrow">
           <div className="mb-12 text-center md:mb-16">
@@ -167,7 +164,6 @@ export default function Ofrendas() {
         </div>
       </section>
 
-      {/* ── The Practice: Distributism in Five Steps ─────── */}
       <section className="py-16 md:py-24">
         <div className="container-narrow">
           <div className="mb-12 text-center md:mb-16">
@@ -211,7 +207,6 @@ export default function Ofrendas() {
         </div>
       </section>
 
-      {/* ── Closing ──────────────────────────────────────── */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 text-center md:py-24">
         <div className="container-narrow">
           <p className="display-caps mb-4 text-xs tracking-[0.2em] text-ocre">
