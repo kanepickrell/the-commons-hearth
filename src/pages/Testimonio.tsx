@@ -1,64 +1,100 @@
-import { useMemo, useState } from 'react';
+// src/pages/Testimonio.tsx
+// The Testimonio page — the public "evidence of communion" view.
+// Reads approved witness posts from the DB, groups by month, renders the year wheel.
+// Empty wheel is the honest state before the chapter starts posting.
+
+import { useEffect, useMemo, useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
-import { witnessPosts } from '@/lib/fixtures/witness';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { YearWheel } from '@/components/testimonio/YearWheel';
 import { MonthPanel } from '@/components/testimonio/MonthPanel';
+import { supabase } from '@/lib/supabase';
+import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
 
-/**
- * The Testimonio page — the public "evidence of communion" view.
- *
- * Architecture: a liturgical year wheel on the left, a month detail
- * panel on the right. Click any month on the wheel to swap the panel.
- *
- * What this page is: a living year-end artifact. Felton-style — the
- * report is both the data and the ritual. A visitor should be able to
- * scan the wheel in 10 seconds and know the chapter is real.
- *
- * What this page is not: a steward dashboard. No call sheet, no
- * isolated-member callouts, no edit affordances. Honesty about
- * chapter-level gaps (quiet months) is fine; individual-level gaps
- * belong in the steward view when we build it.
- *
- * Known rough edges (not fixing in this pass):
- *   - Liturgical seasons are month-granular (Lent moves; see seasons.ts).
- *   - A month with multiple workshops shows only the first craft's glyph
- *     on the rim, with "× N" for the rest. Variety is recovered in the
- *     panel.
- *   - Planned workshops past today are rendered as ghost glyphs — not
- *     yet wired; for now the "+N planned" count in the metric tile
- *     communicates this.
- */
+// What comes back from the DB — flat columns, single-language body.
+type WitnessRow = {
+  id: string;
+  author_id: string;
+  workshop_id: string | null;
+  replicated_from_post_id: string | null;
+  craft: IconSlug | null;
+  body: string;
+  language: 'en' | 'es' | null;
+  fruit_count: number | null;
+  fruit_unit: string | null;
+  occurred_at: string;
+};
+
+// Convert a DB row into the shape the wheel/panel components already expect.
+// The components take Bilingual strings; we supply the same string for both
+// locales (rendering will show it verbatim) and rely on LanguageNote elsewhere
+// for the "written in X" attribution.
+const adaptRow = (r: WitnessRow): WitnessPost => {
+  const bodyBi: Bilingual = { en: r.body, es: r.body };
+  const unitBi: Bilingual = {
+    en: r.fruit_unit ?? '',
+    es: r.fruit_unit ?? '',
+  };
+  return {
+    id: r.id,
+    workshopId: r.workshop_id ?? '',
+    hostId: r.author_id,
+    date: r.occurred_at,
+    body: bodyBi,
+    iconSlug: (r.craft ?? 'el-pan') as IconSlug,
+    fruit: {
+      count: r.fruit_count ?? 0,
+      unit: unitBi,
+    },
+  };
+};
+
 const Testimonio = () => {
   const { t, locale } = useLocale();
   const s = uiStrings.witness;
 
-  // Default to the current month. If the current month has no data
-  // (likely in year one), the wheel still opens on that month and shows
-  // the quiet-month line — that's the honest move.
+  const [posts, setPosts] = useState<WitnessPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<number>(() => new Date().getMonth());
 
-  // Bucket posts by month for fast lookup and for the headline stats.
-  const postsByMonth = useMemo(() => {
-    const map: Record<number, typeof witnessPosts> = {};
-    for (const p of witnessPosts) {
-      const m = new Date(p.date).getMonth();
-      (map[m] ||= []).push(p);
-    }
-    return map;
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('witness_posts')
+        .select(
+          'id, author_id, workshop_id, replicated_from_post_id, craft, body, language, fruit_count, fruit_unit, occurred_at'
+        )
+        .eq('status', 'approved')
+        .order('occurred_at', { ascending: false });
+
+      if (error) {
+        console.error('Failed to load witness posts:', error);
+      } else if (data) {
+        setPosts((data as WitnessRow[]).map(adaptRow));
+      }
+      setLoading(false);
+    })();
   }, []);
 
-  // Headline stats — computed, not hardcoded, so they stay honest as
-  // the fixture grows.
+  // Bucket posts by month for headline stats.
   const stats = useMemo(() => {
-    const held = witnessPosts.filter((p) => !p.planned);
+    const held = posts.filter((p) => !p.planned);
     const gatherings = held.length;
     const hosts = new Set(held.map((p) => p.hostId)).size;
     const neighbors = held.reduce((sum, p) => sum + p.fruit.count, 0);
     const replicated = held.filter((p) => p.replicated).length;
     return { gatherings, hosts, neighbors, replicated };
-  }, []);
+  }, [posts]);
+
+  const postsByMonth = useMemo(() => {
+    const map: Record<number, WitnessPost[]> = {};
+    for (const p of posts) {
+      const m = new Date(p.date).getMonth();
+      (map[m] ||= []).push(p);
+    }
+    return map;
+  }, [posts]);
 
   const monthPosts = postsByMonth[selectedMonth] || [];
 
@@ -72,43 +108,49 @@ const Testimonio = () => {
           <h1 className="mt-2 font-heading text-[30px] leading-[1.15] text-mesquite md:text-4xl">
             {t(s.heading)}
           </h1>
-          <p className="prose-body mt-1 text-sm italic text-piedra">
-            {t(s.subhead)}
-          </p>
+          <p className="prose-body mt-1 text-sm italic text-piedra">{t(s.subhead)}</p>
         </header>
 
-        {/* Headline stats */}
-        <div className="mx-auto mb-10 grid max-w-2xl grid-cols-4 gap-3">
-          <Stat n={stats.gatherings} label={t(s.statGatherings)} />
-          <Stat n={stats.hosts}      label={t(s.statHosts)} />
-          <Stat n={stats.neighbors}  label={t(s.statNeighbors)} />
-          <Stat n={stats.replicated} label={t(s.statReplicated)} />
-        </div>
+        {loading ? (
+          <p className="mt-16 text-center font-serif italic text-piedra/60">…</p>
+        ) : (
+          <>
+            <div className="mx-auto mb-10 grid max-w-2xl grid-cols-4 gap-3">
+              <Stat n={stats.gatherings} label={t(s.statGatherings)} />
+              <Stat n={stats.hosts} label={t(s.statHosts)} />
+              <Stat n={stats.neighbors} label={t(s.statNeighbors)} />
+              <Stat n={stats.replicated} label={t(s.statReplicated)} />
+            </div>
 
-        {/* Wheel + panel */}
-        <div className="mx-auto grid max-w-4xl grid-cols-1 items-start gap-8 md:grid-cols-[380px_1fr]">
-          <div>
-            <YearWheel
-              posts={witnessPosts}
-              selectedMonth={selectedMonth}
-              onSelectMonth={setSelectedMonth}
-              locale={locale}
-            />
-          </div>
-          <div>
-            <MonthPanel
-              month={selectedMonth}
-              posts={monthPosts}
-              locale={locale}
-              // Actions are wired as no-ops for now — when the page is
-              // lifted into claude.ai or a real chat frame we'll make
-              // these fire into the steward's conversation. On the
-              // static site they're harmless.
-              onAskAboutPost={() => {}}
-              onAskMetric={() => {}}
-            />
-          </div>
-        </div>
+            <div className="mx-auto grid max-w-4xl grid-cols-1 items-start gap-8 md:grid-cols-[380px_1fr]">
+              <div>
+                <YearWheel
+                  posts={posts}
+                  selectedMonth={selectedMonth}
+                  onSelectMonth={setSelectedMonth}
+                  locale={locale}
+                />
+              </div>
+              <div>
+                <MonthPanel
+                  month={selectedMonth}
+                  posts={monthPosts}
+                  locale={locale}
+                  onAskAboutPost={() => {}}
+                  onAskMetric={() => {}}
+                />
+              </div>
+            </div>
+
+            {posts.length === 0 && (
+              <p className="mx-auto mt-12 max-w-md text-center font-serif italic text-piedra">
+                {locale === 'es'
+                  ? 'Aún no hay testimonios escritos. La rueda se llenará con el tiempo.'
+                  : 'No witness posts yet. The wheel will fill as the year unfolds.'}
+              </p>
+            )}
+          </>
+        )}
       </section>
     </Layout>
   );

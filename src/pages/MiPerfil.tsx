@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
+import { Layout } from '@/components/Layout';
 import type { Database, CraftSlug } from '@/lib/database.types';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
@@ -85,72 +86,76 @@ export default function MiPerfil() {
 
   if (authLoading || loading || !profile) {
     return (
-      <div className="container-narrow py-16 text-center font-serif text-mesquite/60">
-        …
-      </div>
+      <Layout>
+        <div className="container-narrow py-16 text-center font-serif text-mesquite/60">
+          …
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="container-narrow py-12 md:py-16">
-      {profile.status === 'pending' && (
-        <div className="mb-8 rounded-sm border border-ocre/30 bg-ocre/5 p-4 font-serif text-sm italic text-mesquite/80">
-          {t(uiStrings.auth.pendingNotice)}
-        </div>
-      )}
+    <Layout>
+      <div className="container-narrow py-12 md:py-16">
+        {profile.status === 'pending' && (
+          <div className="mb-8 rounded-sm border border-ocre/30 bg-ocre/5 p-4 font-serif text-sm italic text-mesquite/80">
+            {t(uiStrings.auth.pendingNotice)}
+          </div>
+        )}
 
-      <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
-        {t({ en: 'MY PROFILE', es: 'MI PERFIL' })}
-      </p>
-
-      <h1 className="mb-2 font-heading text-4xl text-mesquite md:text-5xl">
-        {profile.display_name ?? user?.email}
-      </h1>
-
-      {parish && (
-        <p className="mb-10 font-serif text-lg italic text-mesquite/70">
-          {parish.name}
-          {parish.city ? ` · ${parish.city}` : ''}
+        <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
+          {t({ en: 'MY PROFILE', es: 'MI PERFIL' })}
         </p>
-      )}
 
-      {profile.bio && (
-        <div className="mb-12">
-          <h2 className="mb-3 font-heading text-lg text-mesquite/60">
-            {t(uiStrings.profile.offeringLabel)}
-          </h2>
-          <p className="whitespace-pre-wrap font-serif text-lg leading-relaxed text-mesquite">
-            {profile.bio}
+        <h1 className="mb-2 font-heading text-4xl text-mesquite md:text-5xl">
+          {profile.display_name ?? user?.email}
+        </h1>
+
+        {parish && (
+          <p className="mb-10 font-serif text-lg italic text-mesquite/70">
+            {parish.name}
+            {parish.city ? ` · ${parish.city}` : ''}
           </p>
-        </div>
-      )}
+        )}
 
-      {expertise.length > 0 && (
-        <div className="mb-12">
-          <h2 className="mb-4 font-heading text-lg text-mesquite/60">
-            {t({ en: 'My crafts', es: 'Mis oficios' })}
-          </h2>
-          <ul className="flex flex-wrap gap-2">
-            {expertise.map((e) => (
-              <li
-                key={e.id}
-                className="rounded-sm border border-mesquite/20 bg-cal/60 px-3 py-1.5 font-heading text-sm text-mesquite"
-              >
-                {CRAFT_NAMES[e.craft][locale]}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {profile.bio && (
+          <div className="mb-12">
+            <h2 className="mb-3 font-heading text-lg text-mesquite/60">
+              {t(uiStrings.profile.offeringLabel)}
+            </h2>
+            <p className="whitespace-pre-wrap font-serif text-lg leading-relaxed text-mesquite">
+              {profile.bio}
+            </p>
+          </div>
+        )}
 
-      <div className="mt-12 border-t border-mesquite/10 pt-6">
-        <Link
-          to={buildPath('bienvenido', locale)}
-          className="font-serif text-sm italic text-mesquite/60 transition hover:text-mesquite"
-        >
-          {t({ en: '← Redo onboarding', es: '← Rehacer la bienvenida' })}
-        </Link>
+        {expertise.length > 0 && (
+          <div className="mb-12">
+            <h2 className="mb-4 font-heading text-lg text-mesquite/60">
+              {t({ en: 'My crafts', es: 'Mis oficios' })}
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {expertise.map((e) => (
+                <li
+                  key={e.id}
+                  className="rounded-sm border border-mesquite/20 bg-cal/60 px-3 py-1.5 font-heading text-sm text-mesquite"
+                >
+                  {CRAFT_NAMES[e.craft][locale]}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="mt-12 border-t border-mesquite/10 pt-6">
+          <Link
+            to={`${buildPath('bienvenido', locale)}?redo=1`}
+            className="font-serif text-sm italic text-mesquite/60 transition hover:text-mesquite"
+          >
+            {t({ en: '← Redo onboarding', es: '← Rehacer la bienvenida' })}
+          </Link>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }

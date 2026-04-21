@@ -3,7 +3,7 @@
 // same useLocale() / uiStrings pattern as the rest of the header chrome.
 
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
@@ -12,12 +12,15 @@ import { uiStrings } from '@/lib/fixtures/uiStrings';
 export function AuthButton() {
   const { user, profile, loading, isAdmin, signInWithGoogle, signOut } = useAuth();
   const { locale, t } = useLocale();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const s = uiStrings.auth;
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside. Use 'click' (not 'mousedown') so
+  // React Router's <Link> clicks aren't pre-empted by the menu unmounting
+  // between mousedown and click.
   useEffect(() => {
     if (!menuOpen) return;
     const handler = (e: MouseEvent) => {
@@ -25,8 +28,8 @@ export function AuthButton() {
         setMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
   }, [menuOpen]);
 
   if (loading) return null;
@@ -54,6 +57,13 @@ export function AuthButton() {
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('');
 
+  // Imperative navigation inside click handlers is more robust than <Link>
+  // when the menu is closing on the same click. Matches how Sign out works.
+  const go = (path: string) => {
+    setMenuOpen(false);
+    navigate(path);
+  };
+
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -74,25 +84,23 @@ export function AuthButton() {
             </div>
           )}
 
-          <Link
-            to={buildPath('miPerfil', locale)}
-            onClick={() => setMenuOpen(false)}
-            className="block px-4 py-2 font-serif text-sm text-mesquite transition hover:bg-mesquite/5"
+          <button
+            onClick={() => go(buildPath('miPerfil', locale))}
+            className="block w-full text-left px-4 py-2 font-serif text-sm text-mesquite transition hover:bg-mesquite/5"
           >
             {t(s.myProfile)}
-          </Link>
+          </button>
 
           {isAdmin && (
-            <Link
-              to={buildPath('mayordomo', locale)}
-              onClick={() => setMenuOpen(false)}
-              className="block border-t border-mesquite/10 px-4 py-2 font-serif text-sm text-mesquite transition hover:bg-mesquite/5"
+            <button
+              onClick={() => go(buildPath('mayordomo', locale))}
+              className="block w-full text-left border-t border-mesquite/10 px-4 py-2 font-serif text-sm text-mesquite transition hover:bg-mesquite/5"
             >
               {t(s.stewardship)}
               <span className="ml-2 rounded-full bg-ocre/20 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-ocre">
                 {t(s.adminBadge)}
               </span>
-            </Link>
+            </button>
           )}
 
           <button

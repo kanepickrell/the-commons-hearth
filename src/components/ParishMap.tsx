@@ -1,41 +1,42 @@
+// src/components/ParishMap.tsx
+// Renders approved members on their parish dots, with upcoming approved
+// workshops as separate pins. All data live from Supabase.
+
 import { MapContainer, TileLayer, CircleMarker, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect, useMemo, useState } from 'react';
-import { members } from '@/lib/fixtures/members';
-import { workshops } from '@/lib/fixtures/workshops';
+import { Link } from 'react-router-dom';
 import { iconMap } from '@/lib/icons';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
-import { Link } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
+import type { IconSlug } from '@/lib/types';
 
-// Group members by their parish coordinate.
+type ProfileWithParish = {
+  id: string;
+  display_name: string | null;
+  parish: { id: string; name: string; lat: number | null; lng: number | null } | null;
+};
+
+type WorkshopMarker = {
+  id: string;
+  title: string;
+  craft: IconSlug | null;
+  location_text: string | null;
+  lat: number;
+  lng: number;
+};
+
 type ParishCluster = {
   key: string;
-  parish: string;
+  parishName: string;
   latLon: [number, number];
-  members: typeof members;
+  members: { id: string; name: string }[];
 };
 
-const groupParishes = (): ParishCluster[] => {
-  const map = new Map<string, ParishCluster>();
-  for (const m of members) {
-    const key = `${m.parishLatLon[0]}|${m.parishLatLon[1]}`;
-    const existing = map.get(key);
-    if (existing) {
-      existing.members.push(m);
-    } else {
-      map.set(key, { key, parish: m.parish, latLon: m.parishLatLon, members: [m] });
-    }
-  }
-  return Array.from(map.values());
-};
-
-const buildWorkshopIcon = (slug: keyof typeof iconMap) => {
+const buildWorkshopIcon = (slug: IconSlug) => {
   const meta = iconMap[slug];
-  // Map pins need a visual container so they read on top of map tiles.
-  // Quiet cream disc with a mesquite hairline, icon centered inside.
-  // The icon inherits mesquite ink via `color` on the wrapper.
   const html = `
     <div style="
       width: 40px; height: 40px;
@@ -73,18 +74,66 @@ const FitBounds = ({ points }: { points: [number, number][] }) => {
 
 export const ParishMap = () => {
   const { t, locale } = useLocale();
-  const clusters = useMemo(groupParishes, []);
+  const [clusters, setClusters] = useState<ParishCluster[]>([]);
+  const [workshops, setWorkshops] = useState<WorkshopMarker[]>([]);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
 
+  useEffect(() => {
+    (async () => {
+      const [profileResult, workshopResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('id, display_name, parish:parishes(id, name, lat, lng)')
+          .eq('status', 'approved'),
+        supabase
+          .from('workshops')
+          .select('id, title, craft, location_text, lat, lng, host_id')
+          .eq('status', 'approved')
+          .gte('held_at', new Date().toISOString()),
+      ]);
+
+      // Group profiles by parish.
+      const map = new Map<string, ParishCluster>();
+      for (const p of (profileResult.data ?? []) as unknown as ProfileWithParish[]) {
+        if (!p.parish || p.parish.lat == null || p.parish.lng == null) continue;
+        const key = p.parish.id;
+        const entry = map.get(key);
+        if (entry) {
+          entry.members.push({ id: p.id, name: p.display_name ?? '—' });
+        } else {
+          map.set(key, {
+            key,
+            parishName: p.parish.name,
+            latLon: [p.parish.lat, p.parish.lng],
+            members: [{ id: p.id, name: p.display_name ?? '—' }],
+          });
+        }
+      }
+      setClusters(Array.from(map.values()));
+
+      // Workshops with geocoords only.
+      const marks: WorkshopMarker[] = [];
+      for (const w of workshopResult.data ?? []) {
+        if (w.lat == null || w.lng == null) continue;
+        marks.push({
+          id: w.id,
+          title: w.title,
+          craft: w.craft as IconSlug | null,
+          location_text: w.location_text,
+          lat: w.lat,
+          lng: w.lng,
+        });
+      }
+      setWorkshops(marks);
+    })();
+  }, []);
+
   const allPoints: [number, number][] = useMemo(
-    () => [...clusters.map((c) => c.latLon), ...workshops.map((w) => w.locationLatLon)],
-    [clusters]
+    () => [...clusters.map((c) => c.latLon), ...workshops.map((w) => [w.lat, w.lng] as [number, number])],
+    [clusters, workshops]
   );
 
   const selected = clusters.find((c) => c.key === selectedParish) ?? null;
-  const selectedWorkshops = selected
-    ? workshops.filter((w) => selected.members.some((m) => m.id === w.hostId))
-    : [];
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr,260px]">
@@ -99,7 +148,7 @@ export const ParishMap = () => {
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <FitBounds points={allPoints} />
+          {allPoints.length > 0 && <FitBounds points={allPoints} />}
 
           {clusters.map((c) => (
             <CircleMarker
@@ -112,38 +161,47 @@ export const ParishMap = () => {
                 fillColor: 'hsl(32 56% 51%)',
                 fillOpacity: 0.7,
               }}
-              eventHandlers={{
-                click: () => setSelectedParish(c.key),
-              }}
+              eventHandlers={{ click: () => setSelectedParish(c.key) }}
             >
               <Popup>
                 <div className="font-heading text-mesquite">
-                  <div className="text-base">{c.parish}</div>
+                  <div className="text-base">{c.parishName}</div>
                   <div className="text-sm text-piedra">
-                    {c.members.length} {c.members.length === 1 ? t(uiStrings.common.member) : t(uiStrings.common.members)}
+                    {c.members.length}{' '}
+                    {c.members.length === 1
+                      ? t(uiStrings.common.member)
+                      : t(uiStrings.common.members)}
                   </div>
                 </div>
               </Popup>
             </CircleMarker>
           ))}
 
-          {workshops.map((w) => (
-            <Marker key={w.id} position={w.locationLatLon} icon={buildWorkshopIcon(w.iconSlug)}>
-              <Popup>
-                <div className="font-heading text-mesquite">
-                  <div className="text-base leading-tight">{t(w.title)}</div>
-                  <div className="mt-1 text-sm text-piedra">{w.locationName}</div>
-                  <Link
-                    to={buildPath('tallerDetail', locale, { id: w.id })}
-                    className="mt-2 inline-block text-sm"
-                    style={{ color: 'hsl(32 56% 51%)' }}
-                  >
-                    →
-                  </Link>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {workshops.map((w) =>
+            w.craft ? (
+              <Marker
+                key={w.id}
+                position={[w.lat, w.lng]}
+                icon={buildWorkshopIcon(w.craft)}
+              >
+                <Popup>
+                  <div className="font-heading text-mesquite">
+                    <div className="text-base leading-tight">{w.title}</div>
+                    {w.location_text && (
+                      <div className="mt-1 text-sm text-piedra">{w.location_text}</div>
+                    )}
+                    <Link
+                      to={buildPath('tallerDetail', locale, { id: w.id })}
+                      className="mt-2 inline-block text-sm"
+                      style={{ color: 'hsl(32 56% 51%)' }}
+                    >
+                      →
+                    </Link>
+                  </div>
+                </Popup>
+              </Marker>
+            ) : null
+          )}
         </MapContainer>
       </div>
 
@@ -151,7 +209,7 @@ export const ParishMap = () => {
       <aside className="rounded border border-mesquite/20 bg-cal/50 p-5">
         {selected ? (
           <>
-            <h3 className="font-heading text-lg text-mesquite">{selected.parish}</h3>
+            <h3 className="font-heading text-lg text-mesquite">{selected.parishName}</h3>
             <p className="mt-1 text-sm text-piedra">
               {selected.members.length} {t(uiStrings.common.members)}
             </p>
@@ -169,27 +227,6 @@ export const ParishMap = () => {
                 </li>
               ))}
             </ul>
-            {selectedWorkshops.length > 0 && (
-              <>
-                <div className="rule my-4" />
-                <p className="mb-2 font-heading text-sm text-piedra">
-                  {t(uiStrings.workshop.upcoming)}
-                </p>
-                <ul className="space-y-2">
-                  {selectedWorkshops.map((w) => (
-                    <li key={w.id}>
-                      <Link
-                        to={buildPath('tallerDetail', locale, { id: w.id })}
-                        className="font-heading text-sm text-mesquite no-underline hover:text-ocre"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        {t(w.title)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
           </>
         ) : (
           <p className="font-heading italic text-piedra">
