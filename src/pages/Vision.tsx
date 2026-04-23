@@ -37,8 +37,8 @@ export default function Vision() {
       roman: 'III',
       name: { en: 'Education', es: 'Educación' },
       verse: {
-        en: 'The education and training of Catholic laity in the domestic order, agricultural skills, and craft traditions necessary to successfully cultivate Catholic homesteads.',
-        es: 'La educación y formación de los laicos católicos en el orden doméstico, las habilidades agrícolas y las tradiciones artesanales necesarias para cultivar hogares católicos con éxito.',
+        en: 'Teaching one another the skills a Catholic home needs — the garden, the workshop, the kitchen, the barn — and passing them on before they are lost.',
+        es: 'Enseñarnos unos a otros las habilidades que un hogar católico necesita — el huerto, el taller, la cocina, el granero — y transmitirlas antes de que se pierdan.',
       },
       practice: {
         en: 'These skills are slipping — canning, carpentry, animal husbandry, the care of soil. We learn them back from one another, in workshops and in kitchens, and we pass them on.',
@@ -96,8 +96,8 @@ export default function Vision() {
       num: '5',
       title: { en: 'Give Glory to God', es: 'Da Gloria a Dios' },
       body: {
-        en: 'The whole cycle — the seed, the sweat, the supper — is offered back to the One who gave it. This is what makes our distributism Catholic.',
-        es: 'Todo el ciclo — la semilla, el sudor, la cena — se ofrece al Que lo dio. Esto es lo que hace católico nuestro distributismo.',
+        en: 'The whole cycle — seed, sweat, supper — is offered back to the One who gave it. Without this, we are only farmers. With it, we are sons.',
+        es: 'Todo el ciclo — la semilla, el sudor, la cena — se ofrece al Que lo dio. Sin esto, somos sólo agricultores. Con esto, somos hijos.',
       },
     },
   ];
@@ -106,21 +106,15 @@ export default function Vision() {
     <Layout>
       <section className="container-narrow flex flex-col items-center py-16 text-center md:py-24">
         <p className="display-caps mb-4 text-xs tracking-[0.2em] text-ocre">
-          {t({ en: 'OUR VISION', es: 'NUESTRA VISIÓN' })}
+          {t({ en: 'HE IS OUR CREATOR', es: 'ÉL ES NUESTRO CREADOR' })}
         </p>
         <h1 className="mb-8 font-heading text-5xl text-mesquite md:text-6xl">
-          {t({ en: 'We Are the Gardeners', es: 'Somos los Jardineros' })}
+          {t({ en: 'We Are His Gardeners', es: 'Somos los Jardineros' })}
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
-            en: 'We are Catholic families in Central Texas returning to the land — not to escape the world, but to till a small corner of it for Christ. We build from where we are, with what we have, together.',
-            es: 'Somos familias católicas del Centro de Texas que regresamos a la tierra — no para huir del mundo, sino para labrar un pequeño rincón de él para Cristo. Construimos desde donde estamos, con lo que tenemos, juntos.',
-          })}
-        </p>
-        <p className="mt-8 max-w-xl font-serif italic leading-relaxed text-mesquite/60">
-          {t({
-            en: '"Only the stability which is rooted in one\'s own holding makes of the family the most perfect cell of society." — Pope Pius XII',
-            es: '«Sólo la estabilidad que echa raíces en la propiedad hace de la familia la célula más perfecta de la sociedad.» — Papa Pío XII',
+            en: 'We are Catholic families in Central Texas taking up the first vocation given to man — to till the earth and keep it. Not to flee the world, but to sanctify a small corner of it for Christ.',
+            es: 'Somos familias católicas del Centro de Texas que asumimos la primera vocación dada al hombre — labrar la tierra y guardarla. No para huir del mundo, sino para santificar un pequeño rincón de él para Cristo.',
           })}
         </p>
       </section>
@@ -131,9 +125,15 @@ export default function Vision() {
             <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
               {t({ en: 'FOUNDATIONS', es: 'FUNDAMENTOS' })}
             </p>
-            <h2 className="font-heading text-4xl text-mesquite md:text-5xl">
+            <h2 className="mb-6 font-heading text-4xl text-mesquite md:text-5xl">
               {t({ en: 'The Four Pillars', es: 'Los Cuatro Pilares' })}
             </h2>
+            <p className="mx-auto max-w-2xl font-serif italic leading-relaxed text-mesquite/70">
+              {t({
+                en: 'If we are gardeners, here is the ground we till.',
+                es: 'Si somos jardineros, esta es la tierra que labramos.',
+              })}
+            </p>
           </div>
 
           <div className="space-y-12 md:space-y-16">
@@ -157,6 +157,17 @@ export default function Vision() {
                   <p className="font-serif leading-relaxed text-mesquite/70">
                     {t(p.practice)}
                   </p>
+                  {p.roman === 'I' && (
+                    <blockquote className="mt-6 border-l-2 border-ocre/40 pl-5 font-serif italic leading-relaxed text-mesquite/70">
+                      {t({
+                        en: '"Only the stability which is rooted in one\'s own holding makes of the family the most perfect cell of society."',
+                        es: '«Sólo la estabilidad que echa raíces en la propiedad hace de la familia la célula más perfecta de la sociedad.»',
+                      })}
+                      <footer className="mt-2 text-sm not-italic text-mesquite/50">
+                        — {t({ en: 'Pope Pius XII', es: 'Papa Pío XII' })}
+                      </footer>
+                    </blockquote>
+                  )}
                 </div>
               </article>
             ))}
