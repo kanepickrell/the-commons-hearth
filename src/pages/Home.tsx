@@ -37,15 +37,15 @@ const copy = {
   } satisfies Bilingual,
 
   headline: {
-    en: 'A Catholic chapter, rooted in Central Texas soil.',
-    es: 'Un capítulo católico, con raíces en la tierra del centro de Tejas.',
+    en: 'Rooting Catholic life into Central Texas soil',
+    es: 'Arraigando la vida católica en la tierra del centro de Tejas.',
   } satisfies Bilingual,
 
   // The "ache" — names the longing the visitor already feels. Without this
   // the page reads like a definition; with it, the page recognizes them.
   ache: {
-    en: 'Many Catholic families want to return to land-based, Christ-centered life — to work they can see the end of, food that came from someone they know, neighbors they can call on. It can seem impossible to begin.',
-    es: 'Muchas familias católicas quieren volver a una vida en la tierra, centrada en Cristo — al trabajo cuyo fin se puede ver, a la comida que vino de alguien conocido, a los vecinos a quienes se puede llamar. Puede parecer imposible empezar.',
+    en: 'Many Catholics yearn for a life closer to the land — work done by hand, food grown nearby, neighbors they can call on. It\u2019s hard to know where to begin.',
+    es: 'Muchos católicos anhelan una vida más cercana a la tierra — el trabajo hecho a mano, la comida cultivada cerca, los vecinos a quienes llamar. Cuesta saber por dónde empezar.',
   } satisfies Bilingual,
 
   // The "offer." Kept concrete on purpose — what we are (a chapter), where
@@ -53,8 +53,8 @@ const copy = {
   // work). National CLM can speak of "resettlement" as a mission word; at
   // the chapter level we describe the weekly reality.
   offer: {
-    en: 'We are a chapter of the Catholic Land Movement in the Hill Country and around San Antonio. We meet at each other\u2019s parishes and homesteads, teach each other the old crafts, and share the work that makes a Catholic home fruitful.',
-    es: 'Somos un capítulo del Movimiento Católico de la Tierra en el Hill Country y los alrededores de San Antonio. Nos reunimos en las parroquias y ranchos de unos y otros, nos enseñamos los oficios antiguos, y compartimos el trabajo que hace fecundo un hogar católico.',
+    en: 'We are a chapter of the Catholic Land Movement around San Antonio and the Hill Country. We meet at each other\u2019s parishes and homesteads, teach each other the old crafts, and go when a neighbor needs help.',
+    es: 'Somos un capítulo del Movimiento Católico de la Tierra en los alrededores de San Antonio y el Hill Country. Nos reunimos en las parroquias y ranchos de unos y otros, nos enseñamos los oficios antiguos, y acudimos cuando un vecino necesita ayuda.',
   } satisfies Bilingual,
 
   practicesEyebrow: {

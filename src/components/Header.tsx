@@ -29,7 +29,7 @@ export const Header = () => {
     <header className="relative z-50 border-b border-mesquite/15 bg-cal/80 backdrop-blur-sm">
       <div className="container-wide flex flex-col gap-4 py-5 md:flex-row md:items-center md:justify-between">
         <Link to={buildPath('home', locale)} className="display-caps text-mesquite no-underline" style={{ textDecoration: 'none' }}>
-          <span className="text-base md:text-lg">CLM CENTRAL TEXAS</span>
+          <span className="text-base md:text-lg">CENTRAL TEXAS CLM</span>
         </Link>
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 font-heading text-[1.05rem]">
