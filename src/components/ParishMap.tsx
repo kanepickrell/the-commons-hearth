@@ -2,6 +2,13 @@
 // Renders approved members on parish dots. Workshop icons gated to approved
 // members. When a parish has POCs, they appear at the top of the sidebar with
 // a mailto link; rest of members listed below.
+//
+// Note on the profiles query: we split it into two variants because column-
+// level RLS now prevents anon from reading `contact_email` at all. If we
+// include that column in the SELECT string for an anon user, PostgREST fails
+// the whole query (not the column specifically). So we ask for contact_email
+// only when the viewer is authenticated; anon users get the non-sensitive
+// subset and simply never see POC emails.
 
 import { MapContainer, TileLayer, CircleMarker, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -87,6 +94,7 @@ const FitBounds = ({ points }: { points: [number, number][] }) => {
 export const ParishMap = () => {
   const { t, locale } = useLocale();
   const { user, profile } = useAuth();
+  const isAuthenticated = !!user;
   const isApprovedMember = !!profile && profile.status === 'approved';
 
   const [clusters, setClusters] = useState<ParishCluster[]>([]);
@@ -95,20 +103,34 @@ export const ParishMap = () => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
+      // Two column sets: authenticated users get contact_email (so POCs can be
+      // contacted); anon users get a subset without that column. Column-level
+      // RLS blocks anon from reading contact_email entirely; asking for it
+      // anyway would fail the whole query at the PostgREST layer.
+      const columns = isAuthenticated
+        ? 'id, display_name, is_poc, contact_email, parish:parishes(id, name, lat, lng)'
+        : 'id, display_name, is_poc, parish:parishes(id, name, lat, lng)';
+
+      const { data, error } = await supabase
         .from('profiles')
-        .select('id, display_name, is_poc, contact_email, parish:parishes(id, name, lat, lng)')
+        .select(columns)
         .eq('status', 'approved');
 
+      if (error) {
+        console.error('Failed to load members for map:', error);
+        return;
+      }
+
       const map = new Map<string, ParishCluster>();
-      for (const p of (data ?? []) as unknown as ProfileWithParish[]) {
-        if (!p.parish || p.parish.lat == null || p.parish.lng == null) continue;
-        const key = p.parish.id;
+      for (const row of (data ?? []) as unknown as Array<ProfileWithParish & { contact_email?: string | null }>) {
+        if (!row.parish || row.parish.lat == null || row.parish.lng == null) continue;
+        const key = row.parish.id;
         const member: Member = {
-          id: p.id,
-          name: p.display_name ?? '—',
-          isPoc: p.is_poc,
-          contactEmail: p.contact_email,
+          id: row.id,
+          name: row.display_name ?? '—',
+          isPoc: row.is_poc,
+          // Fall back to null when the column wasn't selected (anon viewer).
+          contactEmail: row.contact_email ?? null,
         };
         const entry = map.get(key);
         if (entry) {
@@ -116,8 +138,8 @@ export const ParishMap = () => {
         } else {
           map.set(key, {
             key,
-            parishName: p.parish.name,
-            latLon: [p.parish.lat, p.parish.lng],
+            parishName: row.parish.name,
+            latLon: [row.parish.lat, row.parish.lng],
             members: [member],
           });
         }
@@ -132,7 +154,7 @@ export const ParishMap = () => {
       }
       setClusters(Array.from(map.values()).filter((c) => c.members.length > 0));
     })();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isApprovedMember) {
