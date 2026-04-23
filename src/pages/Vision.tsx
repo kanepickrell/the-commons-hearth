@@ -136,21 +136,22 @@ export default function Vision() {
             </p>
           </div>
 
-          <div className="space-y-12 md:space-y-16">
+          <div className="space-y-16 md:space-y-24">
             {pillars.map((p) => (
               <article
                 key={p.roman}
-                className="grid gap-6 border-t border-mesquite/15 pt-10 md:grid-cols-[auto_1fr] md:gap-12"
+                className="border-t border-mesquite/15 pt-12 text-center md:pt-16"
               >
-                <div className="flex items-baseline gap-4 md:block">
-                  <span className="font-heading text-5xl text-ocre md:text-6xl">
-                    {p.roman}
-                  </span>
-                  <h3 className="font-heading text-2xl text-mesquite md:mt-2 md:text-3xl">
-                    {t(p.name)}
-                  </h3>
+                <div
+                  aria-hidden="true"
+                  className="font-heading text-7xl leading-none text-ocre md:text-8xl"
+                >
+                  {p.roman}
                 </div>
-                <div className="space-y-4">
+                <h3 className="mt-4 font-heading text-3xl text-mesquite md:mt-6 md:text-4xl">
+                  {t(p.name)}
+                </h3>
+                <div className="mx-auto mt-8 max-w-2xl space-y-5 text-left md:mt-10">
                   <p className="font-serif text-lg leading-relaxed text-mesquite">
                     {t(p.verse)}
                   </p>
@@ -195,23 +196,21 @@ export default function Vision() {
             </p>
           </div>
 
-          <ol className="space-y-8">
+          <ol className="space-y-14 md:space-y-20">
             {cycle.map((step) => (
-              <li
-                key={step.num}
-                className="grid gap-4 md:grid-cols-[auto_1fr] md:gap-8"
-              >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-ocre/40 bg-ocre/10 font-heading text-2xl text-ocre">
+              <li key={step.num} className="text-center">
+                <div
+                  aria-hidden="true"
+                  className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-ocre/40 bg-ocre/10 font-heading text-3xl text-ocre md:h-20 md:w-20 md:text-4xl"
+                >
                   {step.num}
                 </div>
-                <div>
-                  <h3 className="mb-2 font-heading text-2xl text-mesquite">
-                    {t(step.title)}
-                  </h3>
-                  <p className="font-serif leading-relaxed text-mesquite/80">
-                    {t(step.body)}
-                  </p>
-                </div>
+                <h3 className="mt-5 font-heading text-2xl text-mesquite md:mt-6 md:text-3xl">
+                  {t(step.title)}
+                </h3>
+                <p className="mx-auto mt-4 max-w-xl text-left font-serif leading-relaxed text-mesquite/80 md:text-center">
+                  {t(step.body)}
+                </p>
               </li>
             ))}
           </ol>
