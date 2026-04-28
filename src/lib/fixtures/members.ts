@@ -1,4 +1,4 @@
-// CLM Central Texas Commons — member fixtures.
+// CLM Central Texas — member fixtures.
 //
 // IMPORTANT NOTES FOR DEVELOPERS AND REVIEWERS:
 //
