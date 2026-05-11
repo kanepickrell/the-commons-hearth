@@ -7,6 +7,7 @@ import type { Locale } from '@/lib/types';
 export type RouteKey =
   | 'home'
   | 'vision'
+  | 'participate'
   | 'memberDetail'
   | 'talleres'
   | 'tallerDetail'
@@ -19,6 +20,7 @@ export type RouteKey =
 export const routes: Record<RouteKey, { en: string; es: string }> = {
   home:          { en: '/',                es: '/' },
   vision:        { en: '/vision',          es: '/vision' },
+  participate:   { en: '/participate',     es: '/participar' },
   memberDetail:  { en: '/members/:id',     es: '/miembros/:id' },
   talleres:      { en: '/workshops',       es: '/talleres' },
   tallerDetail:  { en: '/workshops/:id',   es: '/talleres/:id' },

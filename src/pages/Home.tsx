@@ -1,19 +1,22 @@
 // src/pages/Home.tsx
 // Landing page — the trailhead, not the whole trail.
 //
-// Structure:
-//   1. Opening beat: mission / ache / offer (three short paragraphs)
-//   2. "What we do" — three practices, one line each
+// Structure (per the chapter's approved copy):
+//   1. Opening — the longing, who we are, what we believe, what the chapter does
+//   2. Pillars — Resettlement, Education, Fellowship, Glorification
 //   3. A single recent witness, large, as evidence
 //   4. The chapter map
-//   5. Three next-step tiles
+//   5. How to Live Out the CLM Vision — three steps: Come and see, Learn and
+//      offer, Live and share (with a reading link to Sid's Substack)
 //
-// Notes on the rewrite:
-//   - Vision page owns the four-pillar exposition; Home stays a trailhead.
-//   - Dropped the four-charism grid — it duplicated Vision and asked visitors
-//     to hold four abstractions before seeing anything concrete.
-//   - Dropped San Isidro from Home — he lives on /santo and in the footer.
-//   - Replaced "See all" dead-end with three parallel CTAs.
+// Notes:
+//   - Vision page still owns the deeper exposition of pillars + the
+//     distributist cycle. Home introduces them; Vision unfolds them.
+//   - The reading list is a single named link to a chapter member's
+//     Substack — it does double duty as a starting place AND as evidence
+//     that real people in the chapter are already doing the intellectual
+//     work. If Sid would rather stay back-page, drop the attribution and
+//     keep just the publication link.
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -31,46 +34,38 @@ import type { IconSlug, Bilingual } from '@/lib/types';
 // landing-page copy — long, editorial, and likely to be revised often.
 // If/when it stabilizes, promote to uiStrings.
 const copy = {
+  // ---------------------------------------------------------------------
+  // 1. Opening
+  // ---------------------------------------------------------------------
   eyebrow: {
     en: 'CENTRAL TEXAS CHAPTER',
     es: 'CAPÍTULO DEL CENTRO DE TEJAS',
   } satisfies Bilingual,
 
-  headline: {
-    en: 'Rooting Catholic life into Central Texas soil',
-    es: 'Arraigando la vida católica en la tierra del centro de Tejas.',
-  } satisfies Bilingual,
-
-  // The "ache" — names the longing the visitor already feels. Without this
-  // the page reads like a definition; with it, the page recognizes them.
+  // The ache. Names the longing the visitor already feels.
   ache: {
-    en: 'Many Catholics yearn for a life closer to the land — work done by hand, food grown nearby, neighbors they can call on. It\u2019s hard to know where to begin.',
-    es: 'Muchos católicos anhelan una vida más cercana a la tierra — el trabajo hecho a mano, la comida cultivada cerca, los vecinos a quienes llamar. Cuesta saber por dónde empezar.',
+    en: 'Many Catholics yearn for a life rooted in the land — work centered in the home, food raised by neighbors, parishes where real fellowship happens. They long for the simple traditions that make the family what God created it to be: the center of social order.',
+    es: 'Muchos católicos anhelan una vida arraigada en la tierra — el trabajo centrado en el hogar, la comida cultivada por los vecinos, parroquias donde haya verdadera hermandad. Anhelan las tradiciones sencillas que hacen de la familia lo que Dios creó que fuera: el centro del orden social.',
   } satisfies Bilingual,
 
-  // The "offer." Kept concrete on purpose — what we are (a chapter), where
-  // we are (Hill Country, San Antonio), what we do (meet, teach, share
-  // work). National CLM can speak of "resettlement" as a mission word; at
-  // the chapter level we describe the weekly reality.
-  offer: {
-    en: 'We are a chapter of the Catholic Land Movement around San Antonio and the Hill Country. We meet at each other\u2019s parishes and homesteads, teach each other the old crafts, and go when a neighbor needs help.',
-    es: 'Somos un capítulo del Movimiento Católico de la Tierra en los alrededores de San Antonio y el Hill Country. Nos reunimos en las parroquias y ranchos de unos y otros, nos enseñamos los oficios antiguos, y acudimos cuando un vecino necesita ayuda.',
+  // Who we are + what we believe + what the chapter does. One paragraph
+  // on purpose — the visitor needs to read it in one breath.
+  whoWeAre: {
+    en: 'We are the Central Texas Chapter of the Catholic Land Movement, and we believe this is possible through the grace of Jesus Christ. It is the work of the laity to orient our families, communities, and institutions toward the beatific vision. Our chapter exists to equip Catholics in Central Texas to transform their parishes into hubs of community life — not merely sacramental stations.',
+    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Es obra de los laicos orientar nuestras familias, comunidades, e instituciones hacia la visión beatífica. Nuestro capítulo existe para equipar a los católicos del centro de Tejas a transformar sus parroquias en centros de vida comunitaria — no simples estaciones sacramentales.',
   } satisfies Bilingual,
 
-  practicesEyebrow: {
-    en: 'WHAT WE DO',
-    es: 'LO QUE HACEMOS',
+  // ---------------------------------------------------------------------
+  // 2. Pillars
+  // ---------------------------------------------------------------------
+  pillarsEyebrow: {
+    en: 'PILLARS',
+    es: 'PILARES',
   } satisfies Bilingual,
 
-  mapEyebrow: {
-    en: 'YOUR NEIGHBORS',
-    es: 'TUS VECINOS',
-  } satisfies Bilingual,
-  mapHeading: {
-    en: 'The chapter, on the land',
-    es: 'El capítulo, en la tierra',
-  } satisfies Bilingual,
-
+  // ---------------------------------------------------------------------
+  // 3. Recent witness
+  // ---------------------------------------------------------------------
   witnessEyebrow: {
     en: 'FROM THE CHAPTER',
     es: 'DEL CAPÍTULO',
@@ -80,42 +75,116 @@ const copy = {
     es: 'Lee el año',
   } satisfies Bilingual,
 
-  ctaEyebrow: {
-    en: 'BEGIN WHERE YOU ARE',
-    es: 'COMIENZA DONDE ESTÁS',
+  // ---------------------------------------------------------------------
+  // 4. The map
+  // ---------------------------------------------------------------------
+  mapEyebrow: {
+    en: 'YOUR NEIGHBORS',
+    es: 'TUS VECINOS',
+  } satisfies Bilingual,
+  mapHeading: {
+    en: 'The chapter, on the land',
+    es: 'El capítulo, en la tierra',
+  } satisfies Bilingual,
+
+  // ---------------------------------------------------------------------
+  // 5. How to Live Out
+  // ---------------------------------------------------------------------
+  liveOutEyebrow: {
+    en: 'HOW TO LIVE OUT THE CLM VISION',
+    es: 'CÓMO VIVIR LA VISIÓN DEL MCT',
   } satisfies Bilingual,
 };
 
-// Three practices. I picked three (not four) because three reads as
-// "what we do"; four reads as doctrine and competes with Vision. Each
-// practice reuses an existing icon to stay in the visual system.
-const practices: {
+// The four pillars. Each gets an icon, a name, and one paragraph. The
+// deeper exposition lives on /vision; this is the introduction.
+const pillars: {
   slug: IconSlug;
-  title: Bilingual;
-  blurb: Bilingual;
+  name: Bilingual;
+  body: Bilingual;
 }[] = [
   {
     slug: 'la-azuela',
-    title: { en: 'Workshops we host', es: 'Los talleres que damos' },
-    blurb: {
-      en: 'Hands-on days — beekeeping, bread, building, preserving. Hosted by members, on real land.',
-      es: 'Días de manos — apicultura, pan, construcción, conserva. Ofrecidos por miembros, en tierra de verdad.',
+    name: { en: 'Resettlement', es: 'Reasentamiento' },
+    body: {
+      en: 'Restoring productive property to households, so families can re-root in land, work, and parish life.',
+      es: 'Restaurar la propiedad productiva a los hogares, para que las familias puedan arraigarse de nuevo en la tierra, el trabajo, y la vida parroquial.',
     },
   },
   {
     slug: 'las-yerbas',
-    title: { en: 'Skills we pass on', es: 'Los oficios que transmitimos' },
-    blurb: {
-      en: 'The old crafts a Catholic home needs — taught back and forth, before they are lost.',
-      es: 'Los oficios antiguos que un hogar católico necesita — enseñándonos unos a otros, antes de que se pierdan.',
+    name: { en: 'Education', es: 'Educación' },
+    body: {
+      en: 'Rebuilding peer-to-peer networks for the land and hand crafts — the practical knowledge that used to pass between neighbors.',
+      es: 'Reconstruir las redes entre vecinos para los oficios de la tierra y de la mano — el conocimiento práctico que antes pasaba de uno a otro.',
     },
   },
   {
     slug: 'el-pan',
-    title: { en: 'Homes we build together', es: 'Hogares que levantamos juntos' },
-    blurb: {
-      en: 'When a neighbor needs help raising a coop, a cistern, a barn — we go.',
-      es: 'Cuando un vecino necesita ayuda para levantar un gallinero, una cisterna, un granero — vamos.',
+    name: { en: 'Fellowship', es: 'Compañerismo' },
+    body: {
+      en: 'A network of practical, intellectual, and spiritual support among households committed to the same vision.',
+      es: 'Una red de apoyo práctico, intelectual, y espiritual entre los hogares comprometidos con la misma visión.',
+    },
+  },
+  {
+    slug: 'la-conserva',
+    name: { en: 'Glorification', es: 'Glorificación' },
+    body: {
+      en: 'All chapter activity is rooted in the sacramental and liturgical life of the Church. Prayer, the Mass, and the rhythms of the liturgical year shape everything we do.',
+      es: 'Toda la actividad del capítulo está arraigada en la vida sacramental y litúrgica de la Iglesia. La oración, la Misa, y los ritmos del año litúrgico dan forma a todo lo que hacemos.',
+    },
+  },
+];
+
+// The three "live out" steps. Each has an eyebrow number, a title, and a
+// body paragraph. Step 3 carries the reading-list link.
+const liveOutSteps: {
+  num: string;
+  title: Bilingual;
+  body: Bilingual;
+  // Optional extra block — used for the reading-list link on step 3.
+  extra?: {
+    leadIn: Bilingual;
+    linkText: Bilingual;
+    linkHref: string;
+    tagline: Bilingual;
+  };
+}[] = [
+  {
+    num: '1',
+    title: { en: 'Come and see.', es: 'Ven y mira.' },
+    body: {
+      en: 'Start with a gathering. Meet the chapter, share a meal, see what we\u2019re about.',
+      es: 'Comienza con una reunión. Conoce al capítulo, comparte una comida, ve de qué se trata.',
+    },
+  },
+  {
+    num: '2',
+    title: { en: 'Learn and offer.', es: 'Aprende y ofrece.' },
+    body: {
+      en: 'We\u2019re a community that helps each other learn. Bring the skills you already have — carpentry, gardening, baking, fixing things, raising children well — and name the ones you want to learn. Connect with the people in the chapter who can teach you.',
+      es: 'Somos una comunidad que se ayuda a aprender. Trae los oficios que ya tienes — carpintería, jardinería, panadería, arreglar cosas, criar bien a los hijos — y nombra los que quieres aprender. Conéctate con las personas del capítulo que pueden enseñarte.',
+    },
+  },
+  {
+    num: '3',
+    title: { en: 'Live and share.', es: 'Vive y comparte.' },
+    body: {
+      en: 'Take what you\u2019ve learned home to your family and parish. Study the principles of Catholic Social Teaching. Share the CLM vision with others. Pray for the chapter.',
+      es: 'Lleva a casa lo que has aprendido, a tu familia y a tu parroquia. Estudia los principios de la Doctrina Social de la Iglesia. Comparte la visión del MCT con otros. Reza por el capítulo.',
+    },
+    extra: {
+      leadIn: {
+        en: 'Start your reading here:',
+        es: 'Empieza a leer aquí:',
+      },
+      linkText: { en: 'Homestead of Saint Joseph', es: 'Homestead of Saint Joseph' },
+      linkHref: 'https://sidarias.substack.com/',
+      tagline: {
+        en: 'chapter member Sid Arias on piety, natural law, and rediscovering reality through faith and reason.',
+        es: 'el miembro del capítulo Sid Arias sobre la piedad, la ley natural, y el redescubrimiento de la realidad por la fe y la razón.',
+      },
     },
   },
 ];
@@ -137,8 +206,8 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
-      // Just one post — the most recent approved. A single piece of
-      // evidence at reading size does more work than three stacked cards.
+      // One post — the most recent approved. A single piece of evidence
+      // at reading size does more work than three stacked cards.
       const { data, error } = await supabase
         .from('witness_posts')
         .select(
@@ -156,47 +225,21 @@ const Home = () => {
     })();
   }, []);
 
-  // Third CTA depends on auth state. Signed-out visitor → "Sign in / Join";
-  // signed-in visitor → "My profile." This turns the third tile into the
-  // actual conversion this page is trying to drive.
-  const thirdCta = user
-    ? {
-        to: buildPath('miPerfil', locale),
-        eyebrow: { en: 'MEMBERS', es: 'MIEMBROS' } satisfies Bilingual,
-        title: { en: 'My profile', es: 'Mi perfil' } satisfies Bilingual,
-        blurb: {
-          en: 'Your parish, your crafts, your gatherings.',
-          es: 'Tu parroquia, tus oficios, tus reuniones.',
-        } satisfies Bilingual,
-      }
-    : {
-        to: buildPath('bienvenido', locale),
-        eyebrow: { en: 'JOIN US', es: 'ÚNETE' } satisfies Bilingual,
-        title: { en: 'Join the chapter', es: 'Únete al capítulo' } satisfies Bilingual,
-        blurb: {
-          en: 'A few questions. Your neighbors find you, and you find them.',
-          es: 'Unas preguntas. Tus vecinos te encuentran, y tú a ellos.',
-        } satisfies Bilingual,
-      };
-
   return (
     <Layout>
       {/* ---------------------------------------------------------------- */}
-      {/* 1. Opening beat: mission / ache / offer                         */}
+      {/* 1. Opening                                                       */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
         <p className="display-caps text-xs tracking-[0.3em] text-ocre">
           {t(copy.eyebrow)}
         </p>
-        <h1 className="mt-8 font-heading text-4xl leading-[1.15] text-mesquite md:text-5xl">
-          {t(copy.headline)}
-        </h1>
         <div className="mx-auto mt-10 max-w-xl space-y-6 text-left">
           <p className="prose-body text-lg leading-relaxed text-mesquite/80">
             {t(copy.ache)}
           </p>
           <p className="prose-body text-lg leading-relaxed text-mesquite">
-            {t(copy.offer)}
+            {t(copy.whoWeAre)}
           </p>
         </div>
       </section>
@@ -204,23 +247,23 @@ const Home = () => {
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 2. What we do — three practices                                 */}
+      {/* 2. Pillars                                                       */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-14 text-center">
           <p className="display-caps text-xs tracking-[0.3em] text-ocre">
-            {t(copy.practicesEyebrow)}
+            {t(copy.pillarsEyebrow)}
           </p>
         </header>
-        <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-3">
-          {practices.map((p) => (
+        <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-2">
+          {pillars.map((p) => (
             <div key={p.slug} className="flex flex-col items-center text-center">
-              <Icon slug={p.slug} size={96} locale={locale} />
-              <h3 className="mt-6 font-heading text-xl leading-snug text-mesquite">
-                {t(p.title)}
+              <Icon slug={p.slug} size={80} locale={locale} />
+              <h3 className="mt-5 font-heading text-2xl leading-snug text-mesquite">
+                {t(p.name)}
               </h3>
-              <p className="prose-body mt-3 text-base italic leading-relaxed text-piedra">
-                {t(p.blurb)}
+              <p className="prose-body mt-3 max-w-md text-base leading-relaxed text-mesquite/80">
+                {t(p.body)}
               </p>
             </div>
           ))}
@@ -287,77 +330,67 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 5. Three next-step tiles                                         */}
+      {/* 5. How to Live Out the CLM Vision                                */}
       {/* ---------------------------------------------------------------- */}
-      <section className="container-wide py-24">
-        <header className="mb-12 text-center">
+      <section className="container-prose py-24">
+        <header className="mb-14 text-center">
           <p className="display-caps text-xs tracking-[0.3em] text-ocre">
-            {t(copy.ctaEyebrow)}
+            {t(copy.liveOutEyebrow)}
           </p>
         </header>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <CtaTile
-            to={buildPath('talleres', locale)}
-            eyebrow={{ en: 'GATHER', es: 'REUNIRSE' }}
-            title={{ en: 'Attend a gathering', es: 'Asiste a una reunión' }}
-            blurb={{
-              en: 'Real workshops, hosted by members — open to anyone willing to show up and work.',
-              es: 'Talleres de verdad, ofrecidos por miembros — abiertos a cualquiera dispuesto a llegar y trabajar.',
-            }}
-            t={t}
-          />
-          <CtaTile
-            to={buildPath('vision', locale)}
-            eyebrow={{ en: 'LEARN', es: 'APRENDE' }}
-            title={{ en: 'Read the vision', es: 'Lee la visión' }}
-            blurb={{
-              en: 'The four pillars and the cycle we walk — why this work, why now.',
-              es: 'Los cuatro pilares y el ciclo que caminamos — por qué este trabajo, por qué ahora.',
-            }}
-            t={t}
-          />
-          <CtaTile
-            to={thirdCta.to}
-            eyebrow={thirdCta.eyebrow}
-            title={thirdCta.title}
-            blurb={thirdCta.blurb}
-            t={t}
-          />
+
+        <ol className="space-y-14">
+          {liveOutSteps.map((step) => (
+            <li key={step.num} className="flex gap-6">
+              <div
+                aria-hidden="true"
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-ocre/40 bg-ocre/10 font-heading text-xl text-ocre"
+              >
+                {step.num}
+              </div>
+              <div className="flex-1">
+                <h3 className="font-heading text-2xl leading-snug text-mesquite">
+                  {t(step.title)}
+                </h3>
+                <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/80">
+                  {t(step.body)}
+                </p>
+                {step.extra && (
+                  <p className="prose-body mt-4 text-base leading-relaxed text-mesquite/80">
+                    {t(step.extra.leadIn)}{' '}
+                    <a
+                      href={step.extra.linkHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-heading italic text-ocre hover:text-mesquite"
+                    >
+                      {t(step.extra.linkText)}
+                    </a>{' '}
+                    — {t(step.extra.tagline)}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {/* The login CTA. We don't want to leave the page without giving
+            the visitor a clear next action. Members → profile; visitors
+            → onboarding. */}
+        <div className="mt-16 flex justify-center border-t border-mesquite/10 pt-10">
+          <Link
+            to={user ? buildPath('miPerfil', locale) : buildPath('bienvenido', locale)}
+            className="inline-flex items-center gap-2 rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal no-underline transition hover:bg-mesquite"
+            style={{ textDecoration: 'none' }}
+          >
+            {user
+              ? t({ en: 'My profile', es: 'Mi perfil' })
+              : t({ en: 'Join the chapter →', es: 'Únete al capítulo →' })}
+          </Link>
         </div>
       </section>
     </Layout>
   );
 };
-
-// Small local component — not worth its own file.
-const CtaTile = ({
-  to,
-  eyebrow,
-  title,
-  blurb,
-  t,
-}: {
-  to: string;
-  eyebrow: Bilingual;
-  title: Bilingual;
-  blurb: Bilingual;
-  t: (b: Bilingual) => string;
-}) => (
-  <Link
-    to={to}
-    className="group flex flex-col border border-mesquite/15 bg-cal/40 p-6 no-underline transition-colors hover:border-ocre hover:bg-cal"
-    style={{ textDecoration: 'none' }}
-  >
-    <p className="display-caps text-[10px] tracking-[0.25em] text-ocre">
-      {t(eyebrow)}
-    </p>
-    <h3 className="mt-3 font-heading text-xl text-mesquite group-hover:text-ocre">
-      {t(title)} →
-    </h3>
-    <p className="prose-body mt-3 text-sm italic leading-relaxed text-piedra">
-      {t(blurb)}
-    </p>
-  </Link>
-);
 
 export default Home;

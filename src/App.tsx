@@ -7,6 +7,7 @@ import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { routes } from "@/i18n/routes";
 import Home from "./pages/Home.tsx";
 import Vision from "./pages/Vision.tsx";
+import Participate from "./pages/Participate.tsx";
 import MemberDetail from "./pages/MemberDetail.tsx";
 import Talleres from "./pages/Talleres.tsx";
 import TallerDetail from "./pages/TallerDetail.tsx";
@@ -31,6 +32,10 @@ const App = () => (
 
             {/* Vision — same slug in both locales */}
             <Route path={routes.vision.en} element={<Vision />} />
+
+            {/* Participate — separate EN and ES slugs */}
+            <Route path={routes.participate.en} element={<Participate />} />
+            <Route path={routes.participate.es} element={<Participate />} />
 
             {/* Legacy /ofrendas URLs redirect to /vision */}
             <Route path="/ofrendas"     element={<Navigate to="/vision" replace />} />

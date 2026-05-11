@@ -7,6 +7,7 @@ export const uiStrings = {
   nav: {
     home:         { en: 'Home',         es: 'Inicio' },
     vision:       { en: 'Vision',       es: 'Visión' },
+    participate:  { en: 'Participate',  es: 'Participar' },
     workshops:    { en: 'Workshops',    es: 'Talleres' },
     witness:      { en: 'Witness',      es: 'Testimonio' },
     patron:       { en: 'Patron',       es: 'Santo Patrón' },

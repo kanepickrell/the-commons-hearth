@@ -9,11 +9,15 @@ export const Header = () => {
   const { pathname } = useLocation();
   const s = uiStrings.nav;
 
+  // Nav order is intentional: what we believe (Vision) → how to live it
+  // (Participate) → where it's happening now (Workshops) → what's
+  // happened so far (Witness) → who we ask to pray for it (Patron).
   const links = [
-    { to: buildPath('vision',     locale), label: t(s.vision) },
-    { to: buildPath('talleres',   locale), label: t(s.workshops) },
-    { to: buildPath('testimonio', locale), label: t(s.witness) },
-    { to: buildPath('santo',      locale), label: t(s.patron) },
+    { to: buildPath('vision',      locale), label: t(s.vision) },
+    { to: buildPath('participate', locale), label: t(s.participate) },
+    { to: buildPath('talleres',    locale), label: t(s.workshops) },
+    { to: buildPath('testimonio',  locale), label: t(s.witness) },
+    { to: buildPath('santo',       locale), label: t(s.patron) },
   ];
 
   const onToggle = (next: 'en' | 'es') => {
