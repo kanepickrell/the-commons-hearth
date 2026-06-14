@@ -201,7 +201,7 @@ export const uiStrings = {
   },
   witness: {
     eyebrow:   { en: 'THE WITNESS · A.D. 2026',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR 2026' },
-    heading:   { en: 'The year, as the chapter has lived it', es: 'El año, tal como el capítulo lo ha vivido' },
+    heading:   { en: 'Our year, in the making', es: 'El año, tal como el capítulo lo ha vivido' },
     subhead:   { en: 'a wheel of months — click any wedge to look closer',
                  es: 'una rueda de meses — toca cualquier sección para ver más' },
     statGatherings:  { en: 'gatherings',  es: 'reuniones' },
