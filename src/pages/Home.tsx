@@ -51,8 +51,8 @@ const copy = {
   // Who we are + what we believe + what the chapter does. One paragraph
   // on purpose — the visitor needs to read it in one breath.
   whoWeAre: {
-    en: 'We are the Central Texas Chapter of the Catholic Land Movement, and we believe this is possible through the grace of Jesus Christ. It is the work of the laity to orient our families, communities, and institutions toward the beatific vision. Our chapter exists to equip Catholics in Central Texas to transform their parishes into hubs of community life — not merely sacramental stations.',
-    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Es obra de los laicos orientar nuestras familias, comunidades, e instituciones hacia la visión beatífica. Nuestro capítulo existe para equipar a los católicos del centro de Tejas a transformar sus parroquias en centros de vida comunitaria — no simples estaciones sacramentales.',
+    en: 'We are the Central Texas Chapter of the Catholic Land Movement, and we believe this is possible through the grace of Jesus Christ. It is the work of the laity to orient our families, communities, and institutions toward the beatific vision.',
+    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Es obra de los laicos orientar nuestras familias, comunidades, e instituciones hacia la visión beatífica.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
@@ -150,44 +150,44 @@ const liveOutSteps: {
     linkHref: string;
     tagline: Bilingual;
   };
-}[] = [
-  {
-    num: '1',
-    title: { en: 'Come and see.', es: 'Ven y mira.' },
-    body: {
-      en: 'Start with a gathering. Meet the chapter, share a meal, see what we\u2019re about.',
-      es: 'Comienza con una reunión. Conoce al capítulo, comparte una comida, ve de qué se trata.',
-    },
-  },
-  {
-    num: '2',
-    title: { en: 'Learn and offer.', es: 'Aprende y ofrece.' },
-    body: {
-      en: 'We\u2019re a community that helps each other learn. Bring the skills you already have — carpentry, gardening, baking, fixing things, raising children well — and name the ones you want to learn. Connect with the people in the chapter who can teach you.',
-      es: 'Somos una comunidad que se ayuda a aprender. Trae los oficios que ya tienes — carpintería, jardinería, panadería, arreglar cosas, criar bien a los hijos — y nombra los que quieres aprender. Conéctate con las personas del capítulo que pueden enseñarte.',
-    },
-  },
-  {
-    num: '3',
-    title: { en: 'Live and share.', es: 'Vive y comparte.' },
-    body: {
-      en: 'Take what you\u2019ve learned home to your family and parish. Study the principles of Catholic Social Teaching. Share the CLM vision with others. Pray for the chapter.',
-      es: 'Lleva a casa lo que has aprendido, a tu familia y a tu parroquia. Estudia los principios de la Doctrina Social de la Iglesia. Comparte la visión del MCT con otros. Reza por el capítulo.',
-    },
-    extra: {
-      leadIn: {
-        en: 'Start your reading here:',
-        es: 'Empieza a leer aquí:',
-      },
-      linkText: { en: 'Homestead of Saint Joseph', es: 'Homestead of Saint Joseph' },
-      linkHref: 'https://sidarias.substack.com/',
-      tagline: {
-        en: 'chapter member Sid Arias on piety, natural law, and rediscovering reality through faith and reason.',
-        es: 'el miembro del capítulo Sid Arias sobre la piedad, la ley natural, y el redescubrimiento de la realidad por la fe y la razón.',
-      },
-    },
-  },
-];
+// }[] = [
+//   {
+//     num: '1',
+//     title: { en: 'Come and see.', es: 'Ven y mira.' },
+//     body: {
+//       en: 'Start with a gathering. Meet the chapter, share a meal, see what we\u2019re about.',
+//       es: 'Comienza con una reunión. Conoce al capítulo, comparte una comida, ve de qué se trata.',
+//     },
+//   },
+//   {
+//     num: '2',
+//     title: { en: 'Learn and offer.', es: 'Aprende y ofrece.' },
+//     body: {
+//       en: 'We\u2019re a community that helps each other learn. Bring the skills you already have — carpentry, gardening, baking, fixing things, raising children well — and name the ones you want to learn. Connect with the people in the chapter who can teach you.',
+//       es: 'Somos una comunidad que se ayuda a aprender. Trae los oficios que ya tienes — carpintería, jardinería, panadería, arreglar cosas, criar bien a los hijos — y nombra los que quieres aprender. Conéctate con las personas del capítulo que pueden enseñarte.',
+//     },
+//   },
+//   {
+//     num: '3',
+//     title: { en: 'Live and share.', es: 'Vive y comparte.' },
+//     body: {
+//       en: 'Take what you\u2019ve learned home to your family and parish. Study the principles of Catholic Social Teaching. Share the CLM vision with others. Pray for the chapter.',
+//       es: 'Lleva a casa lo que has aprendido, a tu familia y a tu parroquia. Estudia los principios de la Doctrina Social de la Iglesia. Comparte la visión del MCT con otros. Reza por el capítulo.',
+//     },
+//     extra: {
+//       leadIn: {
+//         en: 'Start your reading here:',
+//         es: 'Empieza a leer aquí:',
+//       },
+//       linkText: { en: 'Homestead of Saint Joseph', es: 'Homestead of Saint Joseph' },
+//       linkHref: 'https://sidarias.substack.com/',
+//       tagline: {
+//         en: 'chapter member Sid Arias on piety, natural law, and rediscovering reality through faith and reason.',
+//         es: 'el miembro del capítulo Sid Arias sobre la piedad, la ley natural, y el redescubrimiento de la realidad por la fe y la razón.',
+//       },
+//     },
+//   },
+// ];
 
 type RecentPost = {
   id: string;
