@@ -2,6 +2,14 @@
 // One member's public profile — structured around the three questions:
 //   Sharing (crafts) · Building (working_on) · Learning (wants_to_learn) · Bio
 // Plus upcoming + past gatherings they host.
+//
+// PRIVACY-SPLIT NOTE: the hosted-gathering lists now read the redacting
+// `gatherings_public` view, NOT the `workshops` base table. After the lock
+// (drop policy workshops_select), a visitor can no longer SELECT another
+// member's approved workshops directly — only their own rows or, for admins,
+// all rows. The view is approved-only and bypasses RLS, so it's the correct
+// source for "gatherings this member hosts." We split on `event_date`
+// (always present) rather than `held_at` (null when details are gated).
 
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -27,11 +35,11 @@ type DetailRow = {
 
 type Expertise = { id: string; craft: string };
 
-type HostedWorkshop = {
+type HostedGathering = {
   id: string;
   title: string;
-  held_at: string;
-  location_text: string | null;
+  event_date: string;            // 'YYYY-MM-DD', always present on the view
+  location_text: string | null;  // null when details are gated for the viewer
 };
 
 // Kept in sync with the craft enum. Used for friendly display labels.
@@ -67,13 +75,13 @@ const MemberDetail = () => {
 
   const [member, setMember] = useState<DetailRow | null>(null);
   const [expertise, setExpertise] = useState<Expertise[]>([]);
-  const [upcoming, setUpcoming] = useState<HostedWorkshop[]>([]);
-  const [past, setPast] = useState<HostedWorkshop[]>([]);
+  const [upcoming, setUpcoming] = useState<HostedGathering[]>([]);
+  const [past, setPast] = useState<HostedGathering[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
-    const now = new Date().toISOString();
+    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
     (async () => {
       const [profileResult, expertiseResult, upcomingResult, pastResult] = await Promise.all([
         supabase
@@ -89,27 +97,27 @@ const MemberDetail = () => {
           .select('id, craft')
           .eq('profile_id', id)
           .order('created_at'),
+        // Upcoming — read the view (approved-only, so no status filter).
         supabase
-          .from('workshops')
-          .select('id, title, held_at, location_text')
+          .from('gatherings_public')
+          .select('id, title, event_date, location_text')
           .eq('host_id', id)
-          .eq('status', 'approved')
-          .gte('held_at', now)
-          .order('held_at', { ascending: true }),
+          .gte('event_date', today)
+          .order('event_date', { ascending: true }),
+        // Past — same view, the other side of today.
         supabase
-          .from('workshops')
-          .select('id, title, held_at, location_text')
+          .from('gatherings_public')
+          .select('id, title, event_date, location_text')
           .eq('host_id', id)
-          .eq('status', 'approved')
-          .lt('held_at', now)
-          .order('held_at', { ascending: false })
+          .lt('event_date', today)
+          .order('event_date', { ascending: false })
           .limit(10),
       ]);
 
       if (profileResult.data) setMember(profileResult.data as unknown as DetailRow);
       if (expertiseResult.data) setExpertise(expertiseResult.data);
-      if (upcomingResult.data) setUpcoming(upcomingResult.data);
-      if (pastResult.data) setPast(pastResult.data);
+      if (upcomingResult.data) setUpcoming(upcomingResult.data as unknown as HostedGathering[]);
+      if (pastResult.data) setPast(pastResult.data as unknown as HostedGathering[]);
       setLoading(false);
     })();
   }, [id]);
@@ -234,7 +242,7 @@ const MemberDetail = () => {
                       {w.title}
                     </Link>
                     <p className="text-sm text-piedra">
-                      {new Date(w.held_at).toLocaleDateString(
+                      {new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
                         locale === 'es' ? 'es-MX' : 'en-US',
                         { month: 'long', day: 'numeric', year: 'numeric' }
                       )}
@@ -263,7 +271,7 @@ const MemberDetail = () => {
                       {w.title}
                     </Link>
                     <span className="font-mono text-xs italic text-piedra/70">
-                      {new Date(w.held_at).toLocaleDateString(
+                      {new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
                         locale === 'es' ? 'es-MX' : 'en-US',
                         { month: 'short', day: 'numeric', year: 'numeric' }
                       )}

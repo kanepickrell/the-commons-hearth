@@ -11,6 +11,7 @@ import { YearWheel } from '@/components/testimonio/YearWheel';
 import { MonthPanel } from '@/components/testimonio/MonthPanel';
 import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
+import { MonthCarousel } from '@/components/testimonio/MonthCarousel';
 
 // What comes back from the DB — flat columns, single-language body.
 type WitnessRow = {
@@ -25,6 +26,11 @@ type WitnessRow = {
   fruit_unit: string | null;
   occurred_at: string;
 };
+
+// near the top of the file, above the component — the year the wheel represents.
+// The wheel hardcodes 2026 in its hub, so the carousel matches it. Switch to
+// new Date().getFullYear() if you'd rather it track the live year.
+const WHEEL_YEAR = 2026;
 
 // Convert a DB row into the shape the wheel/panel components already expect.
 // The components take Bilingual strings; we supply the same string for both
@@ -140,6 +146,9 @@ const Testimonio = () => {
                   onAskMetric={() => {}}
                 />
               </div>
+
+              <MonthCarousel year={WHEEL_YEAR} month={selectedMonth} locale={locale} />
+
             </div>
 
             {posts.length === 0 && (
