@@ -21,6 +21,7 @@ interface AuthState {
   loading: boolean;
   isAdmin: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -82,10 +83,25 @@ export function useAuth(): AuthState {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/bienvenido`,
+        queryParams: { prompt: 'select_account' },
       },
     });
     if (error) {
       console.error('Sign-in error:', error);
+      throw error;
+    }
+  }, []);
+
+  const signInWithEmail = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/bienvenido`,
+        shouldCreateUser: true, // doubles as sign-up for new members
+      },
+    });
+    if (error) {
+      console.error('Magic-link error:', error);
       throw error;
     }
   }, []);
@@ -107,5 +123,6 @@ export function useAuth(): AuthState {
     signInWithGoogle,
     signOut,
     refreshProfile,
+    signInWithEmail,
   };
 }
