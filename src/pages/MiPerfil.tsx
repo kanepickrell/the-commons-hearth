@@ -28,6 +28,14 @@ type HostedWorkshop = {
   location_text: string | null;
 };
 
+type MyGathering = {
+  id: string;
+  title: string;
+  held_at: string;
+  location_text: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+};
+
 type MyRsvpRow = {
   id: string;
   workshop_id: string;
@@ -81,6 +89,7 @@ export default function MiPerfil() {
   const [past, setPast] = useState<HostedWorkshop[]>([]);
   const [hostedRsvps, setHostedRsvps] = useState<Record<string, MyRsvpRow[]>>({});
   const [loading, setLoading] = useState(true);
+  const [myPending, setMyPending] = useState<MyGathering[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -127,6 +136,16 @@ export default function MiPerfil() {
       if (expResult.data) setExpertise(expResult.data);
       if (upcomingResult.data) setUpcoming(upcomingResult.data);
       if (pastResult.data) setPast(pastResult.data);
+
+      // My own submissions still awaiting — or denied — approval.
+      const { data: mineData } = await supabase
+        .from('workshops')
+        .select('id, title, held_at, location_text, status')
+        .eq('host_id', user.id)
+        .in('status', ['pending', 'rejected'])
+        .gte('held_at', now)
+        .order('held_at', { ascending: true });
+      if (mineData) setMyPending(mineData as MyGathering[]);
 
       // For each upcoming workshop I'm hosting, fetch RSVPs
       if (upcomingResult.data && upcomingResult.data.length > 0) {
@@ -191,6 +210,18 @@ export default function MiPerfil() {
           </p>
         )}
 
+        {profile.status === 'approved' && (
+          <div className="mb-12">
+            <Link
+              to={buildPath('nuevaReunion', locale)}
+              className="inline-flex items-center gap-2 rounded-sm bg-ocre px-5 py-2.5 font-heading text-sm text-cal no-underline transition hover:bg-mesquite"
+              style={{ textDecoration: 'none' }}
+            >
+              + {t({ en: 'Host a gathering', es: 'Ofrecer una reunión' })}
+            </Link>
+          </div>
+        )}
+
         {/* Sharing */}
         {expertise.length > 0 && (
           <section className="mb-12">
@@ -243,6 +274,40 @@ export default function MiPerfil() {
             <p className="whitespace-pre-wrap font-serif text-lg leading-relaxed text-mesquite">
               {profile.bio}
             </p>
+          </section>
+        )}
+
+        {/* My submissions awaiting / denied approval */}
+        {myPending.length > 0 && (
+          <section className="mb-12">
+            <h2 className="mb-4 font-heading text-xl text-mesquite">
+              {t({ en: 'Submitted gatherings', es: 'Reuniones enviadas' })}
+            </h2>
+            <ul className="space-y-4">
+              {myPending.map((w) => (
+                <li key={w.id} className="rounded-sm border border-mesquite/15 bg-cal/40 p-4">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <span className="font-heading text-lg text-mesquite">{w.title}</span>
+                    {w.status === 'pending' ? (
+                      <span className="rounded-full bg-ocre/15 px-2.5 py-0.5 text-[10px] uppercase tracking-wide text-ocre">
+                        {t({ en: 'awaiting approval', es: 'esperando aprobación' })}
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-rojo/10 px-2.5 py-0.5 text-[10px] uppercase tracking-wide text-rojo">
+                        {t({ en: 'not approved', es: 'no aprobada' })}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm text-piedra">
+                    {new Date(w.held_at).toLocaleDateString(
+                      locale === 'es' ? 'es-MX' : 'en-US',
+                      { month: 'long', day: 'numeric', year: 'numeric' }
+                    )}
+                    {w.location_text ? ` — ${w.location_text}` : ''}
+                  </p>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 

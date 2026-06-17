@@ -17,6 +17,7 @@ import Bienvenido from "./pages/Bienvenido.tsx";
 import MiPerfil from "./pages/MiPerfil.tsx";
 import Mayordomo from "./pages/Mayordomo.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import NuevaReunion from "./pages/NuevaReunion.tsx";
 
 const queryClient = new QueryClient();
 
@@ -46,8 +47,12 @@ const App = () => (
             <Route path={routes.memberDetail.es} element={<MemberDetail />} />
             <Route path={routes.memberDetail.en} element={<MemberDetail />} />
 
+            <Route path={routes.nuevaReunion.es} element={<NuevaReunion />} />
+            <Route path={routes.nuevaReunion.en} element={<NuevaReunion />} />
+
             <Route path={routes.talleres.es} element={<Talleres />} />
             <Route path={routes.talleres.en} element={<Talleres />} />
+
             <Route path={routes.tallerDetail.es} element={<TallerDetail />} />
             <Route path={routes.tallerDetail.en} element={<TallerDetail />} />
 

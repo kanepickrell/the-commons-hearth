@@ -15,13 +15,15 @@ export type RouteKey =
   | 'santo'
   | 'bienvenido'
   | 'miPerfil'
-  | 'mayordomo';
+  | 'mayordomo'
+  | 'nuevaReunion';
 
 export const routes: Record<RouteKey, { en: string; es: string }> = {
   home:          { en: '/',                es: '/' },
   vision:        { en: '/vision',          es: '/vision' },
   participate:   { en: '/participate',     es: '/participar' },
   memberDetail:  { en: '/members/:id',     es: '/miembros/:id' },
+  nuevaReunion:  { en: '/workshops/new',   es: '/talleres/nueva' },
   talleres:      { en: '/workshops',       es: '/talleres' },
   tallerDetail:  { en: '/workshops/:id',   es: '/talleres/:id' },
   testimonio:    { en: '/witness',         es: '/testimonio' },
