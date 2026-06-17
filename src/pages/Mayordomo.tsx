@@ -7,6 +7,7 @@ import { buildPath } from '@/i18n/routes';
 import { toast } from '@/hooks/use-toast';
 import { Layout } from '@/components/Layout';
 import { ParishPocPanel } from '@/components/admin/ParishPocPanel';
+import { MonthPhotoPanel } from '@/components/admin/MonthPhotoPanel';
 import type { Database } from '@/lib/database.types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -354,6 +355,13 @@ export default function Mayordomo() {
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <ParishPocPanel />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 4: Month photos (Year Wheel carousel) */}
+        {/* ------------------------------------------------------------------ */}
+        <section className="border-t border-mesquite/10 pt-12">
+          <MonthPhotoPanel />
         </section>
       </div>
     </Layout>
