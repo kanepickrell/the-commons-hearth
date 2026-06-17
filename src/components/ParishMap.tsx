@@ -162,11 +162,11 @@ export const ParishMap = () => {
       return;
     }
     (async () => {
+      const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
       const { data } = await supabase
-        .from('workshops')
-        .select('id, title, craft, location_text, lat, lng, host_id')
-        .eq('status', 'approved')
-        .gte('held_at', new Date().toISOString());
+        .from('gatherings_public')
+        .select('id, title, craft, location_text, lat, lng')
+        .gte('event_date', today);
 
       const marks: WorkshopMarker[] = [];
       for (const w of data ?? []) {

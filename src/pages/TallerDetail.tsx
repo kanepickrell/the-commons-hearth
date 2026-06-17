@@ -1,12 +1,8 @@
 // src/pages/TallerDetail.tsx
-// Workshop detail page with the full RSVP flow:
-//   - Host name links to their profile
-//   - "I'll be there" button opens the contribution modal
-//   - After a successful RSVP, row is inserted, email trigger fires
-//   - "Who's coming" list shows names + what they're bringing (approved
-//     members see this via RLS; anonymous visitors don't see it at all)
-// Note: the confirmation email is fired by a Postgres trigger → Edge Function
-// → Resend. The client just does the INSERT.
+// Gathering detail page with the full RSVP flow.
+// Reads the redacting view: exact time + address of an upcoming gathering
+// are gated to approved members (details_visible). Past events and members
+// see everything. RSVP + "who's coming" are unchanged (they read `rsvps`).
 
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -22,15 +18,19 @@ import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import type { IconSlug } from '@/lib/types';
 
-type WorkshopDetail = {
+type GatheringDetail = {
   id: string;
   title: string;
   description: string | null;
   language: 'en' | 'es' | null;
   craft: IconSlug | null;
-  held_at: string;
-  location_text: string | null;
-  host: { id: string; display_name: string | null } | null;
+  event_date: string;            // always present
+  held_at: string | null;        // exact time — null when gated
+  location_text: string | null;  // address — null when gated
+  host_id: string | null;
+  host_name: string | null;
+  parish_city: string | null;
+  details_visible: boolean;
 };
 
 type RsvpRow = {
@@ -46,7 +46,7 @@ const TallerDetail = () => {
   const { t, locale } = useLocale();
   const { user, profile } = useAuth();
 
-  const [w, setW] = useState<WorkshopDetail | null>(null);
+  const [w, setW] = useState<GatheringDetail | null>(null);
   const [rsvps, setRsvps] = useState<RsvpRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -58,24 +58,23 @@ const TallerDetail = () => {
     if (!id) return;
     (async () => {
       const { data, error } = await supabase
-        .from('workshops')
+        .from('gatherings_public')
         .select(
-          'id, title, description, language, craft, held_at, location_text, host:profiles!workshops_host_id_fkey(id, display_name)'
+          'id, title, description, language, craft, event_date, held_at, location_text, host_id, host_name, parish_city, details_visible'
         )
         .eq('id', id)
-        .eq('status', 'approved')
         .maybeSingle();
 
       if (error) {
-        console.error('Failed to load workshop:', error);
+        console.error('Failed to load gathering:', error);
       } else if (data) {
-        setW(data as unknown as WorkshopDetail);
+        setW(data as unknown as GatheringDetail);
       }
       setLoading(false);
     })();
   }, [id]);
 
-  // Load RSVPs — RLS limits this to approved members (or the host, or the
+  // RSVPs — RLS limits this to approved members (or the host, or the
   // attendee themselves), so anonymous visitors get an empty array.
   const loadRsvps = async () => {
     if (!id) return;
@@ -106,7 +105,6 @@ const TallerDetail = () => {
     });
 
     if (error) {
-      // Unique-index violation (already RSVP'd)
       if (error.code === '23505') {
         throw new Error(t(uiStrings.rsvp.alreadyRsvpd));
       }
@@ -114,9 +112,7 @@ const TallerDetail = () => {
     }
 
     setModalOpen(false);
-    toast({
-      title: t(uiStrings.rsvp.confirmed),
-    });
+    toast({ title: t(uiStrings.rsvp.confirmed) });
     await loadRsvps();
   };
 
@@ -162,6 +158,17 @@ const TallerDetail = () => {
   const c = uiStrings.contribution;
   const contributionLabel = (k: ContributionType) => t(c[k]);
 
+  const dateLine = new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
+    locale === 'es' ? 'es-MX' : 'en-US',
+    { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }
+  );
+  const timeLine = w.held_at
+    ? new Date(w.held_at).toLocaleTimeString(locale === 'es' ? 'es-MX' : 'en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : null;
+
   return (
     <Layout>
       <article className="container-prose py-20">
@@ -172,12 +179,8 @@ const TallerDetail = () => {
         <header className="mt-10 flex flex-col items-center text-center">
           {w.craft && <Icon slug={w.craft} size={96} locale={locale} />}
           <p className="mt-6 display-caps text-xs tracking-[0.2em] text-ocre">
-            {new Date(w.held_at).toLocaleDateString(locale === 'es' ? 'es-MX' : 'en-US', {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric',
-            })}
+            {dateLine}
+            {timeLine ? `, ${timeLine}` : ''}
           </p>
           <h1 className="mt-4 font-heading text-4xl leading-tight text-mesquite">{w.title}</h1>
         </header>
@@ -192,30 +195,47 @@ const TallerDetail = () => {
         )}
 
         <dl className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {w.host && (
+          {w.host_id && (
             <div>
               <dt className="display-caps text-xs tracking-[0.2em] text-ocre">
                 {t(uiStrings.workshop.hostedBy)}
               </dt>
               <dd className="mt-2 font-heading text-lg text-mesquite">
                 <Link
-                  to={buildPath('memberDetail', locale, { id: w.host.id })}
+                  to={buildPath('memberDetail', locale, { id: w.host_id })}
                   className="no-underline hover:text-ocre"
                   style={{ textDecoration: 'none' }}
                 >
-                  {w.host.display_name ?? '—'}
+                  {w.host_name ?? '—'}
                 </Link>
               </dd>
             </div>
           )}
-          {w.location_text && (
-            <div>
-              <dt className="display-caps text-xs tracking-[0.2em] text-ocre">
-                {t(uiStrings.workshop.location)}
-              </dt>
-              <dd className="mt-2 font-heading text-lg text-mesquite">{w.location_text}</dd>
-            </div>
-          )}
+          <div>
+            <dt className="display-caps text-xs tracking-[0.2em] text-ocre">
+              {t(uiStrings.workshop.location)}
+            </dt>
+            <dd className="mt-2 font-heading text-lg text-mesquite">
+              {w.details_visible ? (
+                w.location_text ?? w.parish_city ?? '—'
+              ) : (
+                <span className="font-serif text-base italic text-mesquite/70">
+                  {w.parish_city
+                    ? `${locale === 'es' ? 'Cerca de' : 'Near'} ${w.parish_city}. `
+                    : ''}
+                  {locale === 'es'
+                    ? 'El lugar y la hora exactos se comparten con los miembros.'
+                    : 'The exact location and time are shared with members.'}
+                  {!user && (
+                    <>
+                      {' '}
+                      {locale === 'es' ? 'Inicia sesión para verlos.' : 'Sign in to see them.'}
+                    </>
+                  )}
+                </span>
+              )}
+            </dd>
+          </div>
         </dl>
 
         <div className="mt-14 flex flex-col items-center gap-3">
@@ -234,7 +254,6 @@ const TallerDetail = () => {
           </p>
         </div>
 
-        {/* Who's coming — only shown if there are RSVPs and the viewer can see them */}
         {rsvps.length > 0 && (
           <section className="mt-16 border-t border-mesquite/10 pt-10">
             <h2 className="display-caps mb-6 text-xs tracking-[0.2em] text-ocre">
@@ -257,7 +276,7 @@ const TallerDetail = () => {
                   </div>
                   {r.contribution_note && (
                     <p className="font-serif text-sm italic text-mesquite/70">
-                      “{r.contribution_note}”
+                      "{r.contribution_note}"
                     </p>
                   )}
                 </li>
@@ -267,11 +286,7 @@ const TallerDetail = () => {
         )}
       </article>
 
-      <RsvpModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleRsvp}
-      />
+      <RsvpModal open={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleRsvp} />
     </Layout>
   );
 };

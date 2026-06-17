@@ -1,6 +1,7 @@
 // src/pages/Talleres.tsx
-// Upcoming approved workshops, ordered by date.
-// Empty until approved workshops exist in the DB.
+// Upcoming approved gatherings, ordered by date.
+// Reads the redacting view: anon sees the day, parish, and host, but the
+// exact time and address of UPCOMING gatherings are gated to members.
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,37 +14,39 @@ import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import type { IconSlug } from '@/lib/types';
 
-type WorkshopRow = {
+type GatheringRow = {
   id: string;
   title: string;
   description: string | null;
   language: 'en' | 'es' | null;
   craft: IconSlug | null;
-  held_at: string;
-  location_text: string | null;
-  host: { id: string; display_name: string | null } | null;
+  event_date: string;            // 'YYYY-MM-DD', always present
+  held_at: string | null;        // exact time — null when gated
+  location_text: string | null;  // address — null when gated
+  host_name: string | null;
+  details_visible: boolean;
 };
 
 const Talleres = () => {
   const { t, locale } = useLocale();
-  const [workshops, setWorkshops] = useState<WorkshopRow[]>([]);
+  const [workshops, setWorkshops] = useState<GatheringRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
+      const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
       const { data, error } = await supabase
-        .from('workshops')
+        .from('gatherings_public')
         .select(
-          'id, title, description, language, craft, held_at, location_text, host:profiles!workshops_host_id_fkey(id, display_name)'
+          'id, title, description, language, craft, event_date, held_at, location_text, host_name, details_visible'
         )
-        .eq('status', 'approved')
-        .gte('held_at', new Date().toISOString())
-        .order('held_at', { ascending: true });
+        .gte('event_date', today)
+        .order('event_date', { ascending: true });
 
       if (error) {
-        console.error('Failed to load workshops:', error);
+        console.error('Failed to load gatherings:', error);
       } else if (data) {
-        setWorkshops(data as unknown as WorkshopRow[]);
+        setWorkshops(data as unknown as GatheringRow[]);
       }
       setLoading(false);
     })();
@@ -90,7 +93,7 @@ const Talleres = () => {
                   </div>
                   <div className="flex-1">
                     <p className="display-caps text-xs tracking-[0.2em] text-ocre">
-                      {new Date(w.held_at).toLocaleDateString(
+                      {new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
                         locale === 'es' ? 'es-MX' : 'en-US',
                         { weekday: 'long', month: 'long', day: 'numeric' }
                       )}
@@ -106,8 +109,16 @@ const Talleres = () => {
                     )}
                     <p className="mt-4 text-sm italic text-piedra">
                       {t(uiStrings.workshop.hostedBy)}{' '}
-                      {w.host?.display_name ?? '—'}
-                      {w.location_text ? ` · ${w.location_text}` : ''}
+                      {w.host_name ?? '—'}
+                      {w.details_visible
+                        ? w.location_text
+                          ? ` · ${w.location_text}`
+                          : ''
+                        : ` · ${
+                            locale === 'es'
+                              ? 'lugar y hora visibles para miembros'
+                              : 'location & time shown to members'
+                          }`}
                     </p>
                   </div>
                 </Link>
