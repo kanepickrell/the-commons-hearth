@@ -24,22 +24,21 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
-import type { Database, CraftSlug } from '@/lib/database.types';
-
 import { Icon } from '@/components/Icon';
+import type { Database, CraftSlug } from '@/lib/database.types';
 import type { IconSlug } from '@/lib/types';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
 
-const CRAFTS_V1: { slug: CraftSlug; iconPath: string; en: string; es: string }[] = [
-  { slug: 'las-abejas',  iconPath: '/src/assets/icons/las-abejas.svg',  en: 'Bees',       es: 'Las Abejas' },
-  { slug: 'la-gallina',  iconPath: '/src/assets/icons/la-gallina.svg',  en: 'Hens',       es: 'La Gallina' },
-  { slug: 'el-pan',      iconPath: '/src/assets/icons/el-pan.svg',      en: 'Bread',      es: 'El Pan' },
-  { slug: 'la-conserva', iconPath: '/src/assets/icons/la-conserva.svg', en: 'Preserving', es: 'La Conserva' },
-  { slug: 'la-cisterna', iconPath: '/src/assets/icons/la-cisterna.svg', en: 'Rainwater',  es: 'La Cisterna' },
-  { slug: 'la-azuela',   iconPath: '/src/assets/icons/la-azuela.svg',   en: 'Woodwork',   es: 'La Azuela' },
-  { slug: 'el-telar',    iconPath: '/src/assets/icons/el-telar.svg',    en: 'Textiles',   es: 'El Telar' },
-  { slug: 'las-yerbas',  iconPath: '/src/assets/icons/las-yerbas.svg',  en: 'Herbs',      es: 'Las Yerbas' },
+const CRAFTS_V1: { slug: CraftSlug; en: string; es: string }[] = [
+  { slug: 'las-abejas',  en: 'Bees',       es: 'Las Abejas' },
+  { slug: 'la-gallina',  en: 'Hens',       es: 'La Gallina' },
+  { slug: 'el-pan',      en: 'Bread',      es: 'El Pan' },
+  { slug: 'la-conserva', en: 'Preserving', es: 'La Conserva' },
+  { slug: 'la-cisterna', en: 'Rainwater',  es: 'La Cisterna' },
+  { slug: 'la-azuela',   en: 'Woodwork',   es: 'La Azuela' },
+  { slug: 'el-telar',    en: 'Textiles',   es: 'El Telar' },
+  { slug: 'las-yerbas',  en: 'Herbs',      es: 'Las Yerbas' },
 ];
 
 function normalize(s: string): string {
@@ -522,11 +521,11 @@ export default function Bienvenido() {
                         : 'border-mesquite/15 bg-cal/40 text-mesquite/60 hover:border-mesquite/40 hover:text-mesquite'
                     }`}
                   >
-                    <img
-                      src={craft.iconPath}
-                      alt=""
-                      className={`h-12 w-12 transition ${selected ? 'opacity-100' : 'opacity-60'}`}
-                      style={{ filter: selected ? 'none' : 'grayscale(40%)' }}
+                    <Icon
+                      slug={craft.slug as IconSlug}
+                      size={48}
+                      locale={locale}
+                      className={`transition ${selected ? 'opacity-100' : 'opacity-60'}`}
                     />
                     <span className="font-heading text-sm leading-tight">
                       {locale === 'es' ? craft.es : craft.en}
