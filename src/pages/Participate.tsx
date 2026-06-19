@@ -141,10 +141,12 @@ export default function Participate() {
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-24">
         <div className="container-narrow">
           <div className="space-y-16 md:space-y-24">
-            {movements.map((m) => (
+            {movements.map((m, i) => (
               <article
                 key={m.roman}
-                className="border-t border-mesquite/15 pt-12 text-center md:pt-16"
+                className={`text-center ${
+                  i === 0 ? '' : 'border-t border-mesquite/15 pt-12 md:pt-16'
+                }`}
               >
                 <div
                   aria-hidden="true"
@@ -177,7 +179,7 @@ export default function Participate() {
                       </p>
                       <p className="font-serif leading-relaxed text-mesquite/80">
                         {t(m.reading.leadIn)}{' '}
-                        <a
+                        
                           href={m.reading.substackHref}
                           target="_blank"
                           rel="noopener noreferrer"
