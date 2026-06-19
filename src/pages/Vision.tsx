@@ -30,11 +30,11 @@ export default function Vision() {
       // abstract — it's productive property as the substrate that lets
       // the family function as a real social unit again.
       verse: {
-        en: 'The restoration of productive property into the hands of households, which re-roots families as real social units fully integrated in land, work, parish, and community.',
+        en: 'To restore productive property into the hands of households, which roots families as real social units fully integrated in land, work, parish, and community.',
         es: 'La restauración de la propiedad productiva en manos de los hogares, lo cual arraiga de nuevo a las familias como unidades sociales reales, plenamente integradas en la tierra, el trabajo, la parroquia, y la comunidad.',
       },
       practice: {
-        en: 'You do not need many acres to begin. A backyard garden, a parish plot, a flock of hens in the side yard — productive property is whatever land you can put to fruitful use. We begin where we are, with what we have.',
+        en: 'You do not need many acres to begin. A backyard garden, a parish plot, a flock of hens in the side yard will do. A productive property is whatever land you can put to fruitful use. We start where we are and with what we already have.',
         es: 'No necesitas muchos acres para comenzar. Un huerto en el patio, una parcela parroquial, unas gallinas al lado de la casa — la propiedad productiva es cualquier tierra que puedas hacer fructífera. Comenzamos donde estamos, con lo que tenemos.',
       },
     },
@@ -42,7 +42,7 @@ export default function Vision() {
       roman: 'II',
       name: { en: 'Education', es: 'Educación' },
       verse: {
-        en: 'The Catholic Land Movement exists to restore peer-to-peer networks of education in the colloquial land and hand crafts.',
+        en: 'The Catholic Land Movement exists to grow peer-to-peer networks of education in production land and hand crafts.',
         es: 'El Movimiento Católico de la Tierra existe para restaurar redes de educación entre vecinos en los oficios cotidianos de la tierra y de la mano.',
       },
       practice: {
@@ -94,7 +94,7 @@ export default function Vision() {
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
-            en: 'We are Catholic families in Central Texas taking up the first vocation given to man — to till the earth and keep it. Not to flee the world, but to sanctify a small corner of it for Christ.',
+            en: 'We are families in Central Texas taking up the first vocation given to man — to till the earth and keep it. Not to flee the world, but to sanctify a small corner of it for Christ.',
             es: 'Somos familias católicas del Centro de Texas que asumimos la primera vocación dada al hombre — labrar la tierra y guardarla. No para huir del mundo, sino para santificar un pequeño rincón de él para Cristo.',
           })}
         </p>
@@ -105,7 +105,7 @@ export default function Vision() {
       {/* ---------------------------------------------------------------- */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-24">
         <div className="container-narrow">
-          <div className="mb-12 text-center md:mb-16">
+          {/* <div className="mb-12 text-center md:mb-16">
             <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
               {t({ en: 'FOUNDATIONS', es: 'FUNDAMENTOS' })}
             </p>
@@ -114,11 +114,11 @@ export default function Vision() {
             </h2>
             <p className="mx-auto max-w-2xl font-serif italic leading-relaxed text-mesquite/70">
               {t({
-                en: 'If we are gardeners, here is the ground we till.',
+                en: '',
                 es: 'Si somos jardineros, esta es la tierra que labramos.',
               })}
             </p>
-          </div>
+          </div> */}
 
           <div className="space-y-16 md:space-y-24">
             {pillars.map((p) => (
