@@ -174,7 +174,7 @@ export default function MiPerfil() {
   if (authLoading || loading || !profile) {
     return (
       <Layout>
-        <div className="container-narrow py-16 text-center font-serif text-mesquite/60">
+        <div className="container-prose py-16 text-center font-serif text-mesquite/60">
           …
         </div>
       </Layout>
@@ -188,7 +188,7 @@ export default function MiPerfil() {
 
   return (
     <Layout>
-      <div className="container-narrow py-12 md:py-16">
+      <div className="container-prose py-12 md:py-16">
         {profile.status === 'pending' && (
           <div className="mb-8 rounded-sm border border-ocre/30 bg-ocre/5 p-4 font-serif text-sm italic text-mesquite/80">
             {t(uiStrings.auth.pendingNotice)}

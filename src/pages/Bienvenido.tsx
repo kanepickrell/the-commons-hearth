@@ -26,6 +26,9 @@ import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
 import type { Database, CraftSlug } from '@/lib/database.types';
 
+import { Icon } from '@/components/Icon';
+import type { IconSlug } from '@/lib/types';
+
 type Parish = Database['public']['Tables']['parishes']['Row'];
 
 const CRAFTS_V1: { slug: CraftSlug; iconPath: string; en: string; es: string }[] = [
