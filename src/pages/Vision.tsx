@@ -70,7 +70,7 @@ export default function Vision() {
       roman: 'IV',
       name: { en: 'Glorification', es: 'Glorificación' },
       verse: {
-        en: 'All Catholic Land Movement activity happens within Catholic ontology — true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into every facet of chapter activity.',
+        en: 'All Catholic Land Movement activity aligns with Gosepl teaching — true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
         es: 'Toda la actividad del Movimiento Católico de la Tierra sucede dentro de la ontología católica — la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en cada faceta de la actividad del capítulo.',
       },
       practice: {
