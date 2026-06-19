@@ -105,7 +105,7 @@ export default function Vision() {
       {/* ---------------------------------------------------------------- */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-24">
         <div className="container-narrow">
-          {/* <div className="mb-12 text-center md:mb-16">
+          <div className="mb-12 text-center md:mb-16">
             <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
               {t({ en: 'FOUNDATIONS', es: 'FUNDAMENTOS' })}
             </p>
@@ -114,11 +114,11 @@ export default function Vision() {
             </h2>
             <p className="mx-auto max-w-2xl font-serif italic leading-relaxed text-mesquite/70">
               {t({
-                en: '',
+                en: 'The aim of our movement in four pillars',
                 es: 'Si somos jardineros, esta es la tierra que labramos.',
               })}
             </p>
-          </div> */}
+          </div>
 
           <div className="space-y-16 md:space-y-24">
             {pillars.map((p) => (

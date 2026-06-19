@@ -12,6 +12,9 @@
 //   - Vision owns the deeper exposition of the four pillars; Home
 //     introduces them. The "how to live this out" three-movement content
 //     that used to sit at the bottom of Home now lives on Participate.
+//   - The four pillar icons are bespoke line-art (homestead, sprouting
+//     book, shared table, monstrance), kept separate from the craft
+//     iconMap. They're inlined via ?raw so they inherit currentColor.
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -24,6 +27,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import type { IconSlug, Bilingual } from '@/lib/types';
+
+import resettlement from '@/assets/icons/resettlement.svg?raw';
+import education from '@/assets/icons/education.svg?raw';
+import fellowship from '@/assets/icons/fellowship.svg?raw';
+import glorification from '@/assets/icons/glorification.svg?raw';
+
+const PILLAR_ICONS = {
+  resettlement, education, fellowship, glorification,
+} as const;
 
 // Prose is authored inline here rather than in uiStrings.ts because it's
 // landing-page copy — long, editorial, and likely to be revised often.
@@ -84,12 +96,12 @@ const copy = {
 // The four pillars. Each gets an icon, a name, and one paragraph. The
 // deeper exposition lives on /vision; this is the introduction.
 const pillars: {
-  slug: IconSlug;
+  key: keyof typeof PILLAR_ICONS;
   name: Bilingual;
   body: Bilingual;
 }[] = [
   {
-    slug: 'la-azuela',
+    key: 'resettlement',
     name: { en: 'Resettlement', es: 'Reasentamiento' },
     body: {
       en: 'Restoring productive property to households, so families can re-root in land, work, and parish life.',
@@ -97,7 +109,7 @@ const pillars: {
     },
   },
   {
-    slug: 'las-yerbas',
+    key: 'education',
     name: { en: 'Education', es: 'Educación' },
     body: {
       en: 'Rebuilding peer-to-peer networks for the land and hand crafts — the practical knowledge that used to pass between neighbors.',
@@ -105,7 +117,7 @@ const pillars: {
     },
   },
   {
-    slug: 'el-pan',
+    key: 'fellowship',
     name: { en: 'Fellowship', es: 'Compañerismo' },
     body: {
       en: 'A network of practical, intellectual, and spiritual support among households committed to the same vision.',
@@ -113,7 +125,7 @@ const pillars: {
     },
   },
   {
-    slug: 'la-conserva',
+    key: 'glorification',
     name: { en: 'Glorification', es: 'Glorificación' },
     body: {
       en: 'All chapter activity is rooted in the sacramental and liturgical life of the Church. Prayer, the Mass, and the rhythms of the liturgical year shape everything we do.',
@@ -190,8 +202,13 @@ const Home = () => {
         </header>
         <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-2">
           {pillars.map((p) => (
-            <div key={p.slug} className="flex flex-col items-center text-center">
-              <Icon slug={p.slug} size={80} locale={locale} />
+            <div key={p.key} className="flex flex-col items-center text-center">
+              <span
+                className="text-mesquite"
+                style={{ display: 'inline-block', width: 80, height: 80 }}
+                aria-hidden="true"
+                dangerouslySetInnerHTML={{ __html: PILLAR_ICONS[p.key] }}
+              />
               <h3 className="mt-5 font-heading text-2xl leading-snug text-mesquite">
                 {t(p.name)}
               </h3>
