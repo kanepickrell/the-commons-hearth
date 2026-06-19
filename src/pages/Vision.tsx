@@ -35,7 +35,7 @@ export default function Vision() {
       },
       practice: {
         en: 'You do not need many acres to begin. A backyard garden, a parish plot, a flock of hens in the side yard will do. A productive property is whatever land you can put to fruitful use. We start where we are and with what we already have.',
-        es: 'No necesitas muchos acres para comenzar. Un huerto en el patio, una parcela parroquial, unas gallinas al lado de la casa — la propiedad productiva es cualquier tierra que puedas hacer fructífera. Comenzamos donde estamos, con lo que tenemos.',
+        es: 'No necesitas muchos acres para comenzar. Un huerto en el patio, una parcela parroquial, unas gallinas al lado de la casa — la propiedad productiva es cualquier tierra que puedas hacer fructífera. Comenzamos donde estamos, con lo que ya tenemos.',
       },
     },
     {
@@ -43,7 +43,7 @@ export default function Vision() {
       name: { en: 'Education', es: 'Educación' },
       verse: {
         en: 'The Catholic Land Movement exists to grow peer-to-peer networks of education in production land and hand crafts.',
-        es: 'El Movimiento Católico de la Tierra existe para restaurar redes de educación entre vecinos en los oficios cotidianos de la tierra y de la mano.',
+        es: 'El Movimiento Católico de la Tierra existe para cultivar redes de educación entre vecinos en los oficios de la tierra y de la mano.',
       },
       practice: {
         en: 'These skills used to pass between neighbors — canning, carpentry, animal husbandry, the care of soil. We learn them back from one another, in workshops and in kitchens, and we pass them on before they are lost.',
@@ -70,8 +70,8 @@ export default function Vision() {
       roman: 'IV',
       name: { en: 'Glorification', es: 'Glorificación' },
       verse: {
-        en: 'All Catholic Land Movement activity aligns with Gosepl teaching — true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
-        es: 'Toda la actividad del Movimiento Católico de la Tierra sucede dentro de la ontología católica — la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en cada faceta de la actividad del capítulo.',
+        en: 'All Catholic Land Movement activity aligns with Gospel teaching — true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
+        es: 'Toda la actividad del Movimiento Católico de la Tierra se alinea con la enseñanza del Evangelio — la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
       },
       practice: {
         en: 'Christ placed a meal at the center of His Church. The seed, the soil, the harvest, the table — all of it is ordered toward worship. Our labor is an offering.',
@@ -90,12 +90,12 @@ export default function Vision() {
           {t({ en: 'HE IS OUR CREATOR', es: 'ÉL ES NUESTRO CREADOR' })}
         </p>
         <h1 className="mb-8 font-heading text-5xl text-mesquite md:text-6xl">
-          {t({ en: 'We Are His Gardeners', es: 'Somos los Jardineros' })}
+          {t({ en: 'We Are His Gardeners', es: 'Somos Sus Jardineros' })}
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
             en: 'We are families in Central Texas taking up the first vocation given to man — to till the earth and keep it. Not to flee the world, but to sanctify a small corner of it for Christ.',
-            es: 'Somos familias católicas del Centro de Texas que asumimos la primera vocación dada al hombre — labrar la tierra y guardarla. No para huir del mundo, sino para santificar un pequeño rincón de él para Cristo.',
+            es: 'Somos familias del Centro de Texas que asumimos la primera vocación dada al hombre — labrar la tierra y guardarla. No para huir del mundo, sino para santificar un pequeño rincón de él para Cristo.',
           })}
         </p>
       </section>
@@ -115,7 +115,7 @@ export default function Vision() {
             <p className="mx-auto max-w-2xl font-serif italic leading-relaxed text-mesquite/70">
               {t({
                 en: 'The aim of our movement in four pillars',
-                es: 'Si somos jardineros, esta es la tierra que labramos.',
+                es: 'El propósito de nuestro movimiento, en cuatro pilares.',
               })}
             </p>
           </div>
