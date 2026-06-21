@@ -15,7 +15,12 @@
 // the reading-list link: Sid Arias's "Homestead of Saint Joseph" Substack
 // as the warm entry point, and Rerum Novarum / Quadragesimo Anno as the
 // canonical CST texts behind it.
+//
+// NOTE: the Substack link is built with createElement('a', …) rather than
+// a JSX <a> tag on purpose — pasting this file through certain editors was
+// silently stripping the opening anchor tag and breaking the build.
 
+import { createElement } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
@@ -179,14 +184,16 @@ export default function Participate() {
                       </p>
                       <p className="font-serif leading-relaxed text-mesquite/80">
                         {t(m.reading.leadIn)}{' '}
-                        
-                          href={m.reading.substackHref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-heading italic text-ocre hover:text-mesquite"
-                        >
-                          {t(m.reading.substackName)}
-                        </a>{' '}
+                        {createElement(
+                          'a',
+                          {
+                            href: m.reading.substackHref,
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                            className: 'font-heading italic text-ocre hover:text-mesquite',
+                          },
+                          t(m.reading.substackName)
+                        )}{' '}
                         — {t(m.reading.substackTagline)}
                       </p>
 

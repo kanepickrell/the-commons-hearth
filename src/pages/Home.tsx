@@ -44,7 +44,7 @@ const copy = {
   // 1. Opening
   // ---------------------------------------------------------------------
   eyebrow: {
-    en: 'CENTRAL TEXAS CHAPTER',
+    en: 'WE ARE THE CATHOLIC LAND MOVEMENT',
     es: 'CAPÍTULO DEL CENTRO DE TEJAS',
   } satisfies Bilingual,
 
