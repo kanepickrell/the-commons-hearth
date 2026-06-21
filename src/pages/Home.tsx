@@ -270,9 +270,9 @@ const Home = () => {
           <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
             {t(copy.mapEyebrow)}
           </p>
-          <h2 className="mt-4 font-heading text-3xl text-mesquite">
+          {/* <h2 className="mt-4 font-heading text-3xl text-mesquite">
             {t(copy.mapHeading)}
-          </h2>
+          </h2> */}
         </header>
         <ParishMap />
       </section>
