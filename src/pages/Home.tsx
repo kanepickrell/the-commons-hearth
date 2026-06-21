@@ -45,19 +45,19 @@ const copy = {
   // ---------------------------------------------------------------------
   eyebrow: {
     en: 'WE ARE THE CATHOLIC LAND MOVEMENT',
-    es: 'CAPÍTULO DEL CENTRO DE TEJAS',
+    es: 'SOMOS EL MOVIMIENTO CATÓLICO DE LA TIERRA',
   } satisfies Bilingual,
 
   // The ache. Names the longing the visitor already feels.
   ache: {
-    en: 'Many Catholics yearn for a life rooted in the land — work centered in the home, food raised by neighbors, parishes where real fellowship happens. They long for the simple traditions that make the family what God created it to be: the center of social order.',
-    es: 'Muchos católicos anhelan una vida arraigada en la tierra — el trabajo centrado en el hogar, la comida cultivada por los vecinos, parroquias donde haya verdadera hermandad. Anhelan las tradiciones sencillas que hacen de la familia lo que Dios creó que fuera: el centro del orden social.',
+    en: 'Many of us yearn for a life rooted in the land — work centered in the home, food raised by neighbors, parishes where real fellowship happens. We miss the simple traditions that make the family what God created it to be: the heart of society.',
+    es: 'Muchos de nosotros anhelamos una vida arraigada en la tierra — el trabajo centrado en el hogar, la comida cultivada por los vecinos, parroquias donde haya verdadera hermandad. Extrañamos las tradiciones sencillas que hacen de la familia lo que Dios creó que fuera: el corazón de la sociedad.',
   } satisfies Bilingual,
 
   // Who we are + what we believe. One paragraph on purpose.
   whoWeAre: {
-    en: 'We are the Central Texas Chapter of the Catholic Land Movement, and we believe this is possible through the grace of Jesus Christ. It is the work of the laity to orient our families, communities, and institutions toward the beatific vision.',
-    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Es obra de los laicos orientar nuestras familias, comunidades, e instituciones hacia la visión beatífica.',
+    en: 'We are the Central Texas Chapter of the Catholic Land Movement, and we believe this is possible through the grace of Jesus Christ. As laypeople, it is our work to turn our families, communities, and institutions toward the beatific vision.',
+    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Como laicos, nos toca orientar a nuestras familias, comunidades, e instituciones hacia la visión beatífica.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
@@ -104,32 +104,32 @@ const pillars: {
     key: 'resettlement',
     name: { en: 'Resettlement', es: 'Reasentamiento' },
     body: {
-      en: 'Restoring productive property to households, so families can re-root in land, work, and parish life.',
-      es: 'Restaurar la propiedad productiva a los hogares, para que las familias puedan arraigarse de nuevo en la tierra, el trabajo, y la vida parroquial.',
+      en: 'Putting working land back in families’ hands, so they can root again in land, work, and parish life.',
+      es: 'Poner tierra fértil de nuevo en manos de las familias, para que puedan arraigarse otra vez en la tierra, el trabajo, y la parroquia.',
     },
   },
   {
     key: 'education',
     name: { en: 'Education', es: 'Educación' },
     body: {
-      en: 'Rebuilding peer-to-peer networks for the land and hand crafts — the practical knowledge that used to pass between neighbors.',
-      es: 'Reconstruir las redes entre vecinos para los oficios de la tierra y de la mano — el conocimiento práctico que antes pasaba de uno a otro.',
+      en: 'Neighbors teaching neighbors the land and hand crafts — the practical knowledge that used to pass from house to house.',
+      es: 'Vecinos que enseñan a vecinos los oficios de la tierra y de la mano — el conocimiento práctico que antes pasaba de casa en casa.',
     },
   },
   {
     key: 'fellowship',
     name: { en: 'Fellowship', es: 'Compañerismo' },
     body: {
-      en: 'A network of practical, intellectual, and spiritual support among households committed to the same vision.',
-      es: 'Una red de apoyo práctico, intelectual, y espiritual entre los hogares comprometidos con la misma visión.',
+      en: 'Households that show up for each other — with a hand, a conversation, a prayer.',
+      es: 'Hogares que están ahí unos para otros — con una mano, una conversación, una oración.',
     },
   },
   {
     key: 'glorification',
     name: { en: 'Glorification', es: 'Glorificación' },
     body: {
-      en: 'All chapter activity is rooted in the sacramental and liturgical life of the Church. Prayer, the Mass, and the rhythms of the liturgical year shape everything we do.',
-      es: 'Toda la actividad del capítulo está arraigada en la vida sacramental y litúrgica de la Iglesia. La oración, la Misa, y los ritmos del año litúrgico dan forma a todo lo que hacemos.',
+      en: 'Prayer, the Mass, and the seasons of the Church’s year shape everything we do. All of it is offered back to God in worship.',
+      es: 'La oración, la Misa, y las estaciones del año litúrgico dan forma a todo lo que hacemos. Todo se le ofrece a Dios en adoración.',
     },
   },
 ];
