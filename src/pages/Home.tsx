@@ -196,7 +196,7 @@ const Home = () => {
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-14 text-center">
-          <p className="display-caps text-xs tracking-[0.3em] text-ocre">
+          <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
             {t(copy.pillarsEyebrow)}
           </p>
         </header>
@@ -267,7 +267,7 @@ const Home = () => {
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-10 text-center">
-          <p className="display-caps text-xs tracking-[0.3em] text-ocre">
+          <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
             {t(copy.mapEyebrow)}
           </p>
           <h2 className="mt-4 font-heading text-3xl text-mesquite">
