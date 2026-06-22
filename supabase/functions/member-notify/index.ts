@@ -12,6 +12,16 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   global: { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } },
 });
 
+// CORS so the browser preflight (OPTIONS) succeeds when the admin panel at
+// the deployed origin calls this function via supabase.functions.invoke().
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
+const JSON_HEADERS = { ...CORS_HEADERS, 'Content-Type': 'application/json' };
+
 type Lang = 'en' | 'es';
 
 type Member = {
@@ -93,7 +103,14 @@ async function logEmail(kind: string, recipient: string, subject: string, status
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+  // Browser preflight — must succeed or the real POST is never sent.
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: CORS_HEADERS });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS });
+  }
 
   let profileId: string;
   try {
@@ -101,18 +118,18 @@ Deno.serve(async (req: Request) => {
     profileId = body.profile_id;
     if (!profileId) throw new Error('missing profile_id');
   } catch {
-    return new Response('Bad request', { status: 400 });
+    return new Response('Bad request', { status: 400, headers: CORS_HEADERS });
   }
 
   const { data, error } = await admin.rpc('get_member_for_email', { p_profile_id: profileId });
   if (error || !data) {
     return new Response(JSON.stringify({ error: error?.message ?? 'member not found' }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } });
+      { status: 404, headers: JSON_HEADERS });
   }
   const m = data as Member;
 
   if (!m.email) {
-    return new Response(JSON.stringify({ skipped: 'no email' }), { status: 200 });
+    return new Response(JSON.stringify({ skipped: 'no email' }), { status: 200, headers: JSON_HEADERS });
   }
 
   const { subject, html, text } = render(m);
@@ -127,17 +144,13 @@ Deno.serve(async (req: Request) => {
       const errText = await resp.text();
       await logEmail('member_approved', m.email, subject, 'failed', errText);
       return new Response(JSON.stringify({ error: 'resend_failed', detail: errText }),
-        { status: 502, headers: { 'Content-Type': 'application/json' } });
+        { status: 502, headers: JSON_HEADERS });
     }
     await logEmail('member_approved', m.email, subject, 'sent');
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200, headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: JSON_HEADERS });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     await logEmail('member_approved', m.email, subject, 'failed', msg);
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500, headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: JSON_HEADERS });
   }
 });
