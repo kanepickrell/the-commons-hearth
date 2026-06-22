@@ -175,8 +175,11 @@ const Home = () => {
       {/* ---------------------------------------------------------------- */}
       {/* 1. Opening                                                       */}
       {/* ---------------------------------------------------------------- */}
+      {/* ---------------------------------------------------------------- */}
+      {/* 1. Opening                                                       */}
+      {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
-        <h1 className="font-heading text-ocre text-[clamp(1.5rem,5vw,2.75rem)] whitespace-nowrap">
+        <h1 className="font-heading text-ocre text-3xl md:text-4xl">
           {t(copy.eyebrow)}
         </h1>
         <div className="mx-auto mt-10 max-w-xl space-y-6 text-left">
