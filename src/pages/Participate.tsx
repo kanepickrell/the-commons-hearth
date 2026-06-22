@@ -11,16 +11,12 @@
 // Source: the May 2026 site-copy revision that established "How to Live
 // Out the CLM Vision" as its own tab — collapsing an earlier seven-step
 // formation pathway into three movements that a newcomer can hold at
-// once: Come and see → Learn and offer → Live and share. Step 3 carries
-// the reading-list link: Sid Arias's "Homestead of Saint Joseph" Substack
-// as the warm entry point, and Rerum Novarum / Quadragesimo Anno as the
-// canonical CST texts behind it.
+// once: Come and see → Learn and offer → Live and share.
 //
-// NOTE: the Substack link is built with createElement('a', …) rather than
-// a JSX <a> tag on purpose — pasting this file through certain editors was
-// silently stripping the opening anchor tag and breaking the build.
+// NOTE: the reading list (Sid Arias's Substack + Rerum Novarum /
+// Quadragesimo Anno) used to live at the bottom of movement III. It now
+// lives on its own /resources page so it can grow. See Resources.tsx.
 
-import { createElement } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
@@ -29,12 +25,6 @@ import { buildPath } from '@/i18n/routes';
 export default function Participate() {
   const { t, locale } = useLocale();
 
-  // The three movements. Each has:
-  //   - a Roman numeral (visual rhyme with Vision's four pillars)
-  //   - a short title ("Come and see.")
-  //   - a one-line summary (same as Home, for continuity)
-  //   - a fuller paragraph that Home doesn't have room for
-  //   - optional practical specifics
   const movements = [
     {
       roman: 'I',
@@ -43,9 +33,6 @@ export default function Participate() {
         en: 'Start with a gathering. Meet the chapter, share a meal, see what we’re about.',
         es: 'Comienza con una reunión. Conoce al capítulo, comparte una comida, ve de qué se trata.',
       },
-      // The threshold-lowerer. The biggest barrier for a curious visitor
-      // is not knowing what they're walking into. This paragraph answers
-      // the unspoken question.
       body: {
         en: 'You don’t need to know anything about homesteading or Catholic Social Teaching to join. Just come with an open mind, share a meal, a conversation, and prayer.',
         es: 'No necesitas saber nada sobre el distributismo, ni sobre la vida en el campo, ni sobre la Doctrina Social de la Iglesia para venir. No necesitas tierra, ni necesitas estar listo para vivir del campo. Sólo necesitas venir. Una reunión es una comida, una conversación, y oración — esa es toda la forma.',
@@ -82,49 +69,12 @@ export default function Participate() {
         en: 'A chapter is not the goal. The household is the goal, and the parish is the goal. What you learn here is meant to leave with you — into your kitchen, your yard, your block, your pew. Bring a friend to the next gathering. Pray for the chapter. Pray for each member by name when you remember. And as the practice grows, the principles deepen — Catholic Social Teaching is the soil this whole movement grew in, and reading it makes everything else make more sense.',
         es: 'El capítulo no es la meta. El hogar es la meta, y la parroquia es la meta. Lo que aprendes aquí es para llevártelo — a tu cocina, a tu patio, a tu cuadra, a tu banca en la Misa. Invita a un amigo a la próxima reunión. Reza por el capítulo. Reza por cada miembro por su nombre cuando te acuerdes. Y mientras crece la práctica, los principios se profundizan — la Doctrina Social de la Iglesia es la tierra de donde creció todo este movimiento, y leerla hace que todo lo demás tenga más sentido.',
       },
-
-      reading: {
-        leadIn: {
-          en: 'A starting place to read:',
-          es: 'Un lugar para empezar a leer:',
-        },
-        substackName: { en: 'Homestead of Saint Joseph', es: 'Homestead of Saint Joseph' },
-        substackHref: 'https://sidarias.substack.com/',
-        substackTagline: {
-          en: 'chapter member Sid Arias on piety, natural law, and rediscovering reality through faith and reason.',
-          es: 'el miembro del capítulo Sid Arias sobre la piedad, la ley natural, y el redescubrimiento de la realidad por la fe y la razón.',
-        },
-        encyclicalsLeadIn: {
-          en: 'When you’re ready for the source documents, start with the two encyclicals the whole movement grew out of:',
-          es: 'Cuando estés listo para los documentos fuente, empieza con las dos encíclicas de donde creció todo el movimiento:',
-        },
-        encyclicals: [
-          {
-            name: 'Rerum Novarum',
-            author: { en: 'Leo XIII, 1891', es: 'León XIII, 1891' },
-            note: {
-              en: 'The source code. About forty pages. Workers, wages, property, family — the foundation everything else is built on.',
-              es: 'El código fuente. Unas cuarenta páginas. El obrero, el salario, la propiedad, la familia — el fundamento sobre el que se construye todo lo demás.',
-            },
-          },
-          {
-            name: 'Quadragesimo Anno',
-            author: { en: 'Pius XI, 1931', es: 'Pío XI, 1931' },
-            note: {
-              en: 'Forty years later, written into the Depression. Names subsidiarity, deepens the property argument, calls for the reconstruction of the social order.',
-              es: 'Cuarenta años después, escrita en plena Depresión. Nombra la subsidiariedad, profundiza el argumento de la propiedad, llama a reconstruir el orden social.',
-            },
-          },
-        ],
-      },
     },
   ];
 
   return (
     <Layout>
-      {/* ---------------------------------------------------------------- */}
-      {/* Opening                                                          */}
-      {/* ---------------------------------------------------------------- */}
+      {/* Opening */}
       <section className="container-narrow flex flex-col items-center py-16 text-center md:py-24">
         <p className="display-caps mb-4 text-xs tracking-[0.2em] text-ocre">
           {t({ en: 'HOW TO LIVE OUT THE CLM VISION', es: 'CÓMO VIVIR LA VISIÓN DEL MCT' })}
@@ -140,9 +90,7 @@ export default function Participate() {
         </p>
       </section>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* The Three Movements                                              */}
-      {/* ---------------------------------------------------------------- */}
+      {/* The Three Movements */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-24">
         <div className="container-narrow">
           <div className="space-y-16 md:space-y-24">
@@ -175,48 +123,6 @@ export default function Participate() {
                       {t(m.practical)}
                     </p>
                   )}
-
-                  {/* Reading list — only on movement III */}
-                  {m.reading && (
-                    <div className="mt-8 border-l-2 border-ocre/40 pl-5">
-                      <p className="display-caps mb-3 text-[10px] tracking-[0.2em] text-ocre">
-                        {t({ en: 'A READING LIST', es: 'UNA LISTA DE LECTURA' })}
-                      </p>
-                      <p className="font-serif leading-relaxed text-mesquite/80">
-                        {t(m.reading.leadIn)}{' '}
-                        {createElement(
-                          'a',
-                          {
-                            href: m.reading.substackHref,
-                            target: '_blank',
-                            rel: 'noopener noreferrer',
-                            className: 'font-heading italic text-ocre hover:text-mesquite',
-                          },
-                          t(m.reading.substackName)
-                        )}{' '}
-                        — {t(m.reading.substackTagline)}
-                      </p>
-
-                      <p className="mt-5 font-serif leading-relaxed text-mesquite/80">
-                        {t(m.reading.encyclicalsLeadIn)}
-                      </p>
-                      <ul className="mt-4 space-y-4">
-                        {m.reading.encyclicals.map((e) => (
-                          <li key={e.name}>
-                            <p className="font-heading text-mesquite">
-                              <em>{e.name}</em>
-                              <span className="ml-2 text-sm italic text-mesquite/60">
-                                — {t(e.author)}
-                              </span>
-                            </p>
-                            <p className="mt-1 font-serif text-sm leading-relaxed text-mesquite/70">
-                              {t(e.note)}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
               </article>
             ))}
@@ -224,9 +130,7 @@ export default function Participate() {
         </div>
       </section>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* Closing — point to the gatherings page                           */}
-      {/* ---------------------------------------------------------------- */}
+      {/* Closing — point to the gatherings page */}
       <section className="py-16 text-center md:py-20">
         <div className="container-narrow">
           <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">

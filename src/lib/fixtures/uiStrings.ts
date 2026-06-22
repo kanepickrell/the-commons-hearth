@@ -11,6 +11,7 @@ export const uiStrings = {
     workshops:    { en: 'Workshops',    es: 'Talleres' },
     witness:      { en: 'Witness',      es: 'Testimonio' },
     patron:       { en: 'Patron',       es: 'Santo Patrón' },
+    resources:    { en: 'Resources',    es: 'Recursos' },
     welcome:      { en: 'Welcome',      es: 'Bienvenido' },
   },
   home: {
@@ -157,7 +158,7 @@ export const uiStrings = {
       es: 'Bajo el patrocinio de San Isidro Labrador',
     },
     nationalLink: {
-      en: 'Part of the Catholic Land Movement',
+      en: 'We are an individual chapter operating under the leadership of the offical Catholic Land Movement organization',
       es: 'Parte del Movimiento Católico de la Tierra',
     },
     sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · AD 2026', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · AD 2026' },

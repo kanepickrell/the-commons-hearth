@@ -126,6 +126,14 @@ export default function Mayordomo() {
       return;
     }
 
+    if (action === 'approve') {
+      // Fire-and-forget welcome email with the Discord invite. We don't block
+      // the UI or revert the approval if the email send fails.
+      supabase.functions
+        .invoke('member-notify', { body: { profile_id: profileId } })
+        .catch((e) => console.error('member-notify failed:', e));
+    }
+
     toast({
       title:
         action === 'approve'

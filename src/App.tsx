@@ -4,10 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { routes } from "@/i18n/routes";
 import Home from "./pages/Home.tsx";
 import Vision from "./pages/Vision.tsx";
 import Participate from "./pages/Participate.tsx";
+import Resources from "./pages/Resources.tsx";
 import MemberDetail from "./pages/MemberDetail.tsx";
 import Talleres from "./pages/Talleres.tsx";
 import TallerDetail from "./pages/TallerDetail.tsx";
@@ -28,6 +30,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <LocaleProvider>
+          <ScrollToTop />
           <Routes>
             <Route path={routes.home.en} element={<Home />} />
 
@@ -37,6 +40,10 @@ const App = () => (
             {/* Participate — separate EN and ES slugs */}
             <Route path={routes.participate.en} element={<Participate />} />
             <Route path={routes.participate.es} element={<Participate />} />
+
+            {/* Resources — separate EN and ES slugs */}
+            <Route path={routes.resources.en} element={<Resources />} />
+            <Route path={routes.resources.es} element={<Resources />} />
 
             {/* Legacy /ofrendas URLs redirect to /vision */}
             <Route path="/ofrendas"     element={<Navigate to="/vision" replace />} />
@@ -81,8 +88,6 @@ const App = () => (
 );
 
 // Small redirect helper so bookmarks/old links keep working.
-// We don't know the locale preference here, so English vs Spanish
-// just matches the original URL shape.
 function LegacyOfrendaRedirect({ lang = 'es' }: { lang?: 'en' | 'es' }) {
   const id = window.location.pathname.split('/').filter(Boolean).pop();
   const base = lang === 'en' ? '/members' : '/miembros';
