@@ -181,8 +181,8 @@ export const uiStrings = {
   eyebrow: {
     chapter:         { en: 'CENTRAL TEXAS CHAPTER', es: 'CAPÍTULO DEL CENTRO DE TEJAS' },
     foundingMembers: { en: 'FOUNDING MEMBERS',      es: 'MIEMBROS FUNDADORES' },
-    theWorkshop:     { en: 'THE WORKSHOP',          es: 'EL TALLER' },
-    theWitness:      { en: 'THE WITNESS',           es: 'EL TESTIMONIO' },
+    theWorkshop:     { en: 'OUR WORKSHOP',          es: 'EL TALLER' },
+    theWitness:      { en: 'OUR WITNESS',           es: 'EL TESTIMONIO' },
   },
   common: {
     backToTalleres: { en: '← All workshops', es: '← Todos los talleres' },
@@ -201,9 +201,9 @@ export const uiStrings = {
                       es: 'Tu perfil espera aprobación.' },
   },
   witness: {
-    eyebrow:   { en: 'THE WITNESS · A.D. 2026',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR 2026' },
+    eyebrow:   { en: 'OUR WITNESS · A.D. 2026',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR 2026' },
     heading:   { en: 'Our year, in the making', es: 'El año, tal como el capítulo lo ha vivido' },
-    subhead:   { en: 'a wheel of months — click any wedge to look closer',
+    subhead:   { en: 'click any liturguical wedge to see our past and upcoming events',
                  es: 'una rueda de meses — toca cualquier sección para ver más' },
     statGatherings:  { en: 'gatherings',  es: 'reuniones' },
     statHosts:       { en: 'hosts',       es: 'anfitriones' },
