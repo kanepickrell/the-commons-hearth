@@ -176,7 +176,7 @@ const Home = () => {
       {/* 1. Opening                                                       */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
-        <h1 className="font-heading text-4xl text-ocre md:text-5xl">
+        <h1 className="font-heading text-3xl text-ocre md:text-5xl">
           {t(copy.eyebrow)}
         </h1>
         <div className="mx-auto mt-10 max-w-xl space-y-6 text-left">
