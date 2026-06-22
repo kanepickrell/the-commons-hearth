@@ -44,8 +44,8 @@ const copy = {
   // 1. Opening
   // ---------------------------------------------------------------------
   eyebrow: {
-    en: 'WE ARE THE CATHOLIC LAND MOVEMENT',
-    es: 'SOMOS EL MOVIMIENTO CATÓLICO DE LA TIERRA',
+    en: 'We Are the Catholic Land Movement',
+    es: 'Somos el Movimiento Católico de la Tierra',
   } satisfies Bilingual,
 
   // The ache. Names the longing the visitor already feels.
@@ -176,9 +176,9 @@ const Home = () => {
       {/* 1. Opening                                                       */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
-        <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
+        <h1 className="font-heading text-4xl text-ocre md:text-5xl">
           {t(copy.eyebrow)}
-        </p>
+        </h1>
         <div className="mx-auto mt-10 max-w-xl space-y-6 text-left">
           <p className="prose-body text-lg leading-relaxed text-mesquite/80">
             {t(copy.ache)}
