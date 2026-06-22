@@ -1,7 +1,7 @@
 // src/pages/Resources.tsx
-// The chapter's reading list. Chapter-original where it counts (our own
-// writers, our curated shelf), with a pointer out to the national library
-// for the fuller set of books, podcasts, and primary sources.
+// The chapter's reading + listening list. Chapter-original where it counts
+// (our own Texas writers, our curated shelf), pulling in the universal CLM
+// gold. Sections: Books · Texas Writers · Encyclicals & Papal Writings · Podcasts.
 //
 // NOTE: external links are built with createElement('a', …) rather than JSX
 // <a> tags on purpose — pasting this file through certain editors was
@@ -12,29 +12,18 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
 import type { Bilingual } from '@/lib/types';
 
-type Writer = { name: Bilingual; href: string; tagline: Bilingual };
-type SourceDoc = { name: string; author: Bilingual; note: Bilingual; href?: string };
 type Book = { title: string; author: string; note: Bilingual };
+type Writer = { name: string; href: string; tagline: Bilingual };
+type SourceDoc = { name: string; author: Bilingual; note: Bilingual; href?: string };
+type Podcast = { show: string; title: string; href: string };
 
-// Small helper so every external link gets the same treatment and dodges the
-// paste-time <a>-stripping issue.
+// Shared link helper — keeps styling consistent and dodges the paste-time
+// <a>-stripping issue.
 const extLink = (href: string, label: ReactNode, className: string): ReactNode =>
   createElement('a', { href, target: '_blank', rel: 'noopener noreferrer', className }, label);
 
-const writers: Writer[] = [
-  {
-    name: { en: 'Homestead of Saint Joseph', es: 'Homestead of Saint Joseph' },
-    href: 'https://sidarias.substack.com/',
-    tagline: {
-      en: 'chapter member Sid Arias on piety, natural law, and rediscovering reality through faith and reason.',
-      es: 'el miembro del capítulo Sid Arias sobre la piedad, la ley natural, y el redescubrimiento de la realidad por la fe y la razón.',
-    },
-  },
-  // Add more writers / Substacks here.
-];
-
-// Our chapter's core shelf — the six we reach for first. The fuller list
-// lives on the national resources page (linked at the bottom).
+// Our chapter's core shelf — the six we reach for first. The fuller list lives
+// on the national resources page at catholiclandmovement.info/resources.
 const books: Book[] = [
   {
     title: 'Flee to the Fields',
@@ -87,6 +76,25 @@ const books: Book[] = [
   // Add more books here.
 ];
 
+const writers: Writer[] = [
+  {
+    name: 'Homestead of Saint Joseph',
+    href: 'https://sidarias.substack.com/',
+    tagline: {
+      en: 'chapter member Sid Arias on piety, natural law, and rediscovering reality through faith and reason.',
+      es: 'el miembro del capítulo Sid Arias sobre la piedad, la ley natural, y el redescubrimiento de la realidad por la fe y la razón.',
+    },
+  },
+  {
+    name: 'Texas CLM', // TODO: confirm the publication's real name
+    href: 'https://substack.com/@texasclm',
+    tagline: {
+      en: 'notes, dispatches, and reflections from the Catholic Land Movement in Texas.',
+      es: 'notas, despachos, y reflexiones del Movimiento Católico de la Tierra en Tejas.',
+    },
+  },
+];
+
 const sourceDocuments: SourceDoc[] = [
   {
     name: 'Rerum Novarum',
@@ -126,6 +134,36 @@ const sourceDocuments: SourceDoc[] = [
   },
 ];
 
+// Five conversations that introduce the movement well. The national page has
+// the rest — paste any of them in here as new objects.
+const podcasts: Podcast[] = [
+  {
+    show: 'Reality Check · Ep. 1',
+    title: 'Flee to the Fields: The Resurgence of the Catholic Land Movement',
+    href: 'https://www.youtube.com/watch?v=DlvAZRVnpOU',
+  },
+  {
+    show: 'The Catholic Frequency',
+    title: 'The Catholic Land Movement',
+    href: 'https://podcast.catholicfrequency.com/678037e2687f93c27d7aa5ad',
+  },
+  {
+    show: 'Thriving the Future',
+    title: "What's New with the Catholic Land Movement",
+    href: 'https://open.spotify.com/episode/0iGrXDQaayLmhntah7hQwO',
+  },
+  {
+    show: 'An interview with the Catholic Land Movement',
+    title: '(Re)building Christian Community through Homesteading',
+    href: 'https://www.youtube.com/watch?v=zpDuJ5VgeLA',
+  },
+  {
+    show: 'Tex Cathedra Podcast',
+    title: 'The Catholic Land Movement',
+    href: 'https://www.youtube.com/watch?v=3t8r3_Np8Es',
+  },
+];
+
 export default function Resources() {
   const { t } = useLocale();
 
@@ -141,41 +179,22 @@ export default function Resources() {
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
-            en: 'Writers, books, and source documents the chapter reads together. Start anywhere — the practice and the principles deepen each other.',
-            es: 'Escritores, libros, y documentos fuente que el capítulo lee en común. Empieza donde quieras — la práctica y los principios se profundizan mutuamente.',
+            en: 'Books, writers, source documents, and conversations the chapter reads and listens to together. Start anywhere — the practice and the principles deepen each other.',
+            es: 'Libros, escritores, documentos fuente, y conversaciones que el capítulo lee y escucha en común. Empieza donde quieras — la práctica y los principios se profundizan mutuamente.',
           })}
         </p>
       </section>
 
-      {/* Writers */}
+      {/* Books */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-20">
         <div className="container-narrow flex flex-col items-center text-center">
-          <p className="display-caps mb-8 text-xs tracking-[0.2em] text-ocre">
-            {t({ en: 'WRITERS WORTH FOLLOWING', es: 'ESCRITORES QUE VALE LA PENA SEGUIR' })}
-          </p>
-          <ul className="mx-auto max-w-xl space-y-8">
-            {writers.map((w) => (
-              <li key={w.href}>
-                <p className="font-serif leading-relaxed text-mesquite/80">
-                  {extLink(w.href, t(w.name), 'font-heading italic text-ocre hover:text-mesquite')}{' '}
-                  — {t(w.tagline)}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* The core shelf — books */}
-      <section className="border-t border-mesquite/10 py-16 md:py-20">
-        <div className="container-narrow flex flex-col items-center text-center">
           <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
-            {t({ en: 'THE CORE SHELF', es: 'EL ESTANTE ESENCIAL' })}
+            {t({ en: 'BOOKS', es: 'LIBROS' })}
           </p>
           <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'A few books that keep coming up at our gatherings — from the founders of the movement to a working family’s homestead.',
-              es: 'Unos libros que siguen surgiendo en nuestras reuniones — desde los fundadores del movimiento hasta el rancho de una familia trabajadora.',
+              en: 'A few that keep coming up at our gatherings — from the founders of the movement to a working family’s homestead.',
+              es: 'Unos que siguen surgiendo en nuestras reuniones — desde los fundadores del movimiento hasta el rancho de una familia trabajadora.',
             })}
           </p>
           <ul className="mx-auto max-w-2xl space-y-8">
@@ -194,16 +213,35 @@ export default function Resources() {
         </div>
       </section>
 
-      {/* Source documents — encyclicals */}
+      {/* Texas Writers */}
+      <section className="border-t border-mesquite/10 py-16 md:py-20">
+        <div className="container-narrow flex flex-col items-center text-center">
+          <p className="display-caps mb-8 text-xs tracking-[0.2em] text-ocre">
+            {t({ en: 'TEXAS WRITERS', es: 'ESCRITORES TEJANOS' })}
+          </p>
+          <ul className="mx-auto max-w-xl space-y-8">
+            {writers.map((w) => (
+              <li key={w.href}>
+                <p className="font-serif leading-relaxed text-mesquite/80">
+                  {extLink(w.href, w.name, 'font-heading italic text-ocre hover:text-mesquite')}{' '}
+                  — {t(w.tagline)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Encyclicals & Papal Writings */}
       <section className="border-t border-mesquite/10 bg-mesquite/[0.02] py-16 md:py-20">
         <div className="container-narrow flex flex-col items-center text-center">
           <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
-            {t({ en: 'THE SOURCE DOCUMENTS', es: 'LOS DOCUMENTOS FUENTE' })}
+            {t({ en: 'ENCYCLICALS & PAPAL WRITINGS', es: 'ENCÍCLICAS Y ESCRITOS PAPALES' })}
           </p>
           <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'When you’re ready for the source documents, these are the encyclicals the whole movement grew out of:',
-              es: 'Cuando estés listo para los documentos fuente, estas son las encíclicas de donde creció todo el movimiento:',
+              en: 'When you’re ready for the source documents, these are the writings the whole movement grew out of:',
+              es: 'Cuando estés listo para los documentos fuente, estos son los escritos de donde creció todo el movimiento:',
             })}
           </p>
           <ul className="mx-auto max-w-2xl space-y-10">
@@ -211,9 +249,7 @@ export default function Resources() {
               <li key={d.name}>
                 <p className="font-heading text-mesquite">
                   <em>
-                    {d.href
-                      ? extLink(d.href, d.name, 'text-ocre hover:text-mesquite')
-                      : d.name}
+                    {d.href ? extLink(d.href, d.name, 'text-ocre hover:text-mesquite') : d.name}
                   </em>
                   <span className="ml-2 text-sm italic text-mesquite/60">— {t(d.author)}</span>
                 </p>
@@ -226,45 +262,27 @@ export default function Resources() {
         </div>
       </section>
 
-      {/* From the wider movement */}
+      {/* Podcasts */}
       <section className="border-t border-mesquite/10 py-16 md:py-20">
         <div className="container-narrow flex flex-col items-center text-center">
           <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
-            {t({ en: 'FROM THE WIDER MOVEMENT', es: 'DEL MOVIMIENTO EN GENERAL' })}
+            {t({ en: 'PODCASTS', es: 'PÓDCAST' })}
           </p>
-          <p className="mx-auto mb-8 max-w-2xl font-serif leading-relaxed text-mesquite/70">
+          <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'These are the ones our chapter reaches for first. The national movement keeps a fuller library — more books, podcast conversations, and the historical record.',
-              es: 'Estos son los que nuestro capítulo busca primero. El movimiento nacional mantiene una biblioteca más amplia — más libros, conversaciones en pódcast, y el registro histórico.',
+              en: 'A few conversations that introduce the movement well — start with the first.',
+              es: 'Unas conversaciones que presentan bien el movimiento — empieza por la primera.',
             })}
           </p>
-          <ul className="mx-auto max-w-2xl space-y-6">
-            <li>
-              <p className="font-serif leading-relaxed text-mesquite/80">
-                {extLink(
-                  'https://catholiclandmovement.info/resources',
-                  t({ en: 'The national resources library', es: 'La biblioteca nacional de recursos' }),
-                  'font-heading italic text-ocre hover:text-mesquite'
-                )}{' '}
-                — {t({
-                  en: 'the full book list, podcast appearances, and more from the Catholic Land Movement.',
-                  es: 'la lista completa de libros, apariciones en pódcast, y más del Movimiento Católico de la Tierra.',
-                })}
-              </p>
-            </li>
-            <li>
-              <p className="font-serif leading-relaxed text-mesquite/80">
-                {extLink(
-                  'https://collected.jcu.edu/the_cross_and_the_plough/',
-                  t({ en: 'The Cross and the Plough', es: 'The Cross and the Plough' }),
-                  'font-heading italic text-ocre hover:text-mesquite'
-                )}{' '}
-                — {t({
-                  en: 'the original journal of the English land associations, digitized by the John Carroll University Library.',
-                  es: 'la revista original de las asociaciones agrarias inglesas, digitalizada por la biblioteca de John Carroll University.',
-                })}
-              </p>
-            </li>
+          <ul className="mx-auto max-w-2xl space-y-8">
+            {podcasts.map((p) => (
+              <li key={p.href}>
+                <p className="font-heading text-mesquite">
+                  {extLink(p.href, p.title, 'text-ocre hover:text-mesquite')}
+                </p>
+                <p className="mt-1 text-sm italic text-mesquite/60">{p.show}</p>
+              </li>
+            ))}
           </ul>
         </div>
       </section>
