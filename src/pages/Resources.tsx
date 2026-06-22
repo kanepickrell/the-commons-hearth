@@ -150,7 +150,7 @@ const podcasts: Podcast[] = [
   {
     show: 'Thriving the Future',
     title: "What's New with the Catholic Land Movement",
-    href: 'https://open.spotify.com/episode/0iGrXDQaayLmhntah7hQwO',
+    href: 'https://www.youtube.com/watch?v=BOadc-qXtZ8',
   },
   {
     show: 'An interview with the Catholic Land Movement',
@@ -240,7 +240,7 @@ export default function Resources() {
           </p>
           <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'When you’re ready for the source documents, these are the writings the whole movement grew out of:',
+              en: 'When you’re ready for the source documents, these are the writings :',
               es: 'Cuando estés listo para los documentos fuente, estos son los escritos de donde creció todo el movimiento:',
             })}
           </p>
