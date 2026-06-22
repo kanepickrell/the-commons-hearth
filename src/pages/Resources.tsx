@@ -240,7 +240,7 @@ export default function Resources() {
           </p>
           <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'When you’re ready for the source documents, these are the writings :',
+              en: 'When you’re ready for the source documents, these writings are what sparked the CLM over a century ago:',
               es: 'Cuando estés listo para los documentos fuente, estos son los escritos de donde creció todo el movimiento:',
             })}
           </p>
