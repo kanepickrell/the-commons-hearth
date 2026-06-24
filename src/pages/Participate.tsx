@@ -80,11 +80,11 @@ export default function Participate() {
           {t({ en: 'GETTING STARTED', es: 'CÓMO VIVIR LA VISIÓN DEL MCT' })}
         </p>
         <h1 className="mb-8 font-heading text-5xl text-mesquite md:text-6xl">
-          {t({ en: 'How a CLM household begins', es: 'Cómo comienza un hogar' })}
+          {t({ en: 'How a household begins', es: 'Cómo comienza un hogar' })}
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
-            en: 'Our chapter promotes three stages to getting started in the CLM',
+            en: 'Follow these three steps to getting started in our chapter',
             es: 'Tres movimientos. No necesitas estar listo para los tres. Sólo necesitas el primero.',
           })}
         </p>
