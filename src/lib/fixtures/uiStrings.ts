@@ -159,7 +159,7 @@ export const uiStrings = {
       es: 'Bajo el patrocinio de San Isidro Labrador',
     },
     nationalLink: {
-      en: 'We are an individual chapter operating under the leadership of the offical Catholic Land Movement organization',
+      en: 'We operate under the national Catholic Land Movement organization',
       es: 'Parte del Movimiento Católico de la Tierra',
     },
     sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · AD 2026', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · AD 2026' },
