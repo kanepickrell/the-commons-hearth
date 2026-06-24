@@ -172,7 +172,7 @@ export default function Resources() {
       {/* Opening */}
       <section className="container-narrow flex flex-col items-center py-16 text-center md:py-24">
         <p className="display-caps mb-4 text-xs tracking-[0.2em] text-ocre">
-          {t({ en: 'TO READ AND RETURN TO', es: 'PARA LEER Y VOLVER' })}
+          {t({ en: 'OUR LIBRARY', es: 'EL BIBLIOTECA' })}
         </p>
         <h1 className="mb-8 font-heading text-5xl text-mesquite md:text-6xl">
           {t({ en: 'Resources', es: 'Recursos' })}

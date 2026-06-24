@@ -77,10 +77,10 @@ export default function Participate() {
       {/* Opening */}
       <section className="container-narrow flex flex-col items-center py-16 text-center md:py-24">
         <p className="display-caps mb-4 text-xs tracking-[0.2em] text-ocre">
-          {t({ en: 'HOW TO LIVE OUT THE CLM VISION', es: 'CÓMO VIVIR LA VISIÓN DEL MCT' })}
+          {t({ en: 'GETTING STARTED', es: 'CÓMO VIVIR LA VISIÓN DEL MCT' })}
         </p>
         <h1 className="mb-8 font-heading text-5xl text-mesquite md:text-6xl">
-          {t({ en: 'How a household begins', es: 'Cómo comienza un hogar' })}
+          {t({ en: 'How a CLM household begins', es: 'Cómo comienza un hogar' })}
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({

@@ -1,4 +1,3 @@
-
 [functions.send-rsvp-confirmation]
 enabled = true
 verify_jwt = true
@@ -27,3 +26,10 @@ verify_jwt = false
 import_map = "./functions/member-notify/deno.json"
 entrypoint = "./functions/member-notify/index.ts"
 
+[functions.contact-notify]
+enabled = true
+# Public contact form: anonymous visitors must be able to call it, so JWT
+# verification is OFF here. Spam is handled by the honeypot in the function.
+verify_jwt = false
+import_map = "./functions/contact-notify/deno.json"
+entrypoint = "./functions/contact-notify/index.ts"

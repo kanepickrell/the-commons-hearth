@@ -44,8 +44,8 @@ const copy = {
   // 1. Opening
   // ---------------------------------------------------------------------
   eyebrow: {
-    en: 'WE ARE THE CATHOLIC LAND MOVEMENT',
-    es: 'SOMOS EL MOVIMIENTO CATÓLICO DE LA TIERRA',
+    en: 'We Are the Catholic Land Movement',
+    es: 'Somos el Movimiento Católico de la Tierra',
   } satisfies Bilingual,
 
   // The ache. Names the longing the visitor already feels.
@@ -56,8 +56,8 @@ const copy = {
 
   // Who we are + what we believe. One paragraph on purpose.
   whoWeAre: {
-    en: 'We are the Central Texas Chapter of the Catholic Land Movement, and we believe this is possible through the grace of Jesus Christ. As laypeople, it is our work to turn our families, communities, and institutions toward the beatific vision.',
-    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Como laicos, nos toca orientar a nuestras familias, comunidades, e instituciones hacia la visión beatífica.',
+    en: 'We exist to help restore the household to what it once was: a place that makes, grows, and gives, rather than one that only consumes. Whether you\u2019re planning a rural resettlement or simply learning to bake sourdough or build a raised bed. Our mission is to serve every parish in Central Texas, from Austin to San Antonio.',
+    es: 'Existimos para ayudar a restaurar el hogar a lo que alguna vez fue: un lugar que hace, cultiva y da, en vez de uno que solo consume. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre o a construir una cama de cultivo. Nuestra misión es servir a cada parroquia del centro de Tejas, desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
@@ -175,10 +175,13 @@ const Home = () => {
       {/* ---------------------------------------------------------------- */}
       {/* 1. Opening                                                       */}
       {/* ---------------------------------------------------------------- */}
+      {/* ---------------------------------------------------------------- */}
+      {/* 1. Opening                                                       */}
+      {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
-        <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
+        <h1 className="font-heading text-ocre text-3xl md:text-4xl">
           {t(copy.eyebrow)}
-        </p>
+        </h1>
         <div className="mx-auto mt-10 max-w-xl space-y-6 text-left">
           <p className="prose-body text-lg leading-relaxed text-mesquite/80">
             {t(copy.ache)}
