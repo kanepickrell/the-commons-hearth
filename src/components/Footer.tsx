@@ -21,6 +21,7 @@ export const Footer = () => {
     `${t(s.nationalLink)} — catholiclandmovement.info`,
   );
 
+
   return (
     <footer className="mt-24 border-t border-mesquite/15 py-14">
       <div className="container-wide flex flex-col items-center gap-6 text-center">
@@ -31,7 +32,7 @@ export const Footer = () => {
           </span>
         </div>
 
-        <p className="font-heading italic text-mesquite/80">{t(s.underPatronage)}</p>
+        {/* <p className="font-heading italic text-mesquite/80">{t(s.underPatronage)}</p> */}
 
         {nationalLink}
 
