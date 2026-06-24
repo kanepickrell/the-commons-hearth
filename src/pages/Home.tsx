@@ -56,8 +56,8 @@ const copy = {
 
   // Who we are + what we believe. One paragraph on purpose.
   whoWeAre: {
-    en: 'We exist to help restore the household to what it once was: a place that makes, grows, and gives, rather than one that only consumes. Whether youre planning a rural resettlement or simply learning to bake sourdough or build a raised bed. Our mission is to serve every parish in Central Texas, from Austin to San Antonio.',
-    es: 'Somos el Capítulo del Centro de Tejas del Movimiento Católico de la Tierra, y creemos que esto es posible por la gracia de Jesucristo. Como laicos, nos toca orientar a nuestras familias, comunidades, e instituciones hacia la visión beatífica.',
+    en: 'We exist to help restore the household to what it once was: a place that makes, grows, and gives, rather than one that only consumes. Whether you\u2019re planning a rural resettlement or simply learning to bake sourdough or build a raised bed. Our mission is to serve every parish in Central Texas, from Austin to San Antonio.',
+    es: 'Existimos para ayudar a restaurar el hogar a lo que alguna vez fue: un lugar que hace, cultiva y da, en vez de uno que solo consume. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre o a construir una cama de cultivo. Nuestra misión es servir a cada parroquia del centro de Tejas, desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
@@ -120,7 +120,7 @@ const pillars: {
     key: 'fellowship',
     name: { en: 'Fellowship', es: 'Compañerismo' },
     body: {
-      en: 'Households that show up for each other in conversation and a helping hand.',
+      en: 'Households that show up for each other — with a hand, a conversation, a prayer.',
       es: 'Hogares que están ahí unos para otros — con una mano, una conversación, una oración.',
     },
   },

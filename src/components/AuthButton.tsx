@@ -166,6 +166,10 @@ export function AuthButton() {
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('');
 
+  // Nav shows first name only, capped + truncated, so a long display name
+  // can't squeeze the header into overflow.
+  const shortLabel = label.split(/\s+/)[0];
+
   const go = (path: string) => {
     setMenuOpen(false);
     navigate(path);
@@ -180,7 +184,7 @@ export function AuthButton() {
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-mesquite/10 text-[10px] font-bold text-mesquite">
           {initials || '·'}
         </span>
-        <span className="hidden sm:inline">{label}</span>
+        <span className="hidden max-w-[9rem] truncate sm:inline-block">{shortLabel}</span>
       </button>
 
       {menuOpen && (

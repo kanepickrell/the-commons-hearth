@@ -10,6 +10,7 @@ import { Layout } from '@/components/Layout';
 import { Icon } from '@/components/Icon';
 import { LanguageNote } from '@/components/LanguageNote';
 import { RsvpModal, type ContributionType } from '@/components/RsvpModal';
+import { SignInModal } from '@/components/SignInModal';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
@@ -50,6 +51,7 @@ const TallerDetail = () => {
   const [rsvps, setRsvps] = useState<RsvpRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   const isApprovedMember = !!profile && profile.status === 'approved';
   const myRsvp = rsvps.find((r) => r.profile_id === user?.id) ?? null;
@@ -239,22 +241,34 @@ const TallerDetail = () => {
         </dl>
 
         <div className="mt-14 flex flex-col items-center gap-3">
-          <button
-            type="button"
-            onClick={openModal}
-            disabled={!!myRsvp}
-            className="border border-ocre bg-ocre px-8 py-3 font-heading text-lg text-cal transition-colors hover:bg-mesquite hover:border-mesquite disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {myRsvp
-              ? `${t(uiStrings.contribution.bringing)}: ${contributionLabel(myRsvp.contribution_type)}`
-              : t(uiStrings.workshop.rsvp)}
-          </button>
-          <p className="text-sm italic text-piedra">
-            {rsvps.length} {t(uiStrings.workshop.rsvpCount)}
-          </p>
+          {user ? (
+            <button
+              type="button"
+              onClick={openModal}
+              disabled={!!myRsvp}
+              className="border border-ocre bg-ocre px-8 py-3 font-heading text-lg text-cal transition-colors hover:bg-mesquite hover:border-mesquite disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {myRsvp
+                ? `${t(uiStrings.contribution.bringing)}: ${contributionLabel(myRsvp.contribution_type)}`
+                : t(uiStrings.workshop.rsvp)}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSignInOpen(true)}
+              className="border border-ocre bg-ocre px-8 py-3 font-heading text-lg text-cal transition-colors hover:bg-mesquite hover:border-mesquite"
+            >
+              {t(uiStrings.workshop.logInToRsvp)}
+            </button>
+          )}
+          {user && (
+            <p className="text-sm italic text-piedra">
+              {rsvps.length} {t(uiStrings.workshop.rsvpCount)}
+            </p>
+          )}
         </div>
 
-        {rsvps.length > 0 && (
+        {user && rsvps.length > 0 && (
           <section className="mt-16 border-t border-mesquite/10 pt-10">
             <h2 className="display-caps mb-6 text-xs tracking-[0.2em] text-ocre">
               {t(uiStrings.workshop.whosComing).toUpperCase()}
@@ -287,6 +301,7 @@ const TallerDetail = () => {
       </article>
 
       <RsvpModal open={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleRsvp} />
+      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
     </Layout>
   );
 };
