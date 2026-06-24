@@ -163,7 +163,7 @@ export const uiStrings = {
       es: 'Parte del Movimiento Católico de la Tierra',
     },
     sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · AD 2026', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · AD 2026' },
-    reachUs: { en: 'Reach us', es: 'Escríbenos' },
+    reachUs: { en: 'Still Have Questions?', es: 'Escríbenos' },
   },
   contact: {
     modalTitle: { en: 'Reach the chapter', es: 'Escríbele al capítulo' },
