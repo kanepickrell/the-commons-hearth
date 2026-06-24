@@ -64,6 +64,11 @@ const Testimonio = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<number>(() => new Date().getMonth());
 
+  // Headline chapter metrics — sourced from the live tables, not from witness
+  // posts: gatherings + hosts from approved gatherings, neighbors from the
+  // approved member roster, replicated from witness posts that cite a source.
+  const [metrics, setMetrics] = useState({ gatherings: 0, hosts: 0, neighbors: 0, replicated: 0 });
+
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase
@@ -83,15 +88,35 @@ const Testimonio = () => {
     })();
   }, []);
 
-  // Bucket posts by month for headline stats.
-  const stats = useMemo(() => {
-    const held = posts.filter((p) => !p.planned);
-    const gatherings = held.length;
-    const hosts = new Set(held.map((p) => p.hostId)).size;
-    const neighbors = held.reduce((sum, p) => sum + p.fruit.count, 0);
-    const replicated = held.filter((p) => p.replicated).length;
-    return { gatherings, hosts, neighbors, replicated };
-  }, [posts]);
+  // Load the headline metrics. These read approved rows the public can already
+  // see (the gatherings_public view; approved profiles, as the parish map does),
+  // so no elevated access is needed. A gathering counts the moment it's
+  // approved; a neighbor counts the moment their profile is approved.
+  useEffect(() => {
+    (async () => {
+      const [gatherings, members, replicated] = await Promise.all([
+        supabase.from('gatherings_public').select('host_id'),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+        supabase
+          .from('witness_posts')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'approved')
+          .not('replicated_from_post_id', 'is', null),
+      ]);
+
+      if (gatherings.error) console.error('metrics: gatherings', gatherings.error);
+      if (members.error) console.error('metrics: members', members.error);
+      if (replicated.error) console.error('metrics: replicated', replicated.error);
+
+      const gatheringRows = (gatherings.data ?? []) as unknown as Array<{ host_id: string | null }>;
+      setMetrics({
+        gatherings: gatheringRows.length,
+        hosts: new Set(gatheringRows.map((r) => r.host_id).filter(Boolean)).size,
+        neighbors: members.count ?? 0,
+        replicated: replicated.count ?? 0,
+      });
+    })();
+  }, []);
 
   const postsByMonth = useMemo(() => {
     const map: Record<number, WitnessPost[]> = {};
@@ -122,10 +147,10 @@ const Testimonio = () => {
         ) : (
           <>
             <div className="mx-auto mb-10 grid max-w-2xl grid-cols-4 gap-3">
-              <Stat n={stats.gatherings} label={t(s.statGatherings)} />
-              <Stat n={stats.hosts} label={t(s.statHosts)} />
-              <Stat n={stats.neighbors} label={t(s.statNeighbors)} />
-              <Stat n={stats.replicated} label={t(s.statReplicated)} />
+              <Stat n={metrics.gatherings} label={t(s.statGatherings)} />
+              <Stat n={metrics.hosts} label={t(s.statHosts)} />
+              <Stat n={metrics.neighbors} label={t(s.statNeighbors)} />
+              <Stat n={metrics.replicated} label={t(s.statReplicated)} />
             </div>
 
             <div className="mx-auto grid max-w-4xl grid-cols-1 items-start gap-8 md:grid-cols-[380px_1fr]">
