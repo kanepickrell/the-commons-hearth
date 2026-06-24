@@ -84,7 +84,7 @@ const copy = {
   // 4. The map
   // ---------------------------------------------------------------------
   mapEyebrow: {
-    en: 'YOUR NEIGHBORS',
+    en: 'MEET YOUR NEIGHBORS',
     es: 'TUS VECINOS',
   } satisfies Bilingual,
   mapHeading: {
