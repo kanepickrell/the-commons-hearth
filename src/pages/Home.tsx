@@ -56,7 +56,7 @@ const copy = {
 
   // Who we are + what we believe. One paragraph on purpose.
   whoWeAre: {
-    en: 'We exist to help restore the household to what it once was: a place that makes, grows, and gives, rather than one that only consumes. Whether you\u2019re planning a rural resettlement or simply learning to bake sourdough or build a raised bed. Our mission is to serve every parish in Central Texas, from Austin to San Antonio.',
+    en: 'We exist to help restore the household to what it once was: a place that makes, grows, and gives, rather than one that only consumes. Whether you\u2019re planning a rural resettlement or simply learning to bake sourdough, we\u2019re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
     es: 'Existimos para ayudar a restaurar el hogar a lo que alguna vez fue: un lugar que hace, cultiva y da, en vez de uno que solo consume. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre o a construir una cama de cultivo. Nuestra misión es servir a cada parroquia del centro de Tejas, desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
@@ -112,7 +112,7 @@ const pillars: {
     key: 'education',
     name: { en: 'Education', es: 'Educación' },
     body: {
-      en: 'Neighbors teaching neighbors the land and hand crafts — the practical knowledge that used to pass from house to house.',
+      en: 'Neighbors teaching neighbors the land and hand crafts. All practical knowledge used to pass from home to home.',
       es: 'Vecinos que enseñan a vecinos los oficios de la tierra y de la mano — el conocimiento práctico que antes pasaba de casa en casa.',
     },
   },
@@ -120,7 +120,7 @@ const pillars: {
     key: 'fellowship',
     name: { en: 'Fellowship', es: 'Compañerismo' },
     body: {
-      en: 'Households that show up for each other — with a hand, a conversation, a prayer.',
+      en: 'Households that show up for each other with a helping hand and foster lasting relationships',
       es: 'Hogares que están ahí unos para otros — con una mano, una conversación, una oración.',
     },
   },
