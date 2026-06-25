@@ -84,7 +84,7 @@ export default function Participate() {
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
-            en: 'Follow these three steps to getting started in our chapter',
+            en: 'Follow these three steps to get the most from our chapter',
             es: 'Tres movimientos. No necesitas estar listo para los tres. Sólo necesitas el primero.',
           })}
         </p>
