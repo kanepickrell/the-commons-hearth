@@ -29,7 +29,7 @@ const books: Book[] = [
     title: 'Flee to the Fields',
     author: 'Hilaire Belloc, Fr. Vincent McNabb, et al.',
     note: {
-      en: 'The founding anthology — the essays of the English land associations that started it all.',
+      en: 'The founding anthology. Essays of the English land associations that started it all.',
       es: 'La antología fundacional — los ensayos de las asociaciones agrarias inglesas que lo iniciaron todo.',
     },
   },
@@ -45,7 +45,7 @@ const books: Book[] = [
     title: 'An Essay on the Restoration of Property',
     author: 'Hilaire Belloc',
     note: {
-      en: 'The property argument in full: why widely distributed ownership — not the state, not the trust — secures the family.',
+      en: 'The property argument in full: why widely distributed ownership secures the family.',
       es: 'El argumento de la propiedad por completo: por qué la propiedad ampliamente distribuida — ni el estado, ni el monopolio — asegura a la familia.',
     },
   },
@@ -53,8 +53,8 @@ const books: Book[] = [
     title: 'The Outline of Sanity',
     author: 'G.K. Chesterton',
     note: {
-      en: 'The most readable door into distributism — Chesterton on scale, ownership, and the common life.',
-      es: 'La puerta más accesible al distributismo — Chesterton sobre la escala, la propiedad, y la vida común.',
+      en: 'The most readable door into distributism. Chesterton on scale, ownership, and the common life.',
+      es: 'La puerta más accesible al distributismo. Chesterton sobre la escala, la propiedad, y la vida común.',
     },
   },
   {
@@ -101,7 +101,7 @@ const sourceDocuments: SourceDoc[] = [
     author: { en: 'Leo XIII, 1891', es: 'León XIII, 1891' },
     href: 'https://www.vatican.va/content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_15051891_rerum-novarum.html',
     note: {
-      en: 'The source code. About forty pages. Workers, wages, property, family — the foundation everything else is built on.',
+      en: 'The source code. About forty pages. Workers, wages, property, family. The pillars of the CLM comes right out of this writing.',
       es: 'El código fuente. Unas cuarenta páginas. El obrero, el salario, la propiedad, la familia — el fundamento sobre el que se construye todo lo demás.',
     },
   },
@@ -119,7 +119,7 @@ const sourceDocuments: SourceDoc[] = [
     author: { en: 'Pius XII', es: 'Pío XII' },
     href: 'https://www.papalencyclicals.net/pius12/poprural.htm',
     note: {
-      en: 'Pius XII to farmers — the dignity of rural life and of the family on the land, in the movement’s own century.',
+      en: 'Pius XII directly speaking to farmers on the dignity of rural life and of the family on the land.',
       es: 'Pío XII a los labradores — la dignidad de la vida rural y de la familia en la tierra, en el propio siglo del movimiento.',
     },
   },
@@ -128,7 +128,7 @@ const sourceDocuments: SourceDoc[] = [
     author: { en: 'Francis, 2015', es: 'Francisco, 2015' },
     href: 'https://www.vatican.va/content/francesco/en/encyclicals/documents/papa-francesco_20150524_enciclica-laudato-si.html',
     note: {
-      en: 'On care for creation — the stewardship of the earth as a moral and spiritual duty.',
+      en: 'Pope Francis on care for creation, stewardship of the earth as a moral and spiritual duty.',
       es: 'Sobre el cuidado de la creación — la custodia de la tierra como deber moral y espiritual.',
     },
   },
