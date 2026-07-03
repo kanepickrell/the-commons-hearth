@@ -3,16 +3,22 @@
 // Lets a steward/admin add a member by hand: display name, email, parish.
 // Creates the auth.users row (which a plain client insert can't do, because
 // public.profiles.id references auth.users(id)), then writes a minimal profile
-// stub with status 'approved'. The member fills in bio / crafts / working_on /
-// wants_to_learn themselves the first time they sign in with the same email.
+// stub via the admin_add_member SECURITY DEFINER RPC. If a new parish is given,
+// the RPC creates it and links the member — so the parish immediately has a
+// member and appears in "Parishes and contacts" (member_count > 0) with a
+// "no location" badge until coordinates are entered by hand.
 //
-// verify_jwt is OFF (config.toml) so the CORS preflight isn't rejected. Admin
-// access is enforced by resolving the caller from their JWT, then reading their
-// profiles.is_admin with the service-role client.
+// The member fills in bio / crafts / working_on / wants_to_learn the first time
+// they sign in with the same email.
 //
-// The privileged key is read from ADMIN_SERVICE_KEY (a secret you set), falling
-// back to the auto-injected SUPABASE_SERVICE_ROLE_KEY. On the new API-key system
-// this must be your sb_secret_... key — the legacy injected one is inert.
+// Access model (mirrors the rest of this project, which uses SECURITY DEFINER
+// RPCs rather than direct service-role table access):
+//   - Admin gate:  read caller's own profiles.is_admin with the CALLER's token.
+//   - Create user: GoTrue admin API with the secret key (ADMIN_SERVICE_KEY).
+//   - DB writes:   admin_add_member() RPC, called as the caller so auth.uid()
+//                  re-checks admin inside the definer function.
+//
+// verify_jwt is OFF (config.toml) so the CORS preflight isn't rejected.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 
@@ -20,8 +26,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const ANON_KEY     = Deno.env.get('SUPABASE_ANON_KEY')!;
 const ADMIN_KEY    = Deno.env.get('ADMIN_SERVICE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-// Service-role client: privileged, used for the admin check, auth admin API,
-// and table writes.
+// Service client: used ONLY for the GoTrue admin API (createUser / listUsers).
 const admin = createClient(SUPABASE_URL, ADMIN_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   global: { headers: { apikey: ADMIN_KEY, Authorization: `Bearer ${ADMIN_KEY}` } },
@@ -85,8 +90,8 @@ Deno.serve(async (req: Request) => {
   }
   const callerId = userData.user.id;
 
-  // --- Admin gate: read the caller's profile with the service-role client ---
-  const { data: callerProfile, error: profErr } = await admin
+  // --- Admin gate: read caller's own profile with the CALLER's token --------
+  const { data: callerProfile, error: profErr } = await userClient
     .from('profiles')
     .select('is_admin')
     .eq('id', callerId)
@@ -111,19 +116,7 @@ Deno.serve(async (req: Request) => {
   if (!EMAIL_RE.test(email))    return json({ error: 'invalid_email', detail: email }, 422);
   if (displayName.length < 2)   return json({ error: 'invalid_name', detail: displayName }, 422);
 
-  // --- Resolve parish (existing id, or create a new one) -------------------
-  let parishId: string | null = body.parish_id ?? null;
-  if (!parishId && body.new_parish?.name?.trim()) {
-    const { data: newParish, error: parishErr } = await admin
-      .from('parishes')
-      .insert({ name: body.new_parish.name.trim(), city: body.new_parish.city?.trim() || null })
-      .select('id')
-      .single();
-    if (parishErr) return json({ error: 'parish_create_failed', detail: parishErr.message }, 500);
-    parishId = newParish.id;
-  }
-
-  // --- Create (or find) the auth user --------------------------------------
+  // --- Create (or find) the auth user (admin API — needs the secret key) ----
   let userId: string;
   let createdAuthUser = false;
 
@@ -141,38 +134,19 @@ Deno.serve(async (req: Request) => {
     createdAuthUser = true;
   }
 
-  // --- Upsert the profile stub ---------------------------------------------
-  const { data: existingProfile } = await admin
-    .from('profiles')
-    .select('display_name, parish_id, bio_language, status')
-    .eq('id', userId)
-    .maybeSingle();
+  // --- Parish + profile writes via SECURITY DEFINER RPC (as the caller) -----
+  const { data: rpcParishId, error: rpcErr } = await userClient.rpc('admin_add_member', {
+    p_user_id: userId,
+    p_display_name: displayName,
+    p_parish_id: body.parish_id ?? null,
+    p_new_parish_name: body.new_parish?.name ?? null,
+    p_new_parish_city: body.new_parish?.city ?? null,
+    p_language: language,
+  });
 
-  try {
-    if (!existingProfile) {
-      const { error } = await admin.from('profiles').insert({
-        id: userId,
-        display_name: displayName,
-        parish_id: parishId,
-        bio_language: language,
-        status: 'approved',
-      });
-      if (error) throw error;
-    } else {
-      const patch: Record<string, unknown> = {};
-      if (!existingProfile.display_name && displayName) patch.display_name = displayName;
-      if (!existingProfile.parish_id && parishId) patch.parish_id = parishId;
-      if (!existingProfile.bio_language && language) patch.bio_language = language;
-      if (existingProfile.status === 'pending') patch.status = 'approved';
-      if (Object.keys(patch).length > 0) {
-        const { error } = await admin.from('profiles').update(patch).eq('id', userId);
-        if (error) throw error;
-      }
-    }
-  } catch (e) {
-    const detail = e instanceof Error ? e.message : String(e);
-    return json({ error: 'profile_write_failed', detail }, 500);
+  if (rpcErr) {
+    return json({ error: 'profile_write_failed', detail: rpcErr.message }, 500);
   }
 
-  return json({ ok: true, profile_id: userId, created_auth_user: createdAuthUser, parish_id: parishId });
+  return json({ ok: true, profile_id: userId, created_auth_user: createdAuthUser, parish_id: (rpcParishId as string | null) ?? null });
 });

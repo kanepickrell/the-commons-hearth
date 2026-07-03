@@ -31,7 +31,7 @@ export const AddMemberPanel = () => {
   const [newParishCity, setNewParishCity] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [added, setAdded] = useState<{ name: string; email: string; existed: boolean }[]>([]);
+  const [added, setAdded] = useState<{ name: string; email: string; existed: boolean; geocoded?: string }[]>([]);
 
   useEffect(() => {
     supabase
@@ -119,7 +119,7 @@ export const AddMemberPanel = () => {
         }
 
     const existed = data?.created_auth_user === false;
-    setAdded((prev) => [{ name: trimmedName, email: trimmedEmail, existed }, ...prev].slice(0, 8));
+    setAdded((prev) => [{ name: trimmedName, email: trimmedEmail, existed, geocoded: data?.geocoded }, ...prev].slice(0, 8));
 
     // If we created a new parish, add it to the local list so it's selectable next time.
     if (parishChoice === NEW_PARISH && data?.parish_id) {
@@ -270,6 +270,14 @@ export const AddMemberPanel = () => {
                 {m.existed && (
                   <span className="ml-2 font-serif text-xs italic text-ocre">
                     {t({ en: '(already had an account)', es: '(ya tenía cuenta)' })}
+                  </span>
+                )}
+                {(m.geocoded === 'not_found' || m.geocoded === 'error') && (
+                  <span className="ml-2 font-serif text-xs italic text-rojo">
+                    {t({
+                      en: '· couldn’t auto-locate parish — set coordinates in Parishes and contacts',
+                      es: '· no se pudo ubicar la parroquia — pon las coordenadas en Parroquias y contactos',
+                    })}
                   </span>
                 )}
               </li>
