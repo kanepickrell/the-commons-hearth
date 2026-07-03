@@ -93,18 +93,30 @@ export const AddMemberPanel = () => {
     }
 
     const { data, error: fnErr } = await supabase.functions.invoke('admin-add-member', { body });
-    setSubmitting(false);
+        setSubmitting(false);
 
-    if (fnErr || (data && data.error)) {
-      const detail = data?.detail || fnErr?.message || 'unknown error';
-      setError(
-        t({
-          en: `Could not add member. ${detail}`,
-          es: `No pudimos añadir al miembro. ${detail}`,
-        }),
-      );
-      return;
-    }
+        if (fnErr || (data && data.error)) {
+        // On a non-2xx, supabase-js puts the Response in fnErr.context — read the
+        // JSON body to get the function's actual error/detail instead of the
+        // generic "non-2xx status code" message.
+        let detail = data?.detail || data?.error || '';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ctx = (fnErr as any)?.context;
+        if (!detail && ctx && typeof ctx.json === 'function') {
+            try {
+            const parsed = await ctx.json();
+            detail = parsed?.detail ? `${parsed.error}: ${parsed.detail}` : (parsed?.error ?? '');
+            } catch { /* fall through */ }
+        }
+        if (!detail) detail = fnErr?.message ?? 'unknown error';
+        setError(
+            t({
+            en: `Could not add member. ${detail}`,
+            es: `No pudimos añadir al miembro. ${detail}`,
+            }),
+        );
+        return;
+        }
 
     const existed = data?.created_auth_user === false;
     setAdded((prev) => [{ name: trimmedName, email: trimmedEmail, existed }, ...prev].slice(0, 8));
