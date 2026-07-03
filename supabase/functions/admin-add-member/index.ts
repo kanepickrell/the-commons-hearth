@@ -6,20 +6,25 @@
 // stub with status 'approved'. The member fills in bio / crafts / working_on /
 // wants_to_learn themselves the first time they sign in with the same email.
 //
-// verify_jwt is OFF (config.toml) so the CORS preflight isn't rejected; admin
-// access is enforced here by resolving the caller from their JWT and checking
-// profiles.is_admin. Every rejection returns a `detail` so failures are legible.
+// verify_jwt is OFF (config.toml) so the CORS preflight isn't rejected. Admin
+// access is enforced via the is_current_user_admin RPC (SECURITY DEFINER),
+// called as the signed-in user — no direct service_role table read, so it does
+// not depend on table grants.
+//
+// The privileged key is read from ADMIN_SERVICE_KEY (a secret you set), falling
+// back to the auto-injected SUPABASE_SERVICE_ROLE_KEY. It is required for the
+// GoTrue admin API (createUser / listUsers) and the profile/parish writes.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 
-const SUPABASE_URL     = Deno.env.get('SUPABASE_URL')!;
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const ANON_KEY         = Deno.env.get('SUPABASE_ANON_KEY')!;
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const ANON_KEY     = Deno.env.get('SUPABASE_ANON_KEY')!;
+const ADMIN_KEY    = Deno.env.get('ADMIN_SERVICE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-// Service-role client: bypasses RLS, used for all privileged reads/writes.
-const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+// Service-role client: privileged, used for the auth admin API and table writes.
+const admin = createClient(SUPABASE_URL, ADMIN_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  global: { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } },
+  global: { headers: { apikey: ADMIN_KEY, Authorization: `Bearer ${ADMIN_KEY}` } },
 });
 
 const CORS_HEADERS = {
@@ -61,13 +66,14 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS });
 
-  // --- Resolve the caller from their JWT (canonical pattern) ---------------
-  const authHeader = req.headers.get('Authorization') ?? '';
-  if (!authHeader) {
-    return json({ error: 'unauthorized', detail: 'no Authorization header reached the function' }, 401);
+  if (!ADMIN_KEY) {
+    return json({ error: 'config', detail: 'No privileged key in this function. Set an ADMIN_SERVICE_KEY secret.' }, 500);
   }
 
-  // A user-scoped client: getUser() reads the bearer token from this header.
+  // --- Resolve the caller from their JWT -----------------------------------
+  const authHeader = req.headers.get('Authorization') ?? '';
+  if (!authHeader) return json({ error: 'unauthorized', detail: 'no Authorization header reached the function' }, 401);
+
   const userClient = createClient(SUPABASE_URL, ANON_KEY, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { headers: { Authorization: authHeader } },
@@ -77,17 +83,11 @@ Deno.serve(async (req: Request) => {
   if (userErr || !userData?.user) {
     return json({ error: 'unauthorized', detail: `could not resolve caller: ${userErr?.message ?? 'no user in token'}` }, 401);
   }
-  const callerId = userData.user.id;
 
-  const { data: callerProfile, error: profErr } = await admin
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', callerId)
-    .maybeSingle();
-
-  if (profErr)          return json({ error: 'forbidden', detail: `profile lookup failed: ${profErr.message}` }, 403);
-  if (!callerProfile)   return json({ error: 'forbidden', detail: `no profile row for caller ${callerId}` }, 403);
-  if (!callerProfile.is_admin) return json({ error: 'forbidden', detail: `caller ${callerId} is not an admin` }, 403);
+  // --- Admin gate via SECURITY DEFINER RPC (grant-independent) --------------
+  const { data: isAdmin, error: adminErr } = await userClient.rpc('is_current_user_admin');
+  if (adminErr)  return json({ error: 'forbidden', detail: `admin check failed: ${adminErr.message}` }, 403);
+  if (!isAdmin)  return json({ error: 'forbidden', detail: 'caller is not an admin' }, 403);
 
   // --- Parse + validate input ---------------------------------------------
   let body: Body;
