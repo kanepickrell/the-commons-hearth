@@ -68,7 +68,7 @@ const Testimonio = () => {
   // Headline chapter metrics — sourced from the live tables, not from witness
   // posts: gatherings + hosts from approved gatherings, neighbors from the
   // approved member roster, replicated from witness posts that cite a source.
-  const [metrics, setMetrics] = useState({ gatherings: 0, hosts: 0, neighbors: 0, replicated: 0 });
+  const [neighbors, setNeighbors] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -89,33 +89,16 @@ const Testimonio = () => {
     })();
   }, []);
 
-  // Load the headline metrics. These read approved rows the public can already
-  // see (the gatherings_public view; approved profiles, as the parish map does),
-  // so no elevated access is needed. A gathering counts the moment it's
-  // approved; a neighbor counts the moment their profile is approved.
+  // Neighbors = the approved member roster count (parish or not). Gatherings
+  // and hosts totals come from the manual monthly numbers (see yearTotals).
   useEffect(() => {
     (async () => {
-      const [gatherings, members, replicated] = await Promise.all([
-        supabase.from('gatherings_public').select('host_id'),
-        supabase.rpc('approved_member_count'),
-        supabase
-          .from('witness_posts')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'approved')
-          .not('replicated_from_post_id', 'is', null),
-      ]);
-
-      if (gatherings.error) console.error('metrics: gatherings', gatherings.error);
-      if (members.error) console.error('metrics: members', members.error);
-      if (replicated.error) console.error('metrics: replicated', replicated.error);
-
-      const gatheringRows = (gatherings.data ?? []) as unknown as Array<{ host_id: string | null }>;
-      setMetrics({
-        gatherings: gatheringRows.length,
-        hosts: new Set(gatheringRows.map((r) => r.host_id).filter(Boolean)).size,
-        neighbors: (members.data as number) ?? 0,
-        replicated: replicated.count ?? 0,
-      });
+      const { data, error } = await supabase.rpc('approved_member_count');
+      if (error) {
+        console.error('metrics: neighbors', error);
+        return;
+      }
+      setNeighbors((data as number) ?? 0);
     })();
   }, []);
 
@@ -150,6 +133,18 @@ const Testimonio = () => {
     })();
   }, []);
 
+  // Overall Gatherings/Hosts on the headline row = the sum of the manual
+  // monthly totals across the year.
+  const yearTotals = useMemo(() => {
+    let gatherings = 0;
+    let hosts = 0;
+    for (const m of Object.values(monthTotals)) {
+      gatherings += m.gatherings;
+      hosts += m.hosts;
+    }
+    return { gatherings, hosts };
+  }, [monthTotals]);
+
   return (
     <Layout>
       <section className="container-wide pb-24 pt-20">
@@ -167,11 +162,10 @@ const Testimonio = () => {
           <p className="mt-16 text-center font-serif italic text-piedra/60">…</p>
         ) : (
           <>
-            <div className="mx-auto mb-10 grid max-w-2xl grid-cols-4 gap-3">
-              <Stat n={metrics.gatherings} label={t(s.statGatherings)} />
-              <Stat n={metrics.hosts} label={t(s.statHosts)} />
-              <Stat n={metrics.neighbors} label={t(s.statNeighbors)} />
-              <Stat n={metrics.replicated} label={t(s.statReplicated)} />
+            <div className="mx-auto mb-10 grid max-w-2xl grid-cols-3 gap-3">
+              <Stat n={yearTotals.gatherings} label={t(s.statGatherings)} />
+              <Stat n={yearTotals.hosts} label={t(s.statHosts)} />
+              <Stat n={neighbors} label={t(s.statNeighbors)} />
             </div>
 
             <div className="mx-auto grid max-w-4xl grid-cols-1 items-start gap-8 md:grid-cols-[380px_1fr]">
