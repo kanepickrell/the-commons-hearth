@@ -9,6 +9,9 @@ type Props = {
   month: number;
   posts: WitnessPost[];      // posts already filtered to this month
   locale: Locale;
+  // Manual per-month totals (from month_metrics). When set, these override the
+  // numbers derived from witness posts.
+  override?: { gatherings: number; neighbors: number; hosts: number } | null;
   onAskAboutPost?: (post: WitnessPost) => void;
   onAskMetric?: (kind: 'gatherings' | 'neighbors' | 'hosts') => void;
 };
@@ -20,7 +23,7 @@ type Props = {
  * (feast, skill replication) → one card per witness post → or, if the
  * month has nothing, a quiet "the land has seasons" line.
  */
-export const MonthPanel = ({ month, posts, locale, onAskAboutPost, onAskMetric }: Props) => {
+export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onAskMetric }: Props) => {
   const s = uiStrings.witness;
   const monthNames = locale === 'es' ? uiStrings.months.es : uiStrings.months.en;
   const monthName = monthNames[month];
@@ -47,17 +50,17 @@ export const MonthPanel = ({ month, posts, locale, onAskAboutPost, onAskMetric }
       {/* Metrics row */}
       <div className="mb-4 grid grid-cols-3 gap-2">
         <MetricTile
-          n={heldPosts.length + (plannedPosts.length ? `+${plannedPosts.length}` : '')}
-          label={plannedPosts.length ? s.metricHeld[locale] : s.metricGatherings[locale]}
+          n={override ? override.gatherings : heldPosts.length + (plannedPosts.length ? `+${plannedPosts.length}` : '')}
+          label={override ? s.metricGatherings[locale] : (plannedPosts.length ? s.metricHeld[locale] : s.metricGatherings[locale])}
           onClick={() => onAskMetric?.('gatherings')}
         />
         <MetricTile
-          n={neighbors}
+          n={override ? override.neighbors : neighbors}
           label={s.metricNeighbors[locale]}
           onClick={() => onAskMetric?.('neighbors')}
         />
         <MetricTile
-          n={hosts}
+          n={override ? override.hosts : hosts}
           label={s.metricHosts[locale]}
           onClick={() => onAskMetric?.('hosts')}
         />

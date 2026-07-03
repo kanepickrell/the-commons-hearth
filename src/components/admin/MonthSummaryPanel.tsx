@@ -35,26 +35,62 @@ export const MonthSummaryPanel = () => {
   const [body, setBody] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Manual per-month totals (Year Wheel tiles). Override the derived numbers.
+  const [totals, setTotals] = useState({ gatherings: 0, neighbors: 0, hosts: 0 });
+  const [savingTotals, setSavingTotals] = useState(false);
+
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('month_summaries')
-      .select('*')
-      .eq('year', year)
-      .eq('month', month)
-      .order('sort_order', { ascending: true });
-    if (error) {
-      toast({ title: 'Failed to load summaries', description: error.message });
+    const [summariesRes, metricsRes] = await Promise.all([
+      supabase
+        .from('month_summaries')
+        .select('*')
+        .eq('year', year)
+        .eq('month', month)
+        .order('sort_order', { ascending: true }),
+      supabase
+        .from('month_metrics')
+        .select('gatherings, neighbors, hosts')
+        .eq('year', year)
+        .eq('month', month)
+        .maybeSingle(),
+    ]);
+
+    if (summariesRes.error) {
+      toast({ title: 'Failed to load summaries', description: summariesRes.error.message });
       setSummaries([]);
     } else {
-      setSummaries((data ?? []) as MonthSummary[]);
+      setSummaries((summariesRes.data ?? []) as MonthSummary[]);
     }
+
+    const m = metricsRes.data as { gatherings: number; neighbors: number; hosts: number } | null;
+    setTotals(m ? { gatherings: m.gatherings, neighbors: m.neighbors, hosts: m.hosts } : { gatherings: 0, neighbors: 0, hosts: 0 });
+
     setLoading(false);
   }, [year, month]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  const saveTotals = async () => {
+    setSavingTotals(true);
+    try {
+      const { error } = await supabase
+        .from('month_metrics')
+        .upsert(
+          { year, month, gatherings: totals.gatherings, neighbors: totals.neighbors, hosts: totals.hosts, updated_at: new Date().toISOString() },
+          { onConflict: 'year,month' },
+        );
+      if (error) throw error;
+      toast({ title: locale === 'es' ? 'Totales guardados' : 'Totals saved' });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      toast({ title: locale === 'es' ? 'No se pudo guardar' : 'Could not save', description: msg });
+    } finally {
+      setSavingTotals(false);
+    }
+  };
 
   const handleAdd = async () => {
     if (!body.trim()) {
@@ -155,6 +191,44 @@ export const MonthSummaryPanel = () => {
         </div>
       </div>
 
+      {/* Month totals — override the Year Wheel tiles for this month */}
+      <div className="rounded-sm border border-mesquite/15 bg-cal/40 p-4">
+        <p className="display-caps mb-1 text-[10px] tracking-[0.2em] text-ocre">
+          {locale === 'es' ? 'TOTALES DEL MES' : 'MONTH TOTALS'}
+        </p>
+        <p className="mb-3 font-serif text-xs italic text-piedra">
+          {locale === 'es'
+            ? 'Estos números aparecen en las casillas del mes en la rueda del año.'
+            : 'These numbers fill the month’s tiles on the Year Wheel.'}
+        </p>
+        <div className="flex flex-wrap items-end gap-4">
+          <TotalInput
+            label={locale === 'es' ? 'Reuniones' : 'Gatherings'}
+            value={totals.gatherings}
+            onChange={(v) => setTotals((s) => ({ ...s, gatherings: v }))}
+          />
+          <TotalInput
+            label={locale === 'es' ? 'Asistentes' : 'Attended'}
+            value={totals.neighbors}
+            onChange={(v) => setTotals((s) => ({ ...s, neighbors: v }))}
+          />
+          <TotalInput
+            label={locale === 'es' ? 'Anfitriones' : 'Hosts'}
+            value={totals.hosts}
+            onChange={(v) => setTotals((s) => ({ ...s, hosts: v }))}
+          />
+          <button
+            onClick={saveTotals}
+            disabled={savingTotals}
+            className="rounded-sm bg-ocre px-5 py-2 font-heading text-sm text-cal transition hover:bg-mesquite disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {savingTotals
+              ? locale === 'es' ? 'Guardando…' : 'Saving…'
+              : locale === 'es' ? 'Guardar totales' : 'Save totals'}
+          </button>
+        </div>
+      </div>
+
       {/* Add form */}
       <div className="rounded-sm border border-mesquite/15 bg-cal/40 p-4">
         <p className="display-caps mb-3 text-[10px] tracking-[0.2em] text-ocre">
@@ -217,6 +291,34 @@ export const MonthSummaryPanel = () => {
     </section>
   );
 };
+
+// ---------------------------------------------------------------------------
+// TotalInput — small labeled number input for the month totals
+// ---------------------------------------------------------------------------
+function TotalInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div>
+      <label className="display-caps mb-2 block text-[10px] tracking-[0.2em] text-mesquite/50">
+        {label.toUpperCase()}
+      </label>
+      <input
+        type="number"
+        min={0}
+        value={value}
+        onChange={(e) => onChange(Math.max(0, parseInt(e.target.value, 10) || 0))}
+        className="w-24 rounded-sm border border-mesquite/20 bg-cal px-3 py-1.5 font-mono text-sm text-mesquite focus:border-mesquite focus:outline-none"
+      />
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // SummaryCard — inline edit title/body/sort + delete

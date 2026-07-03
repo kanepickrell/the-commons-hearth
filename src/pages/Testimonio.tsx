@@ -130,6 +130,26 @@ const Testimonio = () => {
 
   const monthPosts = postsByMonth[selectedMonth] || [];
 
+  // Manual per-month totals (month_metrics) for the wheel tiles, keyed by month.
+  const [monthTotals, setMonthTotals] = useState<Record<number, { gatherings: number; neighbors: number; hosts: number }>>({});
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('month_metrics')
+        .select('month, gatherings, neighbors, hosts')
+        .eq('year', WHEEL_YEAR);
+      if (error) {
+        console.error('Failed to load month totals:', error);
+        return;
+      }
+      const map: Record<number, { gatherings: number; neighbors: number; hosts: number }> = {};
+      for (const r of (data ?? []) as Array<{ month: number; gatherings: number; neighbors: number; hosts: number }>) {
+        map[r.month] = { gatherings: r.gatherings, neighbors: r.neighbors, hosts: r.hosts };
+      }
+      setMonthTotals(map);
+    })();
+  }, []);
+
   return (
     <Layout>
       <section className="container-wide pb-24 pt-20">
@@ -168,6 +188,7 @@ const Testimonio = () => {
                   month={selectedMonth}
                   posts={monthPosts}
                   locale={locale}
+                  override={monthTotals[selectedMonth] ?? null}
                   onAskAboutPost={() => {}}
                   onAskMetric={() => {}}
                 />
