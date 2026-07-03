@@ -118,10 +118,16 @@ export const ParishMap = () => {
         ? 'id, display_name, is_poc, contact_email, parish:parishes(id, name, lat, lng)'
         : 'id, display_name, is_poc, parish:parishes(id, name, lat, lng)';
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
         .select(columns)
         .eq('status', 'approved');
+
+      // Signed-out visitors only ever receive POC rows. RLS enforces this at
+      // the data layer too; this keeps the payload minimal and the UI honest.
+      if (!isAuthenticated) query = query.eq('is_poc', true);
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Failed to load members for map:', error);
@@ -256,12 +262,18 @@ export const ParishMap = () => {
               <Popup>
                 <div className="font-heading text-mesquite">
                   <div className="text-base">{c.parishName}</div>
-                  <div className="text-sm text-piedra">
-                    {c.members.length}{' '}
-                    {c.members.length === 1
-                      ? t(uiStrings.common.member)
-                      : t(uiStrings.common.members)}
-                  </div>
+                  {isAuthenticated ? (
+                    <div className="text-sm text-piedra">
+                      {c.members.length}{' '}
+                      {c.members.length === 1
+                        ? t(uiStrings.common.member)
+                        : t(uiStrings.common.members)}
+                    </div>
+                  ) : (
+                    c.members[0] && (
+                      <div className="text-sm text-piedra">{c.members[0].name}</div>
+                    )
+                  )}
                 </div>
               </Popup>
             </CircleMarker>
@@ -299,9 +311,11 @@ export const ParishMap = () => {
         {selected ? (
           <>
             <h3 className="font-heading text-lg text-mesquite">{selected.parishName}</h3>
-            <p className="mt-1 text-sm text-piedra">
-              {selected.members.length} {selected.members.length === 1 ? t(uiStrings.common.member) : t(uiStrings.common.members)}
-            </p>
+            {isAuthenticated && (
+              <p className="mt-1 text-sm text-piedra">
+                {selected.members.length} {selected.members.length === 1 ? t(uiStrings.common.member) : t(uiStrings.common.members)}
+              </p>
+            )}
 
             {selectedPocs.length > 0 && (
               <>

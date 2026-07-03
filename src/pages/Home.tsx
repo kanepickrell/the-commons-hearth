@@ -140,7 +140,7 @@ type RecentPost = {
   language: 'en' | 'es' | null;
   craft: IconSlug | null;
   occurred_at: string;
-  author: { display_name: string | null } | null;
+  author_display_name: string | null;
 };
 
 const Home = () => {
@@ -154,11 +154,8 @@ const Home = () => {
       // One post — the most recent approved. A single piece of evidence
       // at reading size does more work than three stacked cards.
       const { data, error } = await supabase
-        .from('witness_posts')
-        .select(
-          'id, body, language, craft, occurred_at, author:profiles!witness_posts_author_id_fkey(display_name)'
-        )
-        .eq('status', 'approved')
+        .from('witness_public')
+        .select('id, body, language, craft, occurred_at, author_display_name')
         .order('occurred_at', { ascending: false })
         .limit(1);
 
@@ -244,7 +241,7 @@ const Home = () => {
                   <LanguageNote contentLanguage={latest.language} className="ml-2" />
                 </p>
                 <footer className="mt-6 text-sm italic text-piedra">
-                  {latest.author?.display_name ?? '—'} ·{' '}
+                  {latest.author_display_name ?? '—'} ·{' '}
                   {new Date(latest.occurred_at).toLocaleDateString(
                     locale === 'es' ? 'es-MX' : 'en-US',
                     { month: 'long', day: 'numeric', year: 'numeric' }

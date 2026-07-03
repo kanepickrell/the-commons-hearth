@@ -96,7 +96,7 @@ const Testimonio = () => {
     (async () => {
       const [gatherings, members, replicated] = await Promise.all([
         supabase.from('gatherings_public').select('host_id'),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+        supabase.rpc('approved_member_count'),
         supabase
           .from('witness_posts')
           .select('id', { count: 'exact', head: true })
@@ -112,7 +112,7 @@ const Testimonio = () => {
       setMetrics({
         gatherings: gatheringRows.length,
         hosts: new Set(gatheringRows.map((r) => r.host_id).filter(Boolean)).size,
-        neighbors: members.count ?? 0,
+        neighbors: (members.data as number) ?? 0,
         replicated: replicated.count ?? 0,
       });
     })();
