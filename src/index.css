@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Marcellus+SC&display=swap');
 @import 'leaflet/dist/leaflet.css';
+@import 'leaflet-draw/dist/leaflet.draw.css';
 
 @tailwind base;
 @tailwind components;
@@ -105,10 +106,26 @@
   font-family: 'Gentium Plus', Georgia, serif;
   background: hsl(var(--cal));
 }
-/* Gentle sepia tile feel — warm enough to sit in the palette, still readable */
+/* Warm-parchment basemap: gentle sepia over the minimal Positron canvas so the
+   map sits inside the palette. Tuned lighter than for raw OSM tiles, which were
+   darker and busier. Vector overlays (dots, region, pins) live in other panes
+   and are untouched by this filter. */
 .leaflet-tile-pane {
-  filter: sepia(0.35) saturate(0.8) brightness(0.98) contrast(0.95);
+  filter: sepia(0.28) saturate(0.85) brightness(1.02) contrast(0.94) hue-rotate(-4deg);
 }
+/* Segment name labels — transparent, editorial, floated over the area fill */
+.seg-label {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: hsl(var(--mesquite));
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 13px;
+  text-shadow: 0 1px 2px hsl(var(--cal) / 0.9), 0 0 3px hsl(var(--cal) / 0.9);
+}
+.seg-label::before { display: none; }
 /* Leaflet popup styling — match the chapter palette */
 .leaflet-popup-content-wrapper {
   background: hsl(var(--cal));

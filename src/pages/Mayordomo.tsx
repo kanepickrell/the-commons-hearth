@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 import { Layout } from '@/components/Layout';
 import { ParishPocPanel } from '@/components/admin/ParishPocPanel';
 import { MonthPhotoPanel } from '@/components/admin/MonthPhotoPanel';
+import { SegmentPanel } from '@/components/admin/SegmentPanel';
 import type { Database } from '@/lib/database.types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -370,6 +371,13 @@ export default function Mayordomo() {
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <MonthPhotoPanel />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 5: Chapter areas (parish-map segments) */}
+        {/* ------------------------------------------------------------------ */}
+        <section className="border-t border-mesquite/10 pt-12">
+          <SegmentPanel />
         </section>
       </div>
     </Layout>

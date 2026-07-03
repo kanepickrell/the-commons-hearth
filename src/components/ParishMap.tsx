@@ -10,8 +10,9 @@
 // only when the viewer is authenticated; anon users get the non-sensitive
 // subset and simply never see POC emails.
 
-import { MapContainer, TileLayer, CircleMarker, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Marker, Popup, Polygon, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { listSegments, type ChapterSegment } from '@/lib/segments';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { iconMap } from '@/lib/icons';
@@ -100,6 +101,12 @@ export const ParishMap = () => {
   const [clusters, setClusters] = useState<ParishCluster[]>([]);
   const [workshops, setWorkshops] = useState<WorkshopMarker[]>([]);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
+  const [segments, setSegments] = useState<ChapterSegment[]>([]);
+
+  // Chapter community areas, drawn by a Mayordomo in the admin editor.
+  useEffect(() => {
+    listSegments().then(setSegments);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -203,10 +210,35 @@ export const ParishMap = () => {
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
-            attribution='&copy; OpenStreetMap'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+            subdomains="abcd"
           />
-          {allPoints.length > 0 && <FitBounds points={allPoints} />}
+          {/* Frame members + all chapter areas, so the territory shows even
+              before any members load. */}
+          <FitBounds points={[...allPoints, ...segments.flatMap((s) => s.ring)]} />
+
+          {/* Chapter community areas — each its own soft colored region with a
+              floating label. Rendered before the markers so they sit underneath,
+              and non-interactive so they never swallow a marker click. */}
+          {segments.map((s) => (
+            <Polygon
+              key={s.id ?? s.name}
+              positions={s.ring}
+              pathOptions={{
+                interactive: false,
+                color: s.color,
+                weight: 2,
+                opacity: 0.6,
+                fillColor: s.color,
+                fillOpacity: 0.06,
+              }}
+            >
+              <Tooltip permanent direction="center" className="seg-label" opacity={1}>
+                {s.name}
+              </Tooltip>
+            </Polygon>
+          ))}
 
           {clusters.map((c) => (
             <CircleMarker
