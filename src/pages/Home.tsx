@@ -64,8 +64,8 @@ const copy = {
   // 2. Pillars
   // ---------------------------------------------------------------------
   pillarsEyebrow: {
-    en: 'PILLARS',
-    es: 'PILARES',
+    en: 'OUR MISSION',
+    es: 'NUESTRA MISION',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
