@@ -179,7 +179,7 @@ export default function Resources() {
         </h1>
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
-            en: 'Books, writers, source documents, and discussions our leadership team recommends.',
+            en: 'Books, writers, and discussions recommended by our chapter leadership.',
             es: 'Libros, escritores, documentos fuente, y conversaciones que el capítulo lee y escucha en común. Empieza donde quieras — la práctica y los principios se profundizan mutuamente.',
           })}
         </p>
