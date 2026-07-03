@@ -9,6 +9,7 @@ import { Layout } from '@/components/Layout';
 import { AddMemberPanel } from '@/components/admin/AddMemberPanel';
 import { ParishPocPanel } from '@/components/admin/ParishPocPanel';
 import { MonthPhotoPanel } from '@/components/admin/MonthPhotoPanel';
+import { MonthSummaryPanel } from '@/components/admin/MonthSummaryPanel';
 import { SegmentPanel } from '@/components/admin/SegmentPanel';
 import type { Database } from '@/lib/database.types';
 
@@ -379,6 +380,13 @@ export default function Mayordomo() {
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <MonthPhotoPanel />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 5b: Gathering summaries (Year Wheel) */}
+        {/* ------------------------------------------------------------------ */}
+        <section className="border-t border-mesquite/10 pt-12">
+          <MonthSummaryPanel />
         </section>
 
         {/* ------------------------------------------------------------------ */}

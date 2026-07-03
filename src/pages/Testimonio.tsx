@@ -12,6 +12,7 @@ import { MonthPanel } from '@/components/testimonio/MonthPanel';
 import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
 import { MonthCarousel } from '@/components/testimonio/MonthCarousel';
+import { MonthSummaries } from '@/components/testimonio/MonthSummaries';
 
 // What comes back from the DB — flat columns, single-language body.
 type WitnessRow = {
@@ -171,6 +172,8 @@ const Testimonio = () => {
                   onAskMetric={() => {}}
                 />
               </div>
+
+              <MonthSummaries year={WHEEL_YEAR} month={selectedMonth} />
 
               <MonthCarousel year={WHEEL_YEAR} month={selectedMonth} locale={locale} />
 
