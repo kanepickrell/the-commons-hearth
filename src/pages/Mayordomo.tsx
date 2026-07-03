@@ -6,6 +6,7 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { toast } from '@/hooks/use-toast';
 import { Layout } from '@/components/Layout';
+import { AddMemberPanel } from '@/components/admin/AddMemberPanel';
 import { ParishPocPanel } from '@/components/admin/ParishPocPanel';
 import { MonthPhotoPanel } from '@/components/admin/MonthPhotoPanel';
 import { SegmentPanel } from '@/components/admin/SegmentPanel';
@@ -271,7 +272,14 @@ export default function Mayordomo() {
         </section>
 
         {/* ------------------------------------------------------------------ */}
-        {/* Section 2: Pending gatherings */}
+        {/* Section 2: Add a member by hand */}
+        {/* ------------------------------------------------------------------ */}
+        <section className="border-t border-mesquite/10 pt-12">
+          <AddMemberPanel />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 3: Pending gatherings */}
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <h2 className="mb-2 font-heading text-3xl text-mesquite md:text-4xl">
@@ -360,21 +368,21 @@ export default function Mayordomo() {
         </section>
 
         {/* ------------------------------------------------------------------ */}
-        {/* Section 3: Parishes & POCs */}
+        {/* Section 4: Parishes & POCs */}
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <ParishPocPanel />
         </section>
 
         {/* ------------------------------------------------------------------ */}
-        {/* Section 4: Month photos (Year Wheel carousel) */}
+        {/* Section 5: Month photos (Year Wheel carousel) */}
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <MonthPhotoPanel />
         </section>
 
         {/* ------------------------------------------------------------------ */}
-        {/* Section 5: Chapter areas (parish-map segments) */}
+        {/* Section 6: Chapter areas (parish-map segments) */}
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <SegmentPanel />

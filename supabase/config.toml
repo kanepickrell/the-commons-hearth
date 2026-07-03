@@ -33,3 +33,12 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/contact-notify/deno.json"
 entrypoint = "./functions/contact-notify/index.ts"
+
+[functions.admin-add-member]
+enabled = true
+# verify_jwt is OFF so the browser CORS preflight (OPTIONS) succeeds, matching
+# the other browser-facing functions. Admin-only access is enforced inside the
+# function by validating the caller's JWT and checking profiles.is_admin.
+verify_jwt = false
+import_map = "./functions/admin-add-member/deno.json"
+entrypoint = "./functions/admin-add-member/index.ts"
