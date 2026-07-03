@@ -7,13 +7,12 @@
 // wants_to_learn themselves the first time they sign in with the same email.
 //
 // verify_jwt is OFF (config.toml) so the CORS preflight isn't rejected. Admin
-// access is enforced via the is_current_user_admin RPC (SECURITY DEFINER),
-// called as the signed-in user — no direct service_role table read, so it does
-// not depend on table grants.
+// access is enforced by resolving the caller from their JWT, then reading their
+// profiles.is_admin with the service-role client.
 //
 // The privileged key is read from ADMIN_SERVICE_KEY (a secret you set), falling
-// back to the auto-injected SUPABASE_SERVICE_ROLE_KEY. It is required for the
-// GoTrue admin API (createUser / listUsers) and the profile/parish writes.
+// back to the auto-injected SUPABASE_SERVICE_ROLE_KEY. On the new API-key system
+// this must be your sb_secret_... key — the legacy injected one is inert.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 
@@ -21,7 +20,8 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const ANON_KEY     = Deno.env.get('SUPABASE_ANON_KEY')!;
 const ADMIN_KEY    = Deno.env.get('ADMIN_SERVICE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-// Service-role client: privileged, used for the auth admin API and table writes.
+// Service-role client: privileged, used for the admin check, auth admin API,
+// and table writes.
 const admin = createClient(SUPABASE_URL, ADMIN_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   global: { headers: { apikey: ADMIN_KEY, Authorization: `Bearer ${ADMIN_KEY}` } },
@@ -83,11 +83,18 @@ Deno.serve(async (req: Request) => {
   if (userErr || !userData?.user) {
     return json({ error: 'unauthorized', detail: `could not resolve caller: ${userErr?.message ?? 'no user in token'}` }, 401);
   }
+  const callerId = userData.user.id;
 
-  // --- Admin gate via SECURITY DEFINER RPC (grant-independent) --------------
-  const { data: isAdmin, error: adminErr } = await userClient.rpc('is_current_user_admin');
-  if (adminErr)  return json({ error: 'forbidden', detail: `admin check failed: ${adminErr.message}` }, 403);
-  if (!isAdmin)  return json({ error: 'forbidden', detail: 'caller is not an admin' }, 403);
+  // --- Admin gate: read the caller's profile with the service-role client ---
+  const { data: callerProfile, error: profErr } = await admin
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', callerId)
+    .maybeSingle();
+
+  if (profErr)                 return json({ error: 'forbidden', detail: `profile lookup failed: ${profErr.message}` }, 403);
+  if (!callerProfile)          return json({ error: 'forbidden', detail: `no profile row for caller ${callerId}` }, 403);
+  if (!callerProfile.is_admin) return json({ error: 'forbidden', detail: `caller ${callerId} is not an admin` }, 403);
 
   // --- Parse + validate input ---------------------------------------------
   let body: Body;
