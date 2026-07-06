@@ -203,10 +203,10 @@ export const uiStrings = {
   },
   patron: {
     heading: {
-      en: 'San Isidro Labrador — our patron',
-      es: 'San Isidro Labrador — nuestro santo patrón',
+      en: 'Saint Isidore',
+      es: 'San Isidro Labrador',
     },
-    feastDay: { en: 'Feast day: May 15', es: 'Fiesta: el 15 de mayo' },
+    feastDay: { en: 'OUR PATRON', es: 'nuestro santo patrón' },
     story: {
       en: 'San Isidro was a 12th-century Spanish farmer who prayed constantly while he worked. He is the patron of farmers, of rural communities, and of the quiet sanctification of ordinary labor. The chapter gathers every May 15 for the blessing of fields, seeds, and tools.',
       es: 'San Isidro fue un labrador español del siglo XII que oraba sin cesar mientras trabajaba. Es el santo patrón de los labradores, de las comunidades rurales, y de la santificación silenciosa del trabajo ordinario. El capítulo se reúne cada 15 de mayo para la bendición del campo, de las semillas, y de las herramientas.',
