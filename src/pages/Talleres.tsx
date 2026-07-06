@@ -65,7 +65,7 @@ const Talleres = () => {
           <p className="prose-body mt-6 italic text-piedra">
             {locale === 'es'
               ? 'Reuniones reales, en lugares reales, con anfitriones reales.'
-              : 'Real gatherings, in real places, with real hosts.'}
+              : 'Monthly skill & education events for our local chapter.'}
           </p>
         </header>
 
