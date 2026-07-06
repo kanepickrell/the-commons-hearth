@@ -104,7 +104,7 @@ const pillars: {
     key: 'resettlement',
     name: { en: 'Resettlement', es: 'Reasentamiento' },
     body: {
-      en: 'Putting working land back in families’ hands, so they can root again in land, work, and parish life.',
+      en: 'To assist in putting working land back in the hands of families through rural resettlement or domestically productive property.',
       es: 'Poner tierra fértil de nuevo en manos de las familias, para que puedan arraigarse otra vez en la tierra, el trabajo, y la parroquia.',
     },
   },
@@ -112,7 +112,7 @@ const pillars: {
     key: 'education',
     name: { en: 'Education', es: 'Educación' },
     body: {
-      en: 'Neighbors teaching neighbors the land and hand crafts. All practical knowledge used to pass from home to home.',
+      en: 'To educate and train in the domestic order, agricultural skills and craft traditions necessary to successfully cultivate Catholic homesteads.',
       es: 'Vecinos que enseñan a vecinos los oficios de la tierra y de la mano — el conocimiento práctico que antes pasaba de casa en casa.',
     },
   },
@@ -120,7 +120,7 @@ const pillars: {
     key: 'fellowship',
     name: { en: 'Fellowship', es: 'Compañerismo' },
     body: {
-      en: 'Households that show up for each other with a helping hand and foster lasting relationships',
+      en: 'To cultivate a network of practical, spiritual and intellectual support between those established Catholic homesteads and those seeking lasting relationships through skill sharing.',
       es: 'Hogares que están ahí unos para otros — con una mano, una conversación, una oración.',
     },
   },
@@ -128,7 +128,7 @@ const pillars: {
     key: 'glorification',
     name: { en: 'Glorification', es: 'Glorificación' },
     body: {
-      en: 'Prayer, the Mass, and the seasons of the Church’s year shape everything we do. All of it is offered back to God in worship.',
+      en: 'To renew prayer, the Mass, and the seasons of the Church back in agrarian life. Recognizing the fruits of our labor as gift from God.',
       es: 'La oración, la Misa, y las estaciones del año litúrgico dan forma a todo lo que hacemos. Todo se le ofrece a Dios en adoración.',
     },
   },
