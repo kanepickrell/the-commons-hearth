@@ -212,7 +212,7 @@ export const uiStrings = {
       es: 'San Isidro fue un labrador español del siglo XII que oraba sin cesar mientras trabajaba. Es el santo patrón de los labradores, de las comunidades rurales, y de la santificación silenciosa del trabajo ordinario. El capítulo se reúne cada 15 de mayo para la bendición del campo, de las semillas, y de las herramientas.',
     },
     prayer: {
-      en: 'O God, through the intercession of San Isidro the farmer, grant that we may overcome all feelings of pride, and always serve you with that humility which pleases you, through his merits and example. Amen.',
+      en: 'O God, in whom we live and move and have our being, grant us sufficient rain, so that, being supplied with what sustains us in this present life, we may seek more confidently what sustains us for eternity. Through our Lord Jesus Christ, your Son, who lives and reigns with you in the unity of the Holy Spirit, one God, for ever and ever. Amen',
       es: 'Oh Dios, por la intercesión de San Isidro labrador, concédenos vencer todo sentimiento de soberbia, y servirte siempre con esa humildad que te agrada, por sus méritos y ejemplo. Amén.',
     },
   },
