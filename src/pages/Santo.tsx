@@ -46,7 +46,20 @@ const Santo = () => {
         <div className="rule mt-12" />
 
         {/* The biographical story — who he was. */}
-        <p className="prose-body mt-12 text-xl text-mesquite">{t(s.story)}</p>
+        <div className="mt-12 space-y-6">
+          {s.story.map((para, i) => (
+            <p
+              key={i}
+              className={
+                i === 0
+                  ? 'prose-body text-xl text-mesquite'
+                  : 'prose-body text-lg text-mesquite/90'
+              }
+            >
+              {t(para)}
+            </p>
+          ))}
+        </div>
 
         {/* The retablo. The page pivots here: before it we were reading
             history, after it we are praying. The painting is the seam. */}
