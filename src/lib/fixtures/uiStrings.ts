@@ -207,10 +207,20 @@ export const uiStrings = {
       es: 'San Isidro Labrador',
     },
     feastDay: { en: 'OUR PATRON', es: 'nuestro santo patrón' },
-    story: {
-      en: 'St Isidore was a 12th-century Spanish farmer who prayed constantly while he worked. He is the patron of farmers, of rural communities, and of the quiet sanctification of ordinary labor. The chapter gathers every May 15 for the blessing of fields, seeds, and tools.',
-      es: 'San Isidro fue un labrador español del siglo XII que oraba sin cesar mientras trabajaba. Es el santo patrón de los labradores, de las comunidades rurales, y de la santificación silenciosa del trabajo ordinario. El capítulo se reúne cada 15 de mayo para la bendición del campo, de las semillas, y de las herramientas.',
-    },
+    story: [
+      {
+        en: 'Isidore was born around 1070 to a poor family near Madrid, and for nearly his whole life he worked the same fields — a hired hand on the estate of a wealthy landowner named Juan de Vergas, just outside the city at Torrelaguna. He married Maria Torribia, a farm girl as poor and as devout as himself; the Church honors her too, as Santa María de la Cabeza. Their only child, a son, died in infancy, and the two of them carried that grief together for the rest of their lives.',
+        es: 'Isidro nació hacia el año 1070 en una familia pobre cerca de Madrid, y durante casi toda su vida trabajó los mismos campos: como jornalero en la hacienda de un rico terrateniente llamado Juan de Vergas, a las afueras de la ciudad, en Torrelaguna. Se casó con María Torribia, una campesina tan pobre y tan devota como él; la Iglesia también la honra a ella, como Santa María de la Cabeza. Su único hijo murió siendo niño, y ambos llevaron juntos ese dolor el resto de sus vidas.',
+      },
+      {
+        en: 'He began each day at Mass before walking out to the fields, and so he often arrived at work later than the other laborers. They grumbled about it — until, the old story goes, some of them came to see for themselves and found two angels at the plow beside him, turning the earth so his rows were finished as soon as anyone\u2019s. Whether behind the oxen or on the road between churches, Isidore prayed as he worked; the labor and the prayer were never two separate things for him.',
+        es: 'Comenzaba cada día en la Misa antes de salir a los campos, y por eso a menudo llegaba al trabajo más tarde que los demás jornaleros. Ellos se quejaban, hasta que —según cuenta la vieja historia— algunos fueron a verlo con sus propios ojos y encontraron a dos ángeles arando junto a él, volteando la tierra de modo que sus surcos quedaban terminados tan pronto como los de cualquiera. Ya fuera tras los bueyes o en el camino entre iglesias, Isidro oraba mientras trabajaba; para él, el trabajo y la oración nunca fueron dos cosas distintas.',
+      },
+      {
+        en: 'He was known above all for his mercy to the poor and to animals. He shared his own meals with the hungry, often keeping less for himself, and Maria kept a stew always warm on the hearth because she never knew how many strangers her husband might bring home. One winter day he brought back more than the pot could hold; when she told him it was empty, he asked her to look again, and she ladled out enough to feed them all. Isidore died on May 15, 1130, and was canonized in 1622 — the patron of farmers and laborers, and the patron under whom our chapter has placed its work.',
+        es: 'Se le conocía sobre todo por su misericordia con los pobres y con los animales. Compartía sus propias comidas con los hambrientos, quedándose muchas veces con menos para sí mismo, y María mantenía siempre un guiso caliente sobre el fogón, porque nunca sabía cuántos extraños traería su marido a casa. Un día de invierno trajo a más de los que la olla podía alimentar; cuando ella le dijo que estaba vacía, él le pidió que mirara de nuevo, y sacó suficiente para todos. Isidro murió el 15 de mayo de 1130 y fue canonizado en 1622: patrono de los agricultores y los trabajadores, y el patrono bajo cuya intercesión nuestro capítulo ha puesto su labor.',
+      },
+    ],
     prayer: {
       en: 'O God, in whom we live and move and have our being, grant us sufficient rain, so that, being supplied with what sustains us in this present life, we may seek more confidently what sustains us for eternity. Through our Lord Jesus Christ, your Son, who lives and reigns with you in the unity of the Holy Spirit, one God, for ever and ever. Amen',
       es: 'Oh Dios, por la intercesión de San Isidro labrador, concédenos vencer todo sentimiento de soberbia, y servirte siempre con esa humildad que te agrada, por sus méritos y ejemplo. Amén.',

@@ -72,7 +72,7 @@ const Santo = () => {
             as a liturgical hinge rather than a paragraph. */}
         <p className="mt-16 text-center display-caps text-xs tracking-[0.25em] text-ocre">
           {t({
-            en: 'THE CHAPTER ASKS HIS PRAYERS',
+            en: 'OUR CHAPTER ASKS HIS PRAYERS IN OUR WALK WITH CHRIST',
             es: 'EL CAPÍTULO PIDE SU INTERCESIÓN',
           })}
         </p>
