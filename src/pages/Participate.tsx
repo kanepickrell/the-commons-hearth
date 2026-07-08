@@ -34,11 +34,11 @@ export default function Participate() {
         es: 'Comienza con una reunión. Conoce al capítulo, comparte una comida, ve de qué se trata.',
       },
       body: {
-        en: 'You don’t need to know anything about homesteading or Catholic Social Teaching to join. Just come with an open mind, share a meal, a conversation, and prayer.',
+        en: 'You don’t need to know anything about homesteading or Catholic Social Teaching to join. Just come with an open mind.',
         es: 'No necesitas saber nada sobre el distributismo, ni sobre la vida en el campo, ni sobre la Doctrina Social de la Iglesia para venir. No necesitas tierra, ni necesitas estar listo para vivir del campo. Sólo necesitas venir. Una reunión es una comida, una conversación, y oración — esa es toda la forma.',
       },
       practical: {
-        en: 'We meet roughly once a month at a member’s home or parish hall in Central Texas. Families come. Kids run around. We open with prayer, share food, and spend an hour or two on a topic — sometimes a reading, sometimes a skill demonstration, sometimes a conversation about something a member is working through. Just come as you are and leave as neighbors.',
+        en: 'We meet roughly once a month at a member’s home or parish hall in Central Texas. Families come, kids are welcome. We open with prayer, eat, and spend an hour or two on a topic. This may include discussing a reading, skill demonstration, or just fellowship. Just come as you are and leave as neighbors.',
         es: 'Nos reunimos más o menos una vez al mes en casa de un miembro o en un salón parroquial en el centro de Texas. Vienen las familias. Los niños corren por todos lados. Abrimos con oración, compartimos la comida, y pasamos una hora o dos sobre un tema — a veces una lectura, a veces una demostración de un oficio, a veces una conversación sobre algo que un miembro está trabajando. No necesitas traer nada la primera vez. No necesitas conocer a nadie. Ven como estás; vete conociendo a unos vecinos.',
       },
     },
@@ -50,7 +50,7 @@ export default function Participate() {
         es: 'Trae los oficios que ya tienes. Nombra los que quieres aprender.',
       },
       body: {
-        en: 'We exist to connect and help each other learn. Bring the skills you already have — carpentry, gardening, baking, fixing things — or maybe use this community to try something new. The point isn’t self-sufficiency; it’s a neighborhood where households can lean on each other. Most members started as beginners in something. That’s the normal state. The chapter exists so beginners can find teachers, and teachers can find someone to pass the work on to.',
+        en: 'We exist to connect and help each other learn. Bring the skills you already have — carpentry, gardening, baking, fixing things — or maybe use this community to try something new. Most members started as beginners in something. The chapter exists so beginners can find teachers, and teachers can find someone to pass the work on to.',
         es: 'Somos una comunidad que se ayuda a aprender. Trae los oficios que ya tienes — carpintería, jardinería, panadería, arreglar cosas, criar bien a los hijos — y nombra los que quieres aprender. La idea no es la autosuficiencia; es un vecindario donde las casas pueden apoyarse unas en otras. La mayoría de los miembros empezamos como principiantes en algo. Eso es lo normal. El capítulo existe para que los principiantes encuentren maestros, y los maestros encuentren a quién pasarle la obra.',
       },
       practical: {
@@ -66,7 +66,7 @@ export default function Participate() {
         es: 'Lleva a casa lo que aprendiste, a tu familia y a tu parroquia.',
       },
       body: {
-        en: 'A chapter is not the goal. The household is the goal, and the parish is the goal. What you learn here is meant to leave with you — into your kitchen, your yard, your block, your pew. Bring a friend to the next gathering. Pray for the chapter. Pray for each member by name when you remember. And as the practice grows, the principles deepen — Catholic Social Teaching is the soil this whole movement grew in, and reading it makes everything else make more sense.',
+        en: 'The chapter is not the goal, building strong Catholic households is the goal. What you learn here is meant to leave with you — into your kitchen, your yard, your block, your pew. Bring a friend to the next gathering. Pray for the chapter. Pray for each member by name when you remember. And as the practice grows, the principles deepen — Catholic Social Teaching is the soil this whole movement grew in, and reading it makes everything else make more sense.',
         es: 'El capítulo no es la meta. El hogar es la meta, y la parroquia es la meta. Lo que aprendes aquí es para llevártelo — a tu cocina, a tu patio, a tu cuadra, a tu banca en la Misa. Invita a un amigo a la próxima reunión. Reza por el capítulo. Reza por cada miembro por su nombre cuando te acuerdes. Y mientras crece la práctica, los principios se profundizan — la Doctrina Social de la Iglesia es la tierra de donde creció todo este movimiento, y leerla hace que todo lo demás tenga más sentido.',
       },
     },
