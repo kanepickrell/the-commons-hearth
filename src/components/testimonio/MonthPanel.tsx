@@ -4,6 +4,7 @@ import { feasts } from '@/lib/fixtures/feasts';
 import { seasonByMonth, seasonMeta } from '@/lib/fixtures/seasons';
 import { members } from '@/lib/fixtures/members';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
+import { WheatStem } from '@/components/testimonio/WheatStem';
 
 type Props = {
   month: number;
@@ -37,6 +38,14 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
 
   // Sort posts within the month ascending by date so the earliest reads first.
   const orderedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
+
+  // A month can carry activity two ways: individual witness cards, or manual
+  // monthly totals set by a steward (month_metrics → `override`). Treat the
+  // month as "quiet" only when neither is present — otherwise a month with a
+  // recorded gathering was wrongly reading as empty.
+  const hasCards = orderedPosts.length > 0;
+  const hasRecordedActivity = !!override && override.gatherings > 0;
+  const isQuiet = !hasCards && !hasRecordedActivity;
 
   return (
     <div className="min-h-[380px]">
@@ -101,10 +110,22 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
           );
         })}
 
-      {/* Empty state or cards */}
-      {orderedPosts.length === 0 ? (
-        <div className="prose-body py-5 text-center text-sm italic leading-relaxed text-piedra whitespace-pre-line">
-          {s.emptyMonth[locale]}
+      {/* Truly quiet month → wheat placeholder + seasons line.
+          Gatherings recorded but no witness cards → a gentle pointer down to
+          the recap/photos. Otherwise → the witness cards. */}
+      {isQuiet ? (
+        <div className="flex flex-col items-center py-6 text-center">
+          <WheatStem size={76} className="text-ocre/45" />
+          <p className="prose-body mt-3 max-w-[16rem] text-sm italic leading-relaxed text-piedra whitespace-pre-line">
+            {s.emptyMonth[locale]}
+          </p>
+        </div>
+      ) : !hasCards ? (
+        <div className="flex flex-col items-center py-6 text-center">
+          <WheatStem size={64} className="text-ocre/40" />
+          <p className="prose-body mt-3 max-w-[16rem] text-sm italic leading-relaxed text-piedra">
+            {s.activityNote[locale]}
+          </p>
         </div>
       ) : (
         orderedPosts.map((post) => {
