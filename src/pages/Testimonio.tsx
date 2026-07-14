@@ -194,7 +194,7 @@ const Testimonio = () => {
 
             </div>
 
-            {posts.length === 0 && (
+            {posts.length === 0 && yearTotals.gatherings === 0 && (
               <p className="mx-auto mt-12 max-w-md text-center font-serif italic text-piedra">
                 {locale === 'es'
                   ? 'Aún no hay testimonios escritos. La rueda se llenará con el tiempo.'

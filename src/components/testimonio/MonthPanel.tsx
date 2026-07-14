@@ -110,9 +110,9 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
           );
         })}
 
-      {/* Truly quiet month → wheat placeholder + seasons line.
-          Gatherings recorded but no witness cards → a gentle pointer down to
-          the recap/photos. Otherwise → the witness cards. */}
+      {/* Truly quiet month → wheat placeholder + seasons line. When gatherings
+          were recorded, the recap + photos render below, so the panel adds
+          nothing here. Otherwise → the witness cards. */}
       {isQuiet ? (
         <div className="flex flex-col items-center py-6 text-center">
           <WheatStem size={76} className="text-ocre/45" />
@@ -120,14 +120,7 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
             {s.emptyMonth[locale]}
           </p>
         </div>
-      ) : !hasCards ? (
-        <div className="flex flex-col items-center py-6 text-center">
-          <WheatStem size={64} className="text-ocre/40" />
-          <p className="prose-body mt-3 max-w-[16rem] text-sm italic leading-relaxed text-piedra">
-            {s.activityNote[locale]}
-          </p>
-        </div>
-      ) : (
+      ) : !hasCards ? null : (
         orderedPosts.map((post) => {
           const host = members.find((m) => m.id === post.hostId);
           const day = new Date(post.date).getDate();
