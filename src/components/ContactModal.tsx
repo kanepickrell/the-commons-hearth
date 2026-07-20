@@ -7,7 +7,8 @@
 // Mirrors RsvpModal's structure and palette. A hidden honeypot ("website")
 // catches bots; the Edge Function silently drops anything that fills it.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { supabase } from '@/lib/supabase';
@@ -34,6 +35,14 @@ export const ContactModal = ({ open, onClose }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+
+  // Lock page scroll while open so the centered modal stays in view.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
 
   if (!open) return null;
 
@@ -75,9 +84,9 @@ export const ContactModal = ({ open, onClose }: Props) => {
     }
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-mesquite/50 p-4 backdrop-blur-sm"
       onClick={(ev) => { if (ev.target === ev.currentTarget) close(); }}
     >
       <div className="w-full max-w-lg rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
@@ -183,6 +192,7 @@ export const ContactModal = ({ open, onClose }: Props) => {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

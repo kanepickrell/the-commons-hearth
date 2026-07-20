@@ -5,7 +5,8 @@
 // Structured contribution_type so we can aggregate on the host view;
 // optional free-text note so the host can plan around specifics.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 
@@ -29,6 +30,14 @@ export const RsvpModal = ({ open, onClose, onSubmit }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Lock page scroll while open so the centered modal stays in view.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
   if (!open) return null;
 
   const handleSubmit = async () => {
@@ -49,9 +58,9 @@ export const RsvpModal = ({ open, onClose, onSubmit }: Props) => {
 
   const typeLabel = (k: ContributionType) => t(c[k]);
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-mesquite/50 p-4 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -118,6 +127,7 @@ export const RsvpModal = ({ open, onClose, onSubmit }: Props) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

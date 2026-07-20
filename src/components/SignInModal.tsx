@@ -1,10 +1,16 @@
 // src/components/SignInModal.tsx
 // Modal sign-in surface, used by the "Log In To RSVP" button on gathering
-// pages. Offers the same two paths as the header AuthButton: Google OAuth
-// and an email magic-link (for members without Gmail). Kept self-contained
-// so the header dropdown stays untouched.
+// pages and the "Join the chapter" CTA on Home. Offers the same two paths as
+// the header AuthButton: Google OAuth and an email magic-link (for members
+// without Gmail). Kept self-contained so the header dropdown stays untouched.
+//
+// Rendered through a portal to document.body: the page's <main> carries a
+// `fade-in` animation whose fill-mode holds a transform, which would otherwise
+// make this modal's `position: fixed` resolve against <main> instead of the
+// viewport (pinning it up-page). The portal escapes that containing block.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocale } from '@/i18n/LocaleProvider';
 
@@ -37,6 +43,14 @@ export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
   const [sent, setSent] = useState(false);
   const [emailErr, setEmailErr] = useState<string | null>(null);
 
+  // Lock page scroll while open so the centered modal can't drift out of view.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
   if (!open) return null;
 
   const close = () => {
@@ -68,9 +82,9 @@ export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
     }
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-mesquite/50 p-4 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) close(); }}
     >
       <div className="w-full max-w-md rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
@@ -159,6 +173,7 @@ export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

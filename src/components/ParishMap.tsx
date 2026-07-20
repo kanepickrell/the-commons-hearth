@@ -93,7 +93,9 @@ const FitBounds = ({ points }: { points: [number, number][] }) => {
   useEffect(() => {
     if (!points.length) return;
     const bounds = L.latLngBounds(points.map(([la, lo]) => L.latLng(la, lo)));
-    map.fitBounds(bounds, { padding: [40, 40] });
+    // Cap the zoom so a lone dot (or a tight cluster) doesn't slam all the way
+    // in, and pad generously so the territory breathes inside the frame.
+    map.fitBounds(bounds, { padding: [64, 64], maxZoom: 10 });
   }, [map, points]);
   return null;
 };
@@ -219,10 +221,12 @@ export const ParishMap = () => {
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr,280px]">
-      <div className="overflow-hidden rounded border border-mesquite/20" style={{ height: 460 }}>
+      <div className="relative overflow-hidden rounded border border-mesquite/20" style={{ height: 460 }}>
         <MapContainer
           center={[29.6, -98.5]}
           zoom={9}
+          minZoom={7}
+          maxZoom={13}
           scrollWheelZoom={false}
           style={{ height: '100%', width: '100%' }}
         >
@@ -263,10 +267,11 @@ export const ParishMap = () => {
               center={c.latLon}
               radius={Math.max(8, 6 + c.memberCount * 2)}
               pathOptions={{
+                className: 'parish-dot',
                 color: 'hsl(92 24% 25%)',
                 weight: 1.5,
                 fillColor: 'hsl(32 56% 51%)',
-                fillOpacity: 0.7,
+                fillOpacity: 0.82,
               }}
               eventHandlers={{ click: () => setSelectedParish(c.key) }}
             >
@@ -313,6 +318,9 @@ export const ParishMap = () => {
             ) : null
           )}
         </MapContainer>
+        {/* Soft inner vignette frames the open parchment so the wide,
+            zoomed-out view reads as intentional rather than empty. */}
+        <div className="map-vignette pointer-events-none absolute inset-0 z-[500] rounded" />
       </div>
 
       <aside className="rounded border border-mesquite/20 bg-cal/50 p-5">
