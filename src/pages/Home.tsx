@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { ParishMap } from '@/components/ParishMap';
+import { SignInModal } from '@/components/SignInModal';
 import { Icon } from '@/components/Icon';
 import { LanguageNote } from '@/components/LanguageNote';
 import { useLocale } from '@/i18n/LocaleProvider';
@@ -148,6 +149,7 @@ const Home = () => {
   const { user } = useAuth();
 
   const [latest, setLatest] = useState<RecentPost | null>(null);
+  const [joinOpen, setJoinOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -283,16 +285,33 @@ const Home = () => {
       {/* 5. Closing CTA                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose py-24 text-center">
-        <Link
-          to={user ? buildPath('miPerfil', locale) : buildPath('bienvenido', locale)}
-          className="inline-flex items-center gap-2 rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal no-underline transition hover:bg-mesquite"
-          style={{ textDecoration: 'none' }}
-        >
-          {user
-            ? t({ en: 'My profile', es: 'Mi perfil' })
-            : t({ en: 'Join the chapter →', es: 'Únete al capítulo →' })}
-        </Link>
+        {user ? (
+          <Link
+            to={buildPath('miPerfil', locale)}
+            className="inline-flex items-center gap-2 rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal no-underline transition hover:bg-mesquite"
+            style={{ textDecoration: 'none' }}
+          >
+            {t({ en: 'My profile', es: 'Mi perfil' })}
+          </Link>
+        ) : (
+          <button
+            onClick={() => setJoinOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal transition hover:bg-mesquite"
+          >
+            {t({ en: 'Join the chapter →', es: 'Únete al capítulo →' })}
+          </button>
+        )}
       </section>
+
+      <SignInModal
+        open={joinOpen}
+        onClose={() => setJoinOpen(false)}
+        title={{ en: 'Join the chapter', es: 'Únete al capítulo' }}
+        subtitle={{
+          en: 'Sign in to create your profile and get started — the link sets up an account if you’re new.',
+          es: 'Inicia sesión para crear tu perfil y empezar — el enlace crea una cuenta si eres nuevo.',
+        }}
+      />
     </Layout>
   );
 };

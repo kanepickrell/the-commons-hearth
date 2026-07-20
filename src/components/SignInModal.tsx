@@ -10,14 +10,27 @@ import { useLocale } from '@/i18n/LocaleProvider';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+type Localized = { en: string; es: string };
+
 type Props = {
   open: boolean;
   onClose: () => void;
+  // Optional copy so the same modal can front different actions (RSVP, join,
+  // etc.). Defaults preserve the original "Log in to RSVP" wording.
+  title?: Localized;
+  subtitle?: Localized;
 };
 
-export const SignInModal = ({ open, onClose }: Props) => {
+export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
   const { signInWithGoogle, signInWithEmail } = useAuth();
   const { t } = useLocale();
+
+  const heading = title ?? { en: 'Log in to RSVP', es: 'Inicia sesión para confirmar' };
+  const blurb =
+    subtitle ?? {
+      en: 'Sign in to reserve your place and see who else is coming.',
+      es: 'Inicia sesión para reservar tu lugar y ver quién más asistirá.',
+    };
 
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
@@ -62,13 +75,10 @@ export const SignInModal = ({ open, onClose }: Props) => {
     >
       <div className="w-full max-w-md rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
         <h2 className="mb-2 font-heading text-2xl text-mesquite">
-          {t({ en: 'Log in to RSVP', es: 'Inicia sesión para confirmar' })}
+          {t(heading)}
         </h2>
         <p className="mb-6 font-serif text-base italic leading-relaxed text-mesquite/70">
-          {t({
-            en: 'Sign in to reserve your place and see who else is coming.',
-            es: 'Inicia sesión para reservar tu lugar y ver quién más asistirá.',
-          })}
+          {t(blurb)}
         </p>
 
         {sent ? (

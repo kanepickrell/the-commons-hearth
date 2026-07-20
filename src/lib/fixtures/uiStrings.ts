@@ -265,7 +265,7 @@ export const uiStrings = {
     feastLabel:      { en: 'FEAST',       es: 'FIESTA' },
     replicatedLabel: { en: 'SKILL REPLICATED', es: 'HABILIDAD REPLICADA' },
     plannedTag:      { en: 'PLANNED',     es: 'PLANEADO' },
-    emptyMonth:      { en: 'A quiet month is not a failed month.\nThe land has its seasons; so do we.',
+    emptyMonth:      { en: 'A quiet month.\nThe land has its seasons.',
                        es: 'Un mes en silencio no es un mes fallido.\nLa tierra tiene sus estaciones; también nosotros.' },
     activityNote:    { en: 'Gatherings were held this month. See the recap and photos below.',
                        es: 'Hubo reuniones este mes. Mira el resumen y las fotos abajo.' },

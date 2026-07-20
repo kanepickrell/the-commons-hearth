@@ -1,14 +1,19 @@
 // src/components/ParishMap.tsx
-// Renders approved members on parish dots. Workshop icons gated to approved
-// members. When a parish has POCs, they appear at the top of the sidebar with
-// a mailto link; rest of members listed below.
+// Renders a dot per parish, sized by its approved-member COUNT. Individual
+// member names are never listed on the map — the only identities shown are
+// members marked as POC in the admin panel (Mayordomo → Parishes & contacts).
+// The sidebar shows the parish's member count plus its POC(s); when signed in,
+// each POC also gets a mailto link. Workshop icons stay gated to approved
+// members.
 //
-// Note on the profiles query: we split it into two variants because column-
-// level RLS now prevents anon from reading `contact_email` at all. If we
-// include that column in the SELECT string for an anon user, PostgREST fails
-// the whole query (not the column specifically). So we ask for contact_email
-// only when the viewer is authenticated; anon users get the non-sensitive
-// subset and simply never see POC emails.
+// Counts come from the `parish_member_counts` view, which exposes totals only
+// (no member rows), so non-POC names never reach the browser for any viewer.
+//
+// Note on the POC query: column-level RLS prevents anon from reading
+// `contact_email` at all. Including that column in the SELECT for an anon user
+// makes PostgREST fail the whole query (not just the column). So we request
+// contact_email only when the viewer is authenticated; anon users get the
+// non-sensitive subset and simply never see POC emails.
 
 import { MapContainer, TileLayer, CircleMarker, Marker, Popup, Polygon, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -111,65 +116,25 @@ export const ParishMap = () => {
 
   useEffect(() => {
     (async () => {
-      if (isAuthenticated) {
-        // Signed in: full roster. Node size and count come from the members
-        // themselves; POCs get contact_email so they can be reached.
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, display_name, is_poc, contact_email, parish:parishes(id, name, lat, lng)')
-          .eq('status', 'approved');
+      // Counts per parish drive the node size and the number we display. They
+      // come from a view that exposes totals only — never individual member
+      // rows — so non-POC identities are never sent to the browser for anyone.
+      //
+      // Names are shown ONLY for members marked as POC in the admin panel.
+      // Signed-in viewers additionally receive each POC's contact_email so the
+      // mailto link can render; column-level RLS blocks that column for anon,
+      // so we only request it when authenticated (see note at top of file).
+      const pocSelect = isAuthenticated
+        ? 'id, display_name, is_poc, contact_email, parish:parishes(id, name, lat, lng)'
+        : 'id, display_name, is_poc, parish:parishes(id, name, lat, lng)';
 
-        if (error) {
-          console.error('Failed to load members for map:', error);
-          return;
-        }
-
-        const map = new Map<string, ParishCluster>();
-        for (const row of (data ?? []) as unknown as Array<ProfileWithParish & { contact_email?: string | null }>) {
-          if (!row.parish || row.parish.lat == null || row.parish.lng == null) continue;
-          const key = row.parish.id;
-          const member: Member = {
-            id: row.id,
-            name: row.display_name ?? '—',
-            isPoc: row.is_poc,
-            contactEmail: row.contact_email ?? null,
-          };
-          const entry = map.get(key);
-          if (entry) {
-            entry.members.push(member);
-          } else {
-            map.set(key, {
-              key,
-              parishName: row.parish.name,
-              latLon: [row.parish.lat, row.parish.lng],
-              memberCount: 0,
-              members: [member],
-            });
-          }
-        }
-        for (const cluster of map.values()) {
-          cluster.memberCount = cluster.members.length;
-          cluster.members.sort((a, b) => {
-            if (a.isPoc && !b.isPoc) return -1;
-            if (!a.isPoc && b.isPoc) return 1;
-            return a.name.localeCompare(b.name);
-          });
-        }
-        setClusters(Array.from(map.values()).filter((c) => c.memberCount > 0));
-        return;
-      }
-
-      // Signed out: aggregate member COUNTS per parish (presence + node size),
-      // plus POC names only. Non-POC identities are never sent — the profiles
-      // table is RLS-locked to POCs for anon, and counts come from a view that
-      // exposes totals without rows.
       const [countsRes, pocRes] = await Promise.all([
         supabase
           .from('parish_member_counts')
           .select('parish_id, name, lat, lng, member_count'),
         supabase
           .from('profiles')
-          .select('id, display_name, is_poc, parish:parishes(id, name, lat, lng)')
+          .select(pocSelect)
           .eq('status', 'approved')
           .eq('is_poc', true),
       ]);
@@ -193,13 +158,22 @@ export const ParishMap = () => {
         });
       }
 
-      // Attach POC names to their parish (identities anon is allowed to see).
-      for (const row of (pocRes.data ?? []) as unknown as ProfileWithParish[]) {
+      // Attach POC identities — the only names the map ever shows.
+      for (const row of (pocRes.data ?? []) as unknown as Array<ProfileWithParish & { contact_email?: string | null }>) {
         if (!row.parish) continue;
         const cluster = map.get(row.parish.id);
         if (cluster) {
-          cluster.members.push({ id: row.id, name: row.display_name ?? '—', isPoc: true, contactEmail: null });
+          cluster.members.push({
+            id: row.id,
+            name: row.display_name ?? '—',
+            isPoc: true,
+            contactEmail: row.contact_email ?? null,
+          });
         }
+      }
+
+      for (const cluster of map.values()) {
+        cluster.members.sort((a, b) => a.name.localeCompare(b.name));
       }
 
       setClusters(Array.from(map.values()));
@@ -240,8 +214,8 @@ export const ParishMap = () => {
   );
 
   const selected = clusters.find((c) => c.key === selectedParish) ?? null;
-  const selectedPocs = selected?.members.filter((m) => m.isPoc) ?? [];
-  const selectedNonPocs = selected?.members.filter((m) => !m.isPoc) ?? [];
+  // Only POCs are ever loaded, so every listed name is a point of contact.
+  const selectedPocs = selected?.members ?? [];
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr,280px]">
@@ -305,7 +279,7 @@ export const ParishMap = () => {
                       ? t(uiStrings.common.member)
                       : t(uiStrings.common.members)}
                   </div>
-                  {!isAuthenticated && c.members[0] && (
+                  {c.members[0] && (
                     <div className="text-sm text-piedra">{c.members[0].name}</div>
                   )}
                 </div>
@@ -379,37 +353,13 @@ export const ParishMap = () => {
               </>
             )}
 
-            {selectedNonPocs.length > 0 && (
-              <>
-                <div className="rule my-4" />
-                {selectedPocs.length > 0 && (
-                  <p className="display-caps mb-3 text-[10px] tracking-[0.2em] text-mesquite/50">
-                    {locale === 'es' ? 'OTROS MIEMBROS' : 'OTHER MEMBERS'}
-                  </p>
-                )}
-                <ul className="space-y-2">
-                  {selectedNonPocs.map((m) => (
-                    <li key={m.id}>
-                      <Link
-                        to={buildPath('memberDetail', locale, { id: m.id })}
-                        className="font-heading text-mesquite no-underline hover:text-ocre"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        {m.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            {!isAuthenticated && selectedPocs.length === 0 && (
+            {selectedPocs.length === 0 && (
               <>
                 <div className="rule my-4" />
                 <p className="font-serif text-xs italic text-piedra/70">
                   {locale === 'es'
-                    ? 'Inicia sesión para ver a los miembros de esta parroquia.'
-                    : 'Sign in to see this parish’s members.'}
+                    ? 'Aún no hay un contacto designado para esta parroquia.'
+                    : 'No point of contact listed yet for this parish.'}
                 </p>
               </>
             )}
