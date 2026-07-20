@@ -251,7 +251,7 @@ export const uiStrings = {
   witness: {
     eyebrow:   { en: 'OUR WITNESS · A.D. 2026',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR 2026' },
     heading:   { en: 'Our year, in the making', es: 'El año, tal como el capítulo lo ha vivido' },
-    subhead:   { en: 'click any liturguical wedge to see our past and upcoming events',
+    subhead:   { en: 'click any liturgical wedge to see our past and upcoming events',
                  es: 'una rueda de meses — toca cualquier sección para ver más' },
     statGatherings:  { en: 'gatherings',  es: 'reuniones' },
     statHosts:       { en: 'hosts',       es: 'anfitriones' },
