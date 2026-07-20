@@ -1,10 +1,11 @@
 // src/components/admin/MonthPhotoPanel.tsx
-// Admin panel for /mayordomo. Upload + manage the photo carousel that shows
-// under each month on the Year Wheel (Witness page).
+// Admin panel for /mayordomo. Upload + manage the photos that show under each
+// month on the Year Wheel (Witness page).
 //
 // Images live in the public 'month-photos' Storage bucket; each public.month_photos
-// row carries the object path, caption, and sort order. Month is 0-indexed
-// (0 = January) to match the wheel — the carousel reads `.eq('month', m)` directly.
+// row carries the object path, caption, sort order, and an optional summary_id
+// linking the photo to a specific gathering (month_summaries row) so the Witness
+// page can show a writeup and its photos together. Month is 0-indexed (0 = January).
 
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -22,11 +23,17 @@ type MonthPhoto = {
   storage_path: string;
   caption: string | null;
   sort_order: number;
+  summary_id: string | null;
   created_at: string;
 };
 
+type SummaryOption = { id: string; title: string | null };
+
 const publicUrl = (path: string) =>
   supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+
+const summaryLabel = (s: SummaryOption, locale: 'en' | 'es') =>
+  s.title || (locale === 'es' ? '(sin título)' : '(untitled)');
 
 export const MonthPhotoPanel = () => {
   const { locale } = useLocale();
@@ -36,26 +43,37 @@ export const MonthPhotoPanel = () => {
   const [year, setYear] = useState<number>(now.getFullYear());
   const [month, setMonth] = useState<number>(now.getMonth());
   const [photos, setPhotos] = useState<MonthPhoto[]>([]);
+  const [summaries, setSummaries] = useState<SummaryOption[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
+  const [summaryId, setSummaryId] = useState<string>(''); // '' = no linked gathering
   const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('month_photos')
-      .select('*')
-      .eq('year', year)
-      .eq('month', month)
-      .order('sort_order', { ascending: true });
-    if (error) {
-      toast({ title: 'Failed to load photos', description: error.message });
+    const [photosRes, summariesRes] = await Promise.all([
+      supabase
+        .from('month_photos')
+        .select('*')
+        .eq('year', year)
+        .eq('month', month)
+        .order('sort_order', { ascending: true }),
+      supabase
+        .from('month_summaries')
+        .select('id, title, sort_order')
+        .eq('year', year)
+        .eq('month', month)
+        .order('sort_order', { ascending: true }),
+    ]);
+    if (photosRes.error) {
+      toast({ title: 'Failed to load photos', description: photosRes.error.message });
       setPhotos([]);
     } else {
-      setPhotos((data ?? []) as MonthPhoto[]);
+      setPhotos((photosRes.data ?? []) as unknown as MonthPhoto[]);
     }
+    setSummaries(summariesRes.error ? [] : ((summariesRes.data ?? []) as unknown as SummaryOption[]));
     setLoading(false);
   }, [year, month]);
 
@@ -91,6 +109,7 @@ export const MonthPhotoPanel = () => {
         storage_path: path,
         caption: caption.trim() || null,
         sort_order: nextSort,
+        summary_id: summaryId || null,
       });
       if (insErr) {
         // Don't leave an orphaned object if the row insert is rejected.
@@ -101,6 +120,7 @@ export const MonthPhotoPanel = () => {
       toast({ title: locale === 'es' ? 'Foto subida' : 'Photo uploaded' });
       setFile(null);
       setCaption('');
+      setSummaryId('');
       await load();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -125,10 +145,19 @@ export const MonthPhotoPanel = () => {
     await load();
   };
 
-  const handleSaveMeta = async (id: string, nextCaption: string, nextSort: number) => {
+  const handleSaveMeta = async (
+    id: string,
+    nextCaption: string,
+    nextSort: number,
+    nextSummaryId: string,
+  ) => {
     const { error } = await supabase
       .from('month_photos')
-      .update({ caption: nextCaption.trim() || null, sort_order: nextSort })
+      .update({
+        caption: nextCaption.trim() || null,
+        sort_order: nextSort,
+        summary_id: nextSummaryId || null,
+      })
       .eq('id', id);
     if (error) {
       toast({ title: 'Failed to save', description: error.message });
@@ -146,8 +175,8 @@ export const MonthPhotoPanel = () => {
         </h2>
         <p className="mt-2 font-serif text-sm italic text-piedra">
           {locale === 'es'
-            ? 'Sube fotos para el carrusel que aparece bajo cada mes en la rueda del año.'
-            : 'Upload photos for the carousel that appears under each month on the Year Wheel.'}
+            ? 'Sube fotos y enlázalas a un encuentro para que aparezcan junto a su reseña en la rueda del año.'
+            : 'Upload photos and link them to a gathering so they appear alongside its writeup on the Year Wheel.'}
         </p>
       </div>
 
@@ -201,6 +230,36 @@ export const MonthPhotoPanel = () => {
             placeholder={locale === 'es' ? 'Pie de foto (opcional)' : 'Caption (optional)'}
             className="w-full rounded-sm border border-mesquite/20 bg-cal px-3 py-2 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none"
           />
+
+          {/* Link to a gathering (writeup) for this month */}
+          <div>
+            <label className="display-caps mb-1.5 block text-[10px] tracking-[0.2em] text-mesquite/50">
+              {locale === 'es' ? 'ENCUENTRO' : 'GATHERING'}
+            </label>
+            {summaries.length === 0 ? (
+              <p className="font-serif text-xs italic text-piedra">
+                {locale === 'es'
+                  ? 'No hay reseñas este mes todavía — añade una en "Resúmenes del mes" para poder enlazar fotos.'
+                  : 'No writeups this month yet — add one under "Month summaries" to link photos to it.'}
+              </p>
+            ) : (
+              <select
+                value={summaryId}
+                onChange={(e) => setSummaryId(e.target.value)}
+                className="w-full rounded-sm border border-mesquite/20 bg-cal px-3 py-2 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none"
+              >
+                <option value="">
+                  {locale === 'es' ? '— Sin encuentro (general) —' : '— No gathering (general) —'}
+                </option>
+                {summaries.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {summaryLabel(s, locale)}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           <div>
             <button
               onClick={handleUpload}
@@ -236,8 +295,9 @@ export const MonthPhotoPanel = () => {
               <PhotoCard
                 key={p.id}
                 photo={p}
+                summaries={summaries}
                 onDelete={() => handleDelete(p)}
-                onSave={(cap, sort) => handleSaveMeta(p.id, cap, sort)}
+                onSave={(cap, sort, sid) => handleSaveMeta(p.id, cap, sort, sid)}
                 locale={locale}
               />
             ))}
@@ -249,23 +309,29 @@ export const MonthPhotoPanel = () => {
 };
 
 // ---------------------------------------------------------------------------
-// PhotoCard — thumbnail + inline caption/sort edit + delete
+// PhotoCard — thumbnail + inline caption/sort/gathering edit + delete
 // ---------------------------------------------------------------------------
 function PhotoCard({
   photo,
+  summaries,
   onDelete,
   onSave,
   locale,
 }: {
   photo: MonthPhoto;
+  summaries: SummaryOption[];
   onDelete: () => void;
-  onSave: (caption: string, sortOrder: number) => void;
+  onSave: (caption: string, sortOrder: number, summaryId: string) => void;
   locale: 'en' | 'es';
 }) {
   const [caption, setCaption] = useState(photo.caption ?? '');
   const [sortOrder, setSortOrder] = useState<number>(photo.sort_order);
+  const [summaryId, setSummaryId] = useState<string>(photo.summary_id ?? '');
 
-  const dirty = caption !== (photo.caption ?? '') || sortOrder !== photo.sort_order;
+  const dirty =
+    caption !== (photo.caption ?? '') ||
+    sortOrder !== photo.sort_order ||
+    summaryId !== (photo.summary_id ?? '');
 
   return (
     <li className="overflow-hidden rounded-sm border border-mesquite/20 bg-cal/60">
@@ -283,6 +349,22 @@ function PhotoCard({
           placeholder={locale === 'es' ? 'Pie de foto' : 'Caption'}
           className="w-full rounded-sm border border-mesquite/20 bg-cal px-2 py-1 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none"
         />
+
+        <select
+          value={summaryId}
+          onChange={(e) => setSummaryId(e.target.value)}
+          className="w-full rounded-sm border border-mesquite/20 bg-cal px-2 py-1 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none"
+        >
+          <option value="">
+            {locale === 'es' ? '— Sin encuentro (general) —' : '— No gathering (general) —'}
+          </option>
+          {summaries.map((s) => (
+            <option key={s.id} value={s.id}>
+              {summaryLabel(s, locale)}
+            </option>
+          ))}
+        </select>
+
         <div className="flex items-center justify-between gap-3">
           <label className="flex items-center gap-2 font-serif text-xs text-piedra">
             {locale === 'es' ? 'Orden' : 'Order'}
@@ -295,7 +377,7 @@ function PhotoCard({
           </label>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => onSave(caption, sortOrder)}
+              onClick={() => onSave(caption, sortOrder, summaryId)}
               disabled={!dirty}
               className="font-serif text-xs text-ocre transition hover:underline disabled:opacity-40"
             >
