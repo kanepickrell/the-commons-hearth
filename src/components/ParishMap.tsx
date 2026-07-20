@@ -18,7 +18,7 @@
 import { MapContainer, TileLayer, CircleMarker, Marker, Popup, Polygon, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { listSegments, type ChapterSegment } from '@/lib/segments';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { iconMap } from '@/lib/icons';
 import { useLocale } from '@/i18n/LocaleProvider';
@@ -90,8 +90,18 @@ const buildWorkshopIcon = (slug: IconSlug) => {
 
 const FitBounds = ({ points }: { points: [number, number][] }) => {
   const map = useMap();
+  const lastSig = useRef<string>('');
   useEffect(() => {
     if (!points.length) return;
+    // Only frame the map when the *set of coordinates* actually changes (data
+    // loads), not on every render. Selecting a parish re-renders this component
+    // and would otherwise re-fit and yank the user's manual zoom back out.
+    const sig = points
+      .map(([la, lo]) => `${la.toFixed(5)},${lo.toFixed(5)}`)
+      .sort()
+      .join('|');
+    if (sig === lastSig.current) return;
+    lastSig.current = sig;
     const bounds = L.latLngBounds(points.map(([la, lo]) => L.latLng(la, lo)));
     // Cap the zoom so a lone dot (or a tight cluster) doesn't slam all the way
     // in, and pad generously so the territory breathes inside the frame.
@@ -227,13 +237,16 @@ export const ParishMap = () => {
           zoom={9}
           minZoom={7}
           maxZoom={13}
+          zoomSnap={0.5}
+          zoomDelta={0.5}
           scrollWheelZoom={false}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             subdomains="abcd"
+            detectRetina
           />
           {/* Frame members + all chapter areas, so the territory shows even
               before any members load. */}
@@ -273,7 +286,11 @@ export const ParishMap = () => {
                 fillColor: 'hsl(32 56% 51%)',
                 fillOpacity: 0.82,
               }}
-              eventHandlers={{ click: () => setSelectedParish(c.key) }}
+              eventHandlers={{
+                click: () => setSelectedParish(c.key),
+                mouseover: (e) => e.target.setStyle({ fillOpacity: 1, weight: 2.5 }),
+                mouseout: (e) => e.target.setStyle({ fillOpacity: 0.82, weight: 1.5 }),
+              }}
             >
               <Popup>
                 <div className="font-heading text-mesquite">

@@ -137,15 +137,31 @@
   background: hsl(var(--cal));
 }
 
-/* Parish dots — a soft drop-shadow lifts them off the open parchment, and a
-   gentle glow on hover invites the click. */
+/* Parish dots — styled as soft "live" lights: a warm ocre glow that gently
+   breathes, lifting them off the open parchment. A crisper glow on hover
+   invites the click. Adapted from live-map treatments to the chapter palette. */
 .parish-dot {
   filter: drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
+  animation: parish-breathe 4s ease-in-out infinite;
   transition: filter 150ms ease;
   cursor: pointer;
 }
 .parish-dot:hover {
-  filter: drop-shadow(0 2px 5px hsl(var(--mesquite) / 0.5));
+  animation: none;
+  filter: drop-shadow(0 0 6px hsl(var(--ocre) / 0.6))
+          drop-shadow(0 2px 4px hsl(var(--mesquite) / 0.45));
+}
+@keyframes parish-breathe {
+  0%, 100% {
+    filter: drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px hsl(var(--ocre) / 0.45))
+            drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .parish-dot { animation: none; }
 }
 
 /* Framing vignette over the basemap: a faint inset shadow settles the empty
