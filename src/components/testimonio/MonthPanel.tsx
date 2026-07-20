@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import type { Locale, WitnessPost } from '@/lib/types';
 import { Icon } from '@/components/Icon';
 import { feasts } from '@/lib/fixtures/feasts';
@@ -56,19 +57,20 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
         {monthName}
       </div>
 
-      {/* Metrics row */}
-      <div className="mb-4 grid grid-cols-3 gap-2">
-        <MetricTile
+      {/* Metrics — stacked editorial figures that sit alongside the wheel and
+          give the column vertical presence. Numbers count up on month select. */}
+      <div className="mb-5 divide-y divide-mesquite/10 border-y border-mesquite/10">
+        <MetricRow
           n={override ? override.gatherings : heldPosts.length + (plannedPosts.length ? `+${plannedPosts.length}` : '')}
           label={override ? s.metricGatherings[locale] : (plannedPosts.length ? s.metricHeld[locale] : s.metricGatherings[locale])}
           onClick={() => onAskMetric?.('gatherings')}
         />
-        <MetricTile
+        <MetricRow
           n={override ? override.neighbors : neighbors}
           label={s.metricNeighbors[locale]}
           onClick={() => onAskMetric?.('neighbors')}
         />
-        <MetricTile
+        <MetricRow
           n={override ? override.hosts : hosts}
           label={s.metricHosts[locale]}
           onClick={() => onAskMetric?.('hosts')}
@@ -156,8 +158,11 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
   );
 };
 
-/** Small metric tile — number + all-caps label, clickable. */
-const MetricTile = ({
+/**
+ * Metric row — a caps label paired with a large figure, stacked into a column
+ * beside the wheel. Reads as an editorial stat line rather than a boxed tile.
+ */
+const MetricRow = ({
   n,
   label,
   onClick,
@@ -169,9 +174,47 @@ const MetricTile = ({
   <button
     type="button"
     onClick={onClick}
-    className="border border-mesquite/10 bg-cal/60 p-2.5 text-center transition-colors hover:bg-ocre/10"
+    className="flex w-full items-baseline justify-between py-5 text-left transition-colors hover:bg-ocre/[0.05]"
   >
-    <div className="font-heading text-[20px] leading-none text-mesquite">{n}</div>
-    <div className="mt-1 font-caps text-[9px] tracking-[0.15em] text-ocre">{label}</div>
+    <span className="font-caps text-[10px] tracking-[0.22em] text-ocre">{label.toUpperCase()}</span>
+    <span className="font-heading text-[38px] leading-none text-mesquite tabular-nums">
+      {typeof n === 'number' ? <AnimatedNumber value={n} /> : n}
+    </span>
   </button>
 );
+
+/**
+ * Counts a figure up to its value, re-running whenever the value changes — i.e.
+ * when a new month is selected, so the numbers "drop in" rather than snapping.
+ * Honors prefers-reduced-motion by jumping straight to the value.
+ */
+const AnimatedNumber = ({ value, duration = 650 }: { value: number; duration?: number }) => {
+  const [display, setDisplay] = useState(value);
+  const fromRef = useRef(value);
+
+  useEffect(() => {
+    const to = value;
+    const from = fromRef.current;
+    const reduce =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (from === to || reduce) {
+      setDisplay(to);
+      fromRef.current = to;
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      setDisplay(Math.round(from + (to - from) * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else fromRef.current = to;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, duration]);
+
+  return <>{display}</>;
+};
