@@ -59,13 +59,14 @@ export const RsvpModal = ({ open, onClose, onSubmit }: Props) => {
   const typeLabel = (k: ContributionType) => t(c[k]);
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-mesquite/50 p-4 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="w-full max-w-lg rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-mesquite/50 backdrop-blur-sm">
+      <div
+        className="flex min-h-full items-center justify-center p-4"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
+        <div className="my-8 w-full max-w-lg rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
         <h2 className="mb-3 font-heading text-2xl text-mesquite">{t(s.modalTitle)}</h2>
         <p className="mb-6 font-serif text-base italic leading-relaxed text-mesquite/70">
           {t(s.modalIntro)}
@@ -125,6 +126,7 @@ export const RsvpModal = ({ open, onClose, onSubmit }: Props) => {
           >
             {submitting ? t(s.submitting) : t(s.submit)}
           </button>
+        </div>
         </div>
       </div>
     </div>,

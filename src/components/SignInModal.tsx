@@ -83,11 +83,12 @@ export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
   };
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-mesquite/50 p-4 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === e.currentTarget) close(); }}
-    >
-      <div className="w-full max-w-md rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-mesquite/50 backdrop-blur-sm">
+      <div
+        className="flex min-h-full items-center justify-center p-4"
+        onClick={(e) => { if (e.target === e.currentTarget) close(); }}
+      >
+        <div className="my-8 w-full max-w-md rounded-sm border border-mesquite/20 bg-cal p-8 shadow-lg">
         <h2 className="mb-2 font-heading text-2xl text-mesquite">
           {t(heading)}
         </h2>
@@ -172,6 +173,7 @@ export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
             </div>
           </>
         )}
+        </div>
       </div>
     </div>,
     document.body

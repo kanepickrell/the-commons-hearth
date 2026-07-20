@@ -11,8 +11,7 @@ import { YearWheel } from '@/components/testimonio/YearWheel';
 import { MonthPanel } from '@/components/testimonio/MonthPanel';
 import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
-import { MonthCarousel } from '@/components/testimonio/MonthCarousel';
-import { MonthSummaries } from '@/components/testimonio/MonthSummaries';
+import { MonthDetail } from '@/components/testimonio/MonthDetail';
 
 // What comes back from the DB — flat columns, single-language body.
 type WitnessRow = {
@@ -187,12 +186,12 @@ const Testimonio = () => {
                   onAskMetric={() => {}}
                 />
               </div>
-
-              <MonthSummaries year={WHEEL_YEAR} month={selectedMonth} />
-
-              <MonthCarousel year={WHEEL_YEAR} month={selectedMonth} locale={locale} />
-
             </div>
+
+            {/* The month's gathering recaps + photo gallery, full-width beneath
+                the wheel so they read as one composed section instead of two
+                cramped columns. */}
+            <MonthDetail year={WHEEL_YEAR} month={selectedMonth} locale={locale} />
 
             {posts.length === 0 && yearTotals.gatherings === 0 && (
               <p className="mx-auto mt-12 max-w-md text-center font-serif italic text-piedra">
