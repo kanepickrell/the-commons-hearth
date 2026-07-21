@@ -124,7 +124,7 @@ export const MonthDetail = ({ year, month, locale }: Props) => {
     summaries.length > 0
       ? locale === 'es'
         ? 'ENCUENTROS DE ESTE MES'
-        : 'GATHERINGS THIS MONTH'
+        : 'SWIPE TO VIEW CONTENT'
       : locale === 'es'
       ? 'FOTOS'
       : 'PHOTOS';
