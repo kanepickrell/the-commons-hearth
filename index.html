@@ -3,14 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Browser tab title -->
     <title>Central Texas CLM</title>
+
     <meta name="description" content="The digital commons of the Central Texas chapter of the Catholic Land Movement. Ordinary Catholic households, becoming producers — together." />
     <meta name="author" content="CLM Central Texas" />
 
-    <meta property="og:title" content="CLM Central Texas Commons" />
+    <!-- Open Graph & Search Engine Meta Tags -->
+    <!-- Forces Google/Social Crawlers to register the full name -->
+    <meta property="og:site_name" content="Central Texas Catholic Land Movement" />
+    <meta property="og:title" content="Central Texas Catholic Land Movement" />
     <meta property="og:description" content="Ordinary Catholic households, becoming producers — together, in Central Texas." />
     <meta property="og:type" content="website" />
 
+    <!-- Optional: Structured Data (Schema.org) to guarantee Google picks up the full name -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Central Texas Catholic Land Movement",
+        "alternateName": "Central Texas CLM"
+      }
+    </script>
   </head>
 
   <body>
