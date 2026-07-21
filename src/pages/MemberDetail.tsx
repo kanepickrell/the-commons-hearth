@@ -30,6 +30,7 @@ type DetailRow = {
   wants_to_learn: string | null;
   bio_language: 'en' | 'es' | null;
   icon_slug: IconSlug | null;
+  custom_skills: string[] | null;
   parish: { name: string; city: string | null } | null;
 };
 
@@ -87,7 +88,7 @@ const MemberDetail = () => {
         supabase
           .from('profiles')
           .select(
-            'id, display_name, bio, working_on, wants_to_learn, bio_language, icon_slug, parish:parishes(name, city)'
+            'id, display_name, bio, working_on, wants_to_learn, bio_language, icon_slug, custom_skills, parish:parishes(name, city)'
           )
           .eq('id', id)
           .eq('status', 'approved')
@@ -167,8 +168,8 @@ const MemberDetail = () => {
         <div className="rule mt-12" />
 
         <section className="mt-12 space-y-12">
-          {/* Sharing — crafts */}
-          {expertise.length > 0 && (
+          {/* Sharing — crafts + self-described skills */}
+          {(expertise.length > 0 || (member.custom_skills?.length ?? 0) > 0) && (
             <div>
               <h2 className="display-caps text-xs tracking-[0.2em] text-ocre">
                 {t(s.sharingLabel)}
@@ -180,6 +181,14 @@ const MemberDetail = () => {
                     className="rounded-sm border border-mesquite/20 bg-cal/60 px-3 py-1.5 font-heading text-sm text-mesquite"
                   >
                     {craftLabel(e.craft)}
+                  </li>
+                ))}
+                {(member.custom_skills ?? []).map((skill) => (
+                  <li
+                    key={`custom-${skill}`}
+                    className="rounded-sm border border-mesquite/20 bg-cal/60 px-3 py-1.5 font-heading text-sm text-mesquite"
+                  >
+                    {skill}
                   </li>
                 ))}
               </ul>

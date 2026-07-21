@@ -182,6 +182,9 @@ export default function MiPerfil() {
   }
 
   const craftLabel = (slug: string) => CRAFT_NAMES[slug]?.[locale] ?? slug;
+  // custom_skills may not be in the generated types yet — read defensively.
+  const customSkills =
+    (profile as unknown as { custom_skills?: string[] | null } | null)?.custom_skills ?? [];
   const contribLabel = (slug: string) => CONTRIBUTION_LABELS[slug]?.[locale] ?? slug;
 
   const hasAnyRsvps = Object.values(hostedRsvps).some((rs) => rs.length > 0);
@@ -223,7 +226,7 @@ export default function MiPerfil() {
         )}
 
         {/* Sharing */}
-        {expertise.length > 0 && (
+        {(expertise.length > 0 || customSkills.length > 0) && (
           <section className="mb-12">
             <h2 className="mb-4 display-caps text-xs tracking-[0.2em] text-ocre">
               {t(uiStrings.profile.sharingLabel)}
@@ -235,6 +238,14 @@ export default function MiPerfil() {
                   className="rounded-sm border border-mesquite/20 bg-cal/60 px-3 py-1.5 font-heading text-sm text-mesquite"
                 >
                   {craftLabel(e.craft)}
+                </li>
+              ))}
+              {customSkills.map((skill) => (
+                <li
+                  key={`custom-${skill}`}
+                  className="rounded-sm border border-mesquite/20 bg-cal/60 px-3 py-1.5 font-heading text-sm text-mesquite"
+                >
+                  {skill}
                 </li>
               ))}
             </ul>

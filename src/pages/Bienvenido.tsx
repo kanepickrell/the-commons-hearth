@@ -8,12 +8,14 @@
 //   2. Bio — "¿Qué ha puesto Dios en tus manos?" (required)
 //   3. Building — what am I working on right now? (optional)
 //   4. Learning — what do I want a teacher for? (optional)
-//   5. Expertise badges — 8-craft grid (optional)
+//   5. Skills — 8-craft icon grid + more-crafts text tags + add-your-own (optional)
 //
 // On completion, writes:
 //   - UPDATE profiles SET display_name, parish_id, bio, bio_language,
-//     working_on, wants_to_learn
+//     working_on, wants_to_learn, custom_skills
 //   - DELETE expertise for this profile_id, then INSERT current selections
+//     (both the icon crafts and the text-tag crafts are enum expertise rows;
+//      the free-text "add your own" entries go to profiles.custom_skills)
 // Then redirects to /mi-perfil.
 
 import { useEffect, useRef, useState } from 'react';
@@ -40,6 +42,24 @@ const CRAFTS_V1: { slug: CraftSlug; en: string; es: string }[] = [
   { slug: 'el-telar',    en: 'Textiles',   es: 'El Telar' },
   { slug: 'las-yerbas',  en: 'Herbs',      es: 'Las Yerbas' },
 ];
+
+// Common crafts beyond the illustrated eight. These are real craft_slug enum
+// values (so they save into `expertise` exactly like the icons above), just
+// shown as text tags — they don't have artwork. Labels match CRAFT_NAMES on the
+// profile pages. Add a row here to surface another enum craft at signup.
+const MORE_CRAFTS: { slug: CraftSlug; en: string; es: string }[] = [
+  { slug: 'el-huerto',      en: 'Vegetable garden', es: 'El Huerto' },
+  { slug: 'el-invernadero', en: 'Greenhouse',       es: 'El Invernadero' },
+  { slug: 'el-rebano',      en: 'Sheep',            es: 'El Rebaño' },
+  { slug: 'la-mesa',        en: 'Scratch cooking',  es: 'La Mesa' },
+  { slug: 'el-jabon',       en: 'Soap',             es: 'El Jabón' },
+  { slug: 'el-candelero',   en: 'Candles',          es: 'El Candelero' },
+  { slug: 'la-escuela',     en: 'Home schooling',   es: 'La Escuela' },
+  { slug: 'el-tractor',     en: 'Land equipment',   es: 'El Tractor' },
+];
+
+const MAX_CUSTOM_SKILLS = 12;
+const MAX_CUSTOM_SKILL_LEN = 40;
 
 function normalize(s: string): string {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -68,6 +88,8 @@ export default function Bienvenido() {
   const [workingOn, setWorkingOn] = useState('');
   const [wantsToLearn, setWantsToLearn] = useState('');
   const [crafts, setCrafts] = useState<Set<CraftSlug>>(new Set());
+  const [customSkills, setCustomSkills] = useState<string[]>([]);
+  const [customInput, setCustomInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -96,6 +118,9 @@ export default function Bienvenido() {
       if (profile.bio) setBio(profile.bio);
       if (profile.working_on) setWorkingOn(profile.working_on);
       if (profile.wants_to_learn) setWantsToLearn(profile.wants_to_learn);
+      // custom_skills may not be in the generated types yet — read defensively.
+      const existing = (profile as unknown as { custom_skills?: string[] | null }).custom_skills;
+      if (existing && existing.length) setCustomSkills(existing);
     }
   }, [profile]);
 
@@ -172,6 +197,17 @@ export default function Bienvenido() {
     });
   };
 
+  const addCustomSkill = () => {
+    const v = customInput.trim().slice(0, MAX_CUSTOM_SKILL_LEN);
+    setCustomInput('');
+    if (!v || customSkills.length >= MAX_CUSTOM_SKILLS) return;
+    if (customSkills.some((s) => s.toLowerCase() === v.toLowerCase())) return;
+    setCustomSkills((prev) => [...prev, v]);
+  };
+
+  const removeCustomSkill = (skill: string) =>
+    setCustomSkills((prev) => prev.filter((s) => s !== skill));
+
   const finish = async () => {
     if (!user) return;
     setSaving(true);
@@ -191,6 +227,7 @@ export default function Bienvenido() {
           bio_language: trimmedBio ? locale : null,
           working_on: trimmedWorking || null,
           wants_to_learn: trimmedLearning || null,
+          custom_skills: customSkills,
         })
         .eq('id', user.id);
 
@@ -533,6 +570,89 @@ export default function Bienvenido() {
                   </button>
                 );
               })}
+            </div>
+
+            {/* More crafts — text tags, no artwork. Same expertise pipeline. */}
+            <div className="mb-8">
+              <p className="display-caps mb-3 text-[11px] tracking-[0.2em] text-mesquite/50">
+                {t({ en: 'MORE SKILLS', es: 'MÁS OFICIOS' })}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {MORE_CRAFTS.map((craft) => {
+                  const selected = crafts.has(craft.slug);
+                  return (
+                    <button
+                      key={craft.slug}
+                      onClick={() => toggleCraft(craft.slug)}
+                      className={`rounded-sm border px-3 py-1.5 font-heading text-sm transition ${
+                        selected
+                          ? 'border-ocre bg-ocre/10 text-mesquite'
+                          : 'border-mesquite/15 bg-cal/40 text-mesquite/60 hover:border-mesquite/40 hover:text-mesquite'
+                      }`}
+                    >
+                      {locale === 'es' ? craft.es : craft.en}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Add your own — free text, for anything not listed above. */}
+            <div className="mb-10">
+              <p className="display-caps mb-1 text-[11px] tracking-[0.2em] text-mesquite/50">
+                {t({ en: 'SOMETHING ELSE?', es: '¿ALGO MÁS?' })}
+              </p>
+              <p className="mb-3 font-serif text-sm italic text-mesquite/60">
+                {t({
+                  en: 'Add your own — a skill or craft not listed above.',
+                  es: 'Agrega el tuyo — un oficio que no esté en la lista.',
+                })}
+              </p>
+
+              {customSkills.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {customSkills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-ocre/40 bg-ocre/10 px-3 py-1.5 font-heading text-sm text-mesquite"
+                    >
+                      {skill}
+                      <button
+                        onClick={() => removeCustomSkill(skill)}
+                        aria-label={t({ en: 'Remove', es: 'Quitar' })}
+                        className="text-mesquite/50 transition hover:text-rojo"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomSkill();
+                    }
+                  }}
+                  maxLength={MAX_CUSTOM_SKILL_LEN}
+                  disabled={customSkills.length >= MAX_CUSTOM_SKILLS}
+                  placeholder={t({ en: 'e.g. Blacksmithing', es: 'ej. Herrería' })}
+                  className="flex-1 rounded-sm border border-mesquite/20 bg-cal/50 px-3 py-2 font-serif text-base text-mesquite focus:border-mesquite focus:bg-cal focus:outline-none disabled:opacity-50"
+                />
+                <button
+                  onClick={addCustomSkill}
+                  disabled={!customInput.trim() || customSkills.length >= MAX_CUSTOM_SKILLS}
+                  className="rounded-sm border border-mesquite/30 px-4 py-2 font-heading text-sm text-mesquite transition hover:border-ocre hover:text-ocre disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {t({ en: 'Add', es: 'Agregar' })}
+                </button>
+              </div>
             </div>
 
             {error && (
