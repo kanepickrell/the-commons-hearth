@@ -111,7 +111,7 @@
    darker and busier. Vector overlays (dots, region, pins) live in other panes
    and are untouched by this filter. */
 .leaflet-tile-pane {
-  filter: sepia(0.28) saturate(0.85) brightness(1.02) contrast(0.94) hue-rotate(-4deg);
+  filter: sepia(0.12) saturate(0.92) brightness(1.0) contrast(1.02) hue-rotate(-4deg);
 }
 /* Segment name labels — transparent, editorial, floated over the area fill */
 .seg-label {

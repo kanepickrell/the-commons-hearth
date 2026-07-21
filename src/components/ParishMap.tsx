@@ -236,16 +236,17 @@ export const ParishMap = () => {
           center={[29.6, -98.5]}
           zoom={9}
           minZoom={7}
-          maxZoom={13}
+          maxZoom={17}
           zoomSnap={0.5}
           zoomDelta={0.5}
-          scrollWheelZoom={false}
+          scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             subdomains="abcd"
+            maxZoom={20}
             detectRetina
           />
           {/* Frame members + all chapter areas, so the territory shows even
