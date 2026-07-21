@@ -4,26 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Browser tab title -->
-    <title>Central Texas CLM</title>
+    <!-- Google uses this for Search Title & initial Browser Tab -->
+    <title>Central Texas Catholic Land Movement</title>
 
     <meta name="description" content="The digital commons of the Central Texas chapter of the Catholic Land Movement. Ordinary Catholic households, becoming producers — together." />
     <meta name="author" content="CLM Central Texas" />
 
-    <!-- Open Graph & Search Engine Meta Tags -->
-    <!-- Forces Google/Social Crawlers to register the full name -->
+    <!-- 1. Open Graph Site Name (Fixes top header line in social/search) -->
     <meta property="og:site_name" content="Central Texas Catholic Land Movement" />
     <meta property="og:title" content="Central Texas Catholic Land Movement" />
     <meta property="og:description" content="Ordinary Catholic households, becoming producers — together, in Central Texas." />
     <meta property="og:type" content="website" />
 
-    <!-- Optional: Structured Data (Schema.org) to guarantee Google picks up the full name -->
+    <!-- 2. Schema.org WebSite JSON-LD (Primary signal Google uses for Site Name) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Central Texas Catholic Land Movement",
-        "alternateName": "Central Texas CLM"
+        "alternateName": ["Central Texas CLM", "CLM Central Texas"],
+        "url": "https://www.centraltexasclm.org/"
       }
     </script>
   </head>
