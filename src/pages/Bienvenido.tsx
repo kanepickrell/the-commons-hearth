@@ -9,6 +9,7 @@
 //   3. Building — what am I working on right now? (optional)
 //   4. Learning — what do I want a teacher for? (optional)
 //   5. Skills — 8-craft icon grid + more-crafts text tags + add-your-own (optional)
+//      (craft lists live in lib/crafts.ts)
 //
 // On completion, writes:
 //   - UPDATE profiles SET display_name, parish_id, bio, bio_language,
@@ -28,35 +29,9 @@ import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
 import { Icon } from '@/components/Icon';
 import type { Database, CraftSlug } from '@/lib/database.types';
-import type { IconSlug } from '@/lib/types';
+import { ILLUSTRATED_CRAFTS, SIGNUP_MORE_CRAFTS } from '@/lib/crafts';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
-
-const CRAFTS_V1: { slug: CraftSlug; en: string; es: string }[] = [
-  { slug: 'las-abejas',  en: 'Bees',       es: 'Las Abejas' },
-  { slug: 'la-gallina',  en: 'Hens',       es: 'La Gallina' },
-  { slug: 'el-pan',      en: 'Bread',      es: 'El Pan' },
-  { slug: 'la-conserva', en: 'Preserving', es: 'La Conserva' },
-  { slug: 'la-cisterna', en: 'Rainwater',  es: 'La Cisterna' },
-  { slug: 'la-azuela',   en: 'Woodwork',   es: 'La Azuela' },
-  { slug: 'el-telar',    en: 'Textiles',   es: 'El Telar' },
-  { slug: 'las-yerbas',  en: 'Herbs',      es: 'Las Yerbas' },
-];
-
-// Common crafts beyond the illustrated eight. These are real craft_slug enum
-// values (so they save into `expertise` exactly like the icons above), just
-// shown as text tags — they don't have artwork. Labels match CRAFT_NAMES on the
-// profile pages. Add a row here to surface another enum craft at signup.
-const MORE_CRAFTS: { slug: CraftSlug; en: string; es: string }[] = [
-  { slug: 'el-huerto',      en: 'Vegetable garden', es: 'El Huerto' },
-  { slug: 'el-invernadero', en: 'Greenhouse',       es: 'El Invernadero' },
-  { slug: 'el-rebano',      en: 'Sheep',            es: 'El Rebaño' },
-  { slug: 'la-mesa',        en: 'Scratch cooking',  es: 'La Mesa' },
-  { slug: 'el-jabon',       en: 'Soap',             es: 'El Jabón' },
-  { slug: 'el-candelero',   en: 'Candles',          es: 'El Candelero' },
-  { slug: 'la-escuela',     en: 'Home schooling',   es: 'La Escuela' },
-  { slug: 'el-tractor',     en: 'Land equipment',   es: 'El Tractor' },
-];
 
 const MAX_CUSTOM_SKILLS = 12;
 const MAX_CUSTOM_SKILL_LEN = 40;
@@ -118,9 +93,7 @@ export default function Bienvenido() {
       if (profile.bio) setBio(profile.bio);
       if (profile.working_on) setWorkingOn(profile.working_on);
       if (profile.wants_to_learn) setWantsToLearn(profile.wants_to_learn);
-      // custom_skills may not be in the generated types yet — read defensively.
-      const existing = (profile as unknown as { custom_skills?: string[] | null }).custom_skills;
-      if (existing && existing.length) setCustomSkills(existing);
+      if (profile.custom_skills?.length) setCustomSkills(profile.custom_skills);
     }
   }, [profile]);
 
@@ -546,7 +519,7 @@ export default function Bienvenido() {
             </p>
 
             <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {CRAFTS_V1.map((craft) => {
+              {ILLUSTRATED_CRAFTS.map((craft) => {
                 const selected = crafts.has(craft.slug);
                 return (
                   <button
@@ -559,7 +532,7 @@ export default function Bienvenido() {
                     }`}
                   >
                     <Icon
-                      slug={craft.slug as IconSlug}
+                      slug={craft.slug}
                       size={48}
                       locale={locale}
                       className={`transition ${selected ? 'opacity-100' : 'opacity-60'}`}
@@ -578,7 +551,7 @@ export default function Bienvenido() {
                 {t({ en: 'MORE SKILLS', es: 'MÁS OFICIOS' })}
               </p>
               <div className="flex flex-wrap gap-2">
-                {MORE_CRAFTS.map((craft) => {
+                {SIGNUP_MORE_CRAFTS.map((craft) => {
                   const selected = crafts.has(craft.slug);
                   return (
                     <button

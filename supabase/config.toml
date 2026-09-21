@@ -22,6 +22,9 @@ entrypoint = "./functions/geocode-parish/index.ts"
 
 [functions.member-notify]
 enabled = true
+# verify_jwt is OFF so the browser CORS preflight (OPTIONS) succeeds. Admin-only
+# access is enforced inside the function by validating the caller's JWT and
+# checking profiles.is_admin (see the function source).
 verify_jwt = false
 import_map = "./functions/member-notify/deno.json"
 entrypoint = "./functions/member-notify/index.ts"
@@ -42,3 +45,18 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/admin-add-member/deno.json"
 entrypoint = "./functions/admin-add-member/index.ts"
+[functions.gathering-notify]
+enabled = true
+# Not called from the browser (invoked server-side with the service key), so
+# gateway JWT verification stays ON.
+verify_jwt = true
+import_map = "./functions/gathering-notify/deno.json"
+entrypoint = "./functions/gathering-notify/index.ts"
+
+[functions.chester]
+enabled = true
+# Public chat guide: anonymous visitors call it, so gateway JWT verification is
+# OFF. Abuse is limited inside the function (per-IP hourly + global daily caps).
+verify_jwt = false
+import_map = "./functions/chester/deno.json"
+entrypoint = "./functions/chester/index.ts"

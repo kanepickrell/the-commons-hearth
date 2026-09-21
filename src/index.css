@@ -106,10 +106,10 @@
   font-family: 'Gentium Plus', Georgia, serif;
   background: hsl(var(--cal));
 }
-/* Warm-parchment basemap: gentle sepia over the minimal Positron canvas so the
-   map sits inside the palette. Tuned lighter than for raw OSM tiles, which were
-   darker and busier. Vector overlays (dots, region, pins) live in other panes
-   and are untouched by this filter. */
+/* Warm-parchment basemap: gentle sepia over the minimal light-gray canvas
+   (Esri) so the map sits inside the palette. Tuned lighter than for raw OSM
+   tiles, which were darker and busier. Vector overlays (dots, region, pins)
+   live in other panes and are untouched by this filter. */
 .leaflet-tile-pane {
   filter: sepia(0.12) saturate(0.92) brightness(1.0) contrast(1.02) hue-rotate(-4deg);
 }

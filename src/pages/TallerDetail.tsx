@@ -18,6 +18,7 @@ import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import type { IconSlug } from '@/lib/types';
+import { formatDate, formatTime, fromDateOnly, dateOnlyInZone, chapterTzLabel } from '@/lib/dates';
 
 type GatheringDetail = {
   id: string;
@@ -160,15 +161,15 @@ const TallerDetail = () => {
   const c = uiStrings.contribution;
   const contributionLabel = (k: ContributionType) => t(c[k]);
 
-  const dateLine = new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
-    locale === 'es' ? 'es-MX' : 'en-US',
-    { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }
-  );
+  // When we have the exact instant, derive the calendar day from it in
+  // Central Time rather than trusting the view's event_date (which may be
+  // computed in UTC and land an evening gathering on the next day).
+  const eventDay = w.held_at ? dateOnlyInZone(w.held_at) : w.event_date;
+  const dateLine = formatDate(fromDateOnly(eventDay), locale, {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+  });
   const timeLine = w.held_at
-    ? new Date(w.held_at).toLocaleTimeString(locale === 'es' ? 'es-MX' : 'en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-      })
+    ? `${formatTime(w.held_at, locale)} ${chapterTzLabel(locale, new Date(w.held_at))}`
     : null;
 
   return (
@@ -179,7 +180,7 @@ const TallerDetail = () => {
         </Link>
 
         <header className="mt-10 flex flex-col items-center text-center">
-          {w.craft && <Icon slug={w.craft} size={96} locale={locale} />}
+          <Icon slug={w.craft} size={96} locale={locale} />
           <p className="mt-6 display-caps text-xs tracking-[0.2em] text-ocre">
             {dateLine}
             {timeLine ? `, ${timeLine}` : ''}

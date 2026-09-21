@@ -258,7 +258,9 @@ Deno.serve(async (req: Request) => {
   const contributionLabel = CONTRIBUTION_LABELS[rsvp.contribution_type]?.[lang] ?? rsvp.contribution_type;
 
   const whenDate = new Date(rsvp.workshop.held_at);
+  // Edge Functions run in UTC; pin the zone so the email says Central Time.
   const whenHuman = whenDate.toLocaleString(lang === 'es' ? 'es-MX' : 'en-US', {
+    timeZone: 'America/Chicago',
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
     hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
   });

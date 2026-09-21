@@ -12,7 +12,9 @@ import { MonthPhotoPanel } from '@/components/admin/MonthPhotoPanel';
 import { MonthSummaryPanel } from '@/components/admin/MonthSummaryPanel';
 import { SegmentPanel } from '@/components/admin/SegmentPanel';
 import { GatheringPanel } from '@/components/admin/GatheringPanel';
+import { ChesterPanel } from '@/components/admin/ChesterPanel';
 import type { Database } from '@/lib/database.types';
+import { formatDate } from '@/lib/dates';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Parish = Database['public']['Tables']['parishes']['Row'];
@@ -156,10 +158,7 @@ export default function Mayordomo() {
                         {p.display_name ?? t({ en: '(no name)', es: '(sin nombre)' })}
                       </h2>
                       <span className="font-mono text-xs text-mesquite/40">
-                        {new Date(p.created_at).toLocaleDateString(
-                          locale === 'es' ? 'es-MX' : 'en-US',
-                          { month: 'short', day: 'numeric', year: 'numeric' }
-                        )}
+                        {formatDate(p.created_at, locale, { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                     </div>
 
@@ -243,6 +242,13 @@ export default function Mayordomo() {
         {/* ------------------------------------------------------------------ */}
         <section className="border-t border-mesquite/10 pt-12">
           <SegmentPanel />
+        </section>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section 7: Chester — the chat guide's notes and recent questions */}
+        {/* ------------------------------------------------------------------ */}
+        <section className="border-t border-mesquite/10 pt-12">
+          <ChesterPanel />
         </section>
       </div>
     </Layout>

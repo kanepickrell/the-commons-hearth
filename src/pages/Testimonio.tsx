@@ -13,12 +13,13 @@ import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
 import { MonthDetail } from '@/components/testimonio/MonthDetail';
 
-// What comes back from the DB — flat columns, single-language body.
+// What comes back from the `witness_public` view — approved posts only, flat
+// columns, single-language body, plus the author's display name.
 type WitnessRow = {
   id: string;
-  author_id: string;
+  author_id: string | null;
+  author_display_name: string | null;
   workshop_id: string | null;
-  replicated_from_post_id: string | null;
   craft: IconSlug | null;
   body: string;
   language: 'en' | 'es' | null;
@@ -45,10 +46,11 @@ const adaptRow = (r: WitnessRow): WitnessPost => {
   return {
     id: r.id,
     workshopId: r.workshop_id ?? '',
-    hostId: r.author_id,
+    hostId: r.author_id ?? '',
+    hostName: r.author_display_name,
     date: r.occurred_at,
     body: bodyBi,
-    iconSlug: (r.craft ?? 'el-pan') as IconSlug,
+    iconSlug: r.craft ?? 'el-pan',
     fruit: {
       count: r.fruit_count ?? 0,
       unit: unitBi,
@@ -72,17 +74,16 @@ const Testimonio = () => {
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase
-        .from('witness_posts')
+        .from('witness_public')
         .select(
-          'id, author_id, workshop_id, replicated_from_post_id, craft, body, language, fruit_count, fruit_unit, occurred_at'
+          'id, author_id, author_display_name, workshop_id, craft, body, language, fruit_count, fruit_unit, occurred_at'
         )
-        .eq('status', 'approved')
         .order('occurred_at', { ascending: false });
 
       if (error) {
         console.error('Failed to load witness posts:', error);
       } else if (data) {
-        setPosts((data as WitnessRow[]).map(adaptRow));
+        setPosts((data as unknown as WitnessRow[]).map(adaptRow));
       }
       setLoading(false);
     })();
@@ -101,11 +102,14 @@ const Testimonio = () => {
     })();
   }, []);
 
+  // Only this year's posts belong on this year's wheel; a 2025 post would
+  // otherwise land in its month slot as if it happened in 2026.
   const postsByMonth = useMemo(() => {
     const map: Record<number, WitnessPost[]> = {};
     for (const p of posts) {
-      const m = new Date(p.date).getMonth();
-      (map[m] ||= []).push(p);
+      const d = new Date(p.date);
+      if (d.getFullYear() !== WHEEL_YEAR) continue;
+      (map[d.getMonth()] ||= []).push(p);
     }
     return map;
   }, [posts]);

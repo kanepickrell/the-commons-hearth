@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath, switchLocalePath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
@@ -6,7 +6,8 @@ import { AuthButton } from '@/components/AuthButton';
 
 export const Header = () => {
   const { locale, setLocale, t } = useLocale();
-  const { pathname } = useLocation();
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
   const s = uiStrings.nav;
 
   // Nav order is intentional: what we believe (Vision) → how to live it
@@ -22,12 +23,16 @@ export const Header = () => {
     { to: buildPath('resources',   locale), label: t(s.resources) },
   ];
 
+  // Swap the URL to the other locale's slug through the router (not
+  // history.replaceState) so useLocation/useParams see the change and the
+  // active-link highlight stays correct. `keepScroll` tells ScrollToTop this
+  // isn't a real page change.
   const onToggle = (next: 'en' | 'es') => {
     if (next === locale) return;
     setLocale(next);
     const nextPath = switchLocalePath(pathname, next);
     if (nextPath !== pathname) {
-      window.history.replaceState(null, '', nextPath);
+      navigate({ pathname: nextPath, search, hash }, { replace: true, state: { keepScroll: true } });
     }
   };
 

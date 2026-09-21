@@ -21,6 +21,7 @@ import { Icon } from '@/components/Icon';
 import { iconMap } from '@/lib/icons';
 import type { Database } from '@/lib/database.types';
 import type { IconSlug } from '@/lib/types';
+import { formatDateTime, isoToZonedInput, zonedInputToISO, chapterTzLabel } from '@/lib/dates';
 
 type Status = Database['public']['Enums']['content_status'];
 
@@ -48,15 +49,6 @@ type Gathering = {
 
 const inputClass =
   'w-full rounded-sm border border-mesquite/20 bg-cal px-3 py-2 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none';
-
-// timestamptz (ISO) -> value for <input type="datetime-local"> in local time.
-const toLocalInput = (iso: string) => {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours()
-  )}:${pad(d.getMinutes())}`;
-};
 
 export const GatheringPanel = () => {
   const { locale, t } = useLocale();
@@ -136,12 +128,7 @@ export const GatheringPanel = () => {
                   <button onClick={() => toggle(g.id)} className="flex-1 text-left">
                     <span className="font-heading text-lg text-mesquite">{g.title}</span>
                     <span className="ml-2 font-serif text-sm italic text-piedra">
-                      {new Date(g.held_at).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
+                      {formatDateTime(g.held_at, locale)}
                       {g.host?.display_name ? ` · ${g.host.display_name}` : ''}
                     </span>
                   </button>
@@ -233,7 +220,7 @@ function GatheringEditor({
   const [craft, setCraft] = useState<string>(gathering.craft ?? '');
   const [parishId, setParishId] = useState(gathering.parish_id ?? '');
   const [locationText, setLocationText] = useState(gathering.location_text ?? '');
-  const [heldAt, setHeldAt] = useState(toLocalInput(gathering.held_at));
+  const [heldAt, setHeldAt] = useState(isoToZonedInput(gathering.held_at));
   const [latInput, setLatInput] = useState(gathering.lat?.toString() ?? '');
   const [lngInput, setLngInput] = useState(gathering.lng?.toString() ?? '');
   const [status, setStatus] = useState<Status>(gathering.status);
@@ -287,8 +274,8 @@ function GatheringEditor({
       );
       return;
     }
-    const when = new Date(heldAt);
-    if (isNaN(when.getTime())) {
+    const heldAtIso = zonedInputToISO(heldAt); // read as Central Time
+    if (!heldAtIso) {
       setError(t({ en: 'Pick a valid date and time.', es: 'Elige una fecha y hora válidas.' }));
       return;
     }
@@ -300,7 +287,7 @@ function GatheringEditor({
       p_description: description.trim() || null,
       p_craft: craft || null,
       p_location_text: locationText.trim() || null,
-      p_held_at: when.toISOString(),
+      p_held_at: heldAtIso,
       p_lat: coords.lat,
       p_lng: coords.lng,
       p_parish_id: parishId || null,
@@ -378,7 +365,7 @@ function GatheringEditor({
           </select>
         </FieldRow>
 
-        <FieldRow label={t({ en: 'Date and time', es: 'Fecha y hora' })}>
+        <FieldRow label={t({ en: `Date and time (${chapterTzLabel('en')})`, es: `Fecha y hora (${chapterTzLabel('es')})` })}>
           <input
             type="datetime-local"
             value={heldAt}

@@ -13,6 +13,7 @@ import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import type { IconSlug } from '@/lib/types';
+import { formatDate, fromDateOnly, todayLocalISO, dateOnlyInZone } from '@/lib/dates';
 
 type GatheringRow = {
   id: string;
@@ -34,7 +35,7 @@ const Talleres = () => {
 
   useEffect(() => {
     (async () => {
-      const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+      const today = todayLocalISO();
       const { data, error } = await supabase
         .from('gatherings_public')
         .select(
@@ -89,14 +90,11 @@ const Talleres = () => {
                   style={{ textDecoration: 'none' }}
                 >
                   <div className="flex-shrink-0 pt-1">
-                    {w.craft && <Icon slug={w.craft} size={88} locale={locale} />}
+                    <Icon slug={w.craft} size={88} locale={locale} />
                   </div>
                   <div className="flex-1">
                     <p className="display-caps text-xs tracking-[0.2em] text-ocre">
-                      {new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
-                        locale === 'es' ? 'es-MX' : 'en-US',
-                        { weekday: 'long', month: 'long', day: 'numeric' }
-                      )}
+                      {formatDate(fromDateOnly(w.held_at ? dateOnlyInZone(w.held_at) : w.event_date), locale, { weekday: 'long', month: 'long', day: 'numeric' })}
                     </p>
                     <h2 className="mt-2 font-heading text-2xl leading-snug text-mesquite group-hover:text-ocre">
                       {w.title}

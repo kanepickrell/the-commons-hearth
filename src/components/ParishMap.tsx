@@ -20,13 +20,14 @@ import L from 'leaflet';
 import { listSegments, type ChapterSegment } from '@/lib/segments';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { iconMap } from '@/lib/icons';
+import { iconMap, hasIcon } from '@/lib/icons';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import type { IconSlug } from '@/lib/types';
+import { todayLocalISO } from '@/lib/dates';
 
 type ProfileWithParish = {
   id: string;
@@ -39,7 +40,7 @@ type ProfileWithParish = {
 type WorkshopMarker = {
   id: string;
   title: string;
-  craft: IconSlug | null;
+  craft: string | null; // any craft_slug; only the illustrated ones get a pin
   location_text: string | null;
   lat: number;
   lng: number;
@@ -198,7 +199,7 @@ export const ParishMap = () => {
       return;
     }
     (async () => {
-      const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+      const today = todayLocalISO();
       const { data } = await supabase
         .from('gatherings_public')
         .select('id, title, craft, location_text, lat, lng')
@@ -210,7 +211,7 @@ export const ParishMap = () => {
         marks.push({
           id: w.id,
           title: w.title,
-          craft: w.craft as IconSlug | null,
+          craft: w.craft,
           location_text: w.location_text,
           lat: w.lat,
           lng: w.lng,
@@ -242,12 +243,21 @@ export const ParishMap = () => {
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
+          {/* Esri's light-gray canvas + a separate labels layer. Same quiet
+              Positron-style look the palette was tuned for, without CARTO's
+              "API KEY REQUIRED" watermark. Native tiles stop at z16; Leaflet
+              upscales beyond that. */}
           <TileLayer
-            attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-            subdomains="abcd"
-            maxZoom={20}
-            detectRetina
+            attribution="Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+            maxNativeZoom={16}
+            maxZoom={17}
+          />
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+            maxNativeZoom={16}
+            maxZoom={17}
+            zIndex={2}
           />
           {/* Frame members + all chapter areas, so the territory shows even
               before any members load. */}
@@ -311,7 +321,7 @@ export const ParishMap = () => {
           ))}
 
           {workshops.map((w) =>
-            w.craft ? (
+            hasIcon(w.craft) ? (
               <Marker
                 key={w.id}
                 position={[w.lat, w.lng]}

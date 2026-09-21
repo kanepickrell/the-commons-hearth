@@ -17,6 +17,8 @@ import { buildPath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
 import type { Database } from '@/lib/database.types';
+import { craftLabel as craftName } from '@/lib/crafts';
+import { formatDate } from '@/lib/dates';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
 type Expertise = Database['public']['Tables']['expertise']['Row'];
@@ -42,31 +44,6 @@ type MyRsvpRow = {
   contribution_type: string;
   contribution_note: string | null;
   attendee: { display_name: string | null } | null;
-};
-
-const CRAFT_NAMES: Record<string, { en: string; es: string }> = {
-  'las-abejas':     { en: 'Bees',              es: 'Las Abejas' },
-  'la-gallina':     { en: 'Hens',              es: 'La Gallina' },
-  'el-pan':         { en: 'Bread',             es: 'El Pan' },
-  'la-conserva':    { en: 'Preserving',        es: 'La Conserva' },
-  'la-cisterna':    { en: 'Rainwater',         es: 'La Cisterna' },
-  'la-azuela':      { en: 'Woodwork',          es: 'La Azuela' },
-  'el-telar':       { en: 'Textiles',          es: 'El Telar' },
-  'las-yerbas':     { en: 'Herbs',             es: 'Las Yerbas' },
-  'el-huerto':      { en: 'Vegetable garden',  es: 'El Huerto' },
-  'el-invernadero': { en: 'Greenhouse',        es: 'El Invernadero' },
-  'la-milpa':       { en: 'Three-sisters field', es: 'La Milpa' },
-  'el-rebano':      { en: 'Sheep',             es: 'El Rebaño' },
-  'el-caldo':       { en: 'Broth & ferments',  es: 'El Caldo' },
-  'la-mesa':        { en: 'Scratch cooking',   es: 'La Mesa' },
-  'el-jabon':       { en: 'Soap',              es: 'El Jabón' },
-  'el-candelero':   { en: 'Candles',           es: 'El Candelero' },
-  'el-tractor':     { en: 'Land equipment',    es: 'El Tractor' },
-  'la-regla':       { en: 'Homestead rhythm',  es: 'La Regla' },
-  'las-medicinas':  { en: 'Natural medicine',  es: 'Las Medicinas' },
-  'la-escuela':     { en: 'Home schooling',    es: 'La Escuela' },
-  'el-jardin':      { en: 'Flower garden',     es: 'El Jardín' },
-  'la-mano':        { en: 'Home repair',       es: 'La Mano' },
 };
 
 const CONTRIBUTION_LABELS: Record<string, { en: string; es: string }> = {
@@ -171,7 +148,7 @@ export default function MiPerfil() {
     })();
   }, [user, profile?.parish_id]);
 
-  if (authLoading || loading || !profile) {
+  if (authLoading || loading) {
     return (
       <Layout>
         <div className="container-prose py-16 text-center font-serif text-mesquite/60">
@@ -181,10 +158,23 @@ export default function MiPerfil() {
     );
   }
 
-  const craftLabel = (slug: string) => CRAFT_NAMES[slug]?.[locale] ?? slug;
-  // custom_skills may not be in the generated types yet — read defensively.
-  const customSkills =
-    (profile as unknown as { custom_skills?: string[] | null } | null)?.custom_skills ?? [];
+  // Signed in but no profiles row (the signup trigger didn't fire, or the row
+  // was deleted). Say so instead of spinning forever.
+  if (!profile) {
+    return (
+      <Layout>
+        <div className="container-prose py-16 text-center font-serif italic text-mesquite/70">
+          {t({
+            en: 'We couldn’t find your profile. Sign out and back in, or contact a steward.',
+            es: 'No encontramos tu perfil. Cierra sesión y vuelve a entrar, o contacta a un mayordomo.',
+          })}
+        </div>
+      </Layout>
+    );
+  }
+
+  const craftLabel = (slug: string) => craftName(slug, locale);
+  const customSkills = profile.custom_skills ?? [];
   const contribLabel = (slug: string) => CONTRIBUTION_LABELS[slug]?.[locale] ?? slug;
 
   const hasAnyRsvps = Object.values(hostedRsvps).some((rs) => rs.length > 0);
@@ -310,10 +300,7 @@ export default function MiPerfil() {
                     )}
                   </div>
                   <p className="mt-1 text-sm text-piedra">
-                    {new Date(w.held_at).toLocaleDateString(
-                      locale === 'es' ? 'es-MX' : 'en-US',
-                      { month: 'long', day: 'numeric', year: 'numeric' }
-                    )}
+                    {formatDate(w.held_at, locale)}
                     {w.location_text ? ` — ${w.location_text}` : ''}
                   </p>
                 </li>
@@ -339,10 +326,7 @@ export default function MiPerfil() {
                     {w.title}
                   </Link>
                   <p className="text-sm text-piedra">
-                    {new Date(w.held_at).toLocaleDateString(
-                      locale === 'es' ? 'es-MX' : 'en-US',
-                      { month: 'long', day: 'numeric', year: 'numeric' }
-                    )}
+                    {formatDate(w.held_at, locale)}
                     {w.location_text ? ` — ${w.location_text}` : ''}
                   </p>
                 </li>
@@ -403,10 +387,7 @@ export default function MiPerfil() {
                     {w.title}
                   </Link>
                   <span className="font-mono text-xs italic text-piedra/70">
-                    {new Date(w.held_at).toLocaleDateString(
-                      locale === 'es' ? 'es-MX' : 'en-US',
-                      { month: 'short', day: 'numeric', year: 'numeric' }
-                    )}
+                    {formatDate(w.held_at, locale, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </li>
               ))}

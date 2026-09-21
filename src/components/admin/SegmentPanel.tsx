@@ -66,10 +66,11 @@ export function SegmentPanel() {
   useEffect(() => {
     if (!elRef.current) return;
     const map = L.map(elRef.current, { scrollWheelZoom: true }).setView([30.0, -98.1], 8);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-      subdomains: 'abcd',
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      maxZoom: 18,
+    // Plain OSM tiles here (no key, no watermark) — the extra road detail is
+    // useful when tracing area boundaries.
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
     }).addTo(map);
 
     const drawn = new L.FeatureGroup().addTo(map);
@@ -93,11 +94,12 @@ export function SegmentPanel() {
 
     // Draw plugin events aren't in Leaflet's core event type map; use a retyped
     // view of the same map object (preserves `this`) to bind them.
-    const m = map as unknown as { on(type: string, fn: (e: any) => void): void };
+    type DrawEvent = L.LeafletEvent & { layer?: L.Layer; layers?: L.LayerGroup };
+    const m = map as unknown as { on(type: string, fn: (e: DrawEvent) => void): void };
     m.on(LD.Draw.Event.CREATED, (e) => { addItem(e.layer as L.Polygon); setDirty(true); });
     m.on(LD.Draw.Event.EDITED, () => { refresh(); setDirty(true); });
     m.on(LD.Draw.Event.DELETED, (e) => {
-      (e.layers as L.LayerGroup).eachLayer((layer) => {
+      e.layers?.eachLayer((layer) => {
         itemsRef.current = itemsRef.current.filter((it) => it.layer !== layer);
       });
       refresh(); setDirty(true);

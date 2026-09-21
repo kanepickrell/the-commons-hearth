@@ -15,6 +15,7 @@ import { Icon } from '@/components/Icon';
 import { iconMap } from '@/lib/icons';
 import type { Database } from '@/lib/database.types';
 import type { IconSlug } from '@/lib/types';
+import { zonedInputToISO, chapterTzLabel } from '@/lib/dates';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
 
@@ -88,8 +89,9 @@ export default function NuevaReunion() {
       }
     }
 
-    const when = new Date(heldAt);
-    if (Number.isNaN(when.getTime()) || when.getTime() < Date.now()) {
+    // The input is read as Central Time no matter where the host's browser is.
+    const heldAtIso = zonedInputToISO(heldAt);
+    if (!heldAtIso || new Date(heldAtIso).getTime() < Date.now()) {
       setError(t({
         en: 'Pick a date and time in the future.',
         es: 'Elige una fecha y hora en el futuro.',
@@ -107,7 +109,7 @@ export default function NuevaReunion() {
       location_text: locationText.trim(),
       lat: latLng?.lat ?? null,
       lng: latLng?.lng ?? null,
-      held_at: when.toISOString(),
+      held_at: heldAtIso,
       language: locale,
       // status omitted → DB default 'pending' (RLS also enforces this)
     });
@@ -242,7 +244,13 @@ export default function NuevaReunion() {
           />
         </Field>
 
-        <Field label={t({ en: 'Date and time', es: 'Fecha y hora' })}>
+        <Field
+          label={t({ en: 'Date and time', es: 'Fecha y hora' })}
+          hint={t({
+            en: `Central Time (${chapterTzLabel('en')})`,
+            es: `Hora del Centro (${chapterTzLabel('es')})`,
+          })}
+        >
           <input
             type="datetime-local"
             value={heldAt}

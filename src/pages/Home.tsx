@@ -16,10 +16,9 @@
 //     book, shared table, monstrance), kept separate from the craft
 //     iconMap. They're inlined via ?raw so they inherit currentColor.
 
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { ParishMap } from '@/components/ParishMap';
 import { SignInModal } from '@/components/SignInModal';
 import { Icon } from '@/components/Icon';
 import { LanguageNote } from '@/components/LanguageNote';
@@ -28,11 +27,18 @@ import { useAuth } from '@/hooks/useAuth';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import type { IconSlug, Bilingual } from '@/lib/types';
+import { formatDate } from '@/lib/dates';
 
 import resettlement from '@/assets/icons/resettlement.svg?raw';
 import education from '@/assets/icons/education.svg?raw';
 import fellowship from '@/assets/icons/fellowship.svg?raw';
 import glorification from '@/assets/icons/glorification.svg?raw';
+
+// Leaflet is the single heaviest dependency on the site; loading it after the
+// first paint keeps the landing page's initial bundle small.
+const ParishMap = lazy(() =>
+  import('@/components/ParishMap').then((m) => ({ default: m.ParishMap }))
+);
 
 const PILLAR_ICONS = {
   resettlement, education, fellowship, glorification,
@@ -174,9 +180,6 @@ const Home = () => {
       {/* ---------------------------------------------------------------- */}
       {/* 1. Opening                                                       */}
       {/* ---------------------------------------------------------------- */}
-      {/* ---------------------------------------------------------------- */}
-      {/* 1. Opening                                                       */}
-      {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
         <h1 className="font-heading text-ocre text-3xl md:text-4xl">
           {t(copy.eyebrow)}
@@ -234,9 +237,7 @@ const Home = () => {
               {t(copy.witnessEyebrow)}
             </p>
             <div className="mt-10 flex flex-col items-center">
-              {latest.craft && (
-                <Icon slug={latest.craft} size={72} locale={locale} />
-              )}
+              <Icon slug={latest.craft} size={72} locale={locale} />
               <blockquote className="mt-8 max-w-xl">
                 <p className="prose-body text-2xl leading-relaxed text-mesquite">
                   &ldquo;{latest.body}&rdquo;
@@ -244,10 +245,7 @@ const Home = () => {
                 </p>
                 <footer className="mt-6 text-sm italic text-piedra">
                   {latest.author_display_name ?? '—'} ·{' '}
-                  {new Date(latest.occurred_at).toLocaleDateString(
-                    locale === 'es' ? 'es-MX' : 'en-US',
-                    { month: 'long', day: 'numeric', year: 'numeric' }
-                  )}
+                  {formatDate(latest.occurred_at, locale)}
                 </footer>
               </blockquote>
               <Link
@@ -276,7 +274,17 @@ const Home = () => {
             {t(copy.mapHeading)}
           </h2> */}
         </header>
-        <ParishMap />
+        <Suspense
+          fallback={
+            <div
+              className="rounded border border-mesquite/20 bg-cal/50"
+              style={{ height: 460 }}
+              aria-hidden="true"
+            />
+          }
+        >
+          <ParishMap />
+        </Suspense>
       </section>
 
       <div className="rule container-wide" />

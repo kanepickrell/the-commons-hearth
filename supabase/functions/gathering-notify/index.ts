@@ -42,7 +42,9 @@ function shell(inner: string, lang: Lang): string {
 function render(g: Gathering, event: Event): { subject: string; html: string; text: string } {
   const lang: Lang = g.language ?? 'en';
   const es = lang === 'es';
+  // Edge Functions run in UTC; without an explicit zone this said "7:00 PM UTC".
   const when = new Date(g.held_at).toLocaleString(es ? 'es-MX' : 'en-US', {
+    timeZone: 'America/Chicago',
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
     hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
   });

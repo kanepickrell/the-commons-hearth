@@ -7,6 +7,8 @@ const FROM_EMAIL       = Deno.env.get('FROM_EMAIL') ?? 'CLM Central Texas <onboa
 const REPLY_TO         = Deno.env.get('REPLY_TO')   ?? 'clmcentraltexas@gmail.com';
 const DISCORD_INVITE   = Deno.env.get('DISCORD_INVITE_URL') ?? '';
 
+const ANON_KEY         = Deno.env.get('SUPABASE_ANON_KEY')!;
+
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   global: { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } },
@@ -102,6 +104,36 @@ async function logEmail(kind: string, recipient: string, subject: string, status
   }
 }
 
+// verify_jwt is OFF in config.toml so the CORS preflight succeeds, which means
+// the gateway doesn't authenticate callers for us. This function sends email
+// to any member whose profile_id you name, so it must be admin-only: resolve
+// the caller from their JWT and check profiles.is_admin, exactly like
+// admin-add-member does.
+async function callerIsAdmin(req: Request): Promise<{ ok: true } | { ok: false; status: number; detail: string }> {
+  const authHeader = req.headers.get('Authorization') ?? '';
+  if (!authHeader) return { ok: false, status: 401, detail: 'no Authorization header' };
+
+  const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: { headers: { Authorization: authHeader } },
+  });
+
+  const { data: userData, error: userErr } = await userClient.auth.getUser();
+  if (userErr || !userData?.user) {
+    return { ok: false, status: 401, detail: userErr?.message ?? 'no user in token' };
+  }
+
+  const { data: profile, error: profErr } = await userClient
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', userData.user.id)
+    .maybeSingle();
+
+  if (profErr) return { ok: false, status: 403, detail: profErr.message };
+  if (!profile?.is_admin) return { ok: false, status: 403, detail: 'caller is not an admin' };
+  return { ok: true };
+}
+
 Deno.serve(async (req: Request) => {
   // Browser preflight — must succeed or the real POST is never sent.
   if (req.method === 'OPTIONS') {
@@ -110,6 +142,12 @@ Deno.serve(async (req: Request) => {
 
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS });
+  }
+
+  const gate = await callerIsAdmin(req);
+  if (!gate.ok) {
+    return new Response(JSON.stringify({ error: 'forbidden', detail: gate.detail }),
+      { status: gate.status, headers: JSON_HEADERS });
   }
 
   let profileId: string;

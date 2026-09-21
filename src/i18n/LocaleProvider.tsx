@@ -12,23 +12,22 @@ const Ctx = createContext<LocaleCtx | null>(null);
 const STORAGE_KEY = 'clm-ctx-locale';
 
 export const LocaleProvider = ({ children }: { children: ReactNode }) => {
-  const [locale, setLocaleState] = useState<Locale>('en');
-
-  // Load remembered preference once.
-  useEffect(() => {
+  // Read the remembered preference synchronously so the first paint is
+  // already in the right language (no 'en' flash for Spanish readers).
+  const [locale, setLocaleState] = useState<Locale>(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved === 'en' || saved === 'es') setLocaleState(saved);
+      if (saved === 'en' || saved === 'es') return saved;
     } catch {
-      /* ignore — SSR / private mode */
+      /* ignore — private mode / storage blocked */
     }
-  }, []);
+    return 'en';
+  });
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
     try {
       window.localStorage.setItem(STORAGE_KEY, l);
-      document.documentElement.lang = l;
     } catch {
       /* ignore */
     }

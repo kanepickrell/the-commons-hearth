@@ -1,8 +1,10 @@
-import { iconMap } from '@/lib/icons';
+import { iconMap, hasIcon } from '@/lib/icons';
 import type { IconSlug, Locale } from '@/lib/types';
 
 type Props = {
-  slug: IconSlug;
+  // Accepts any string so callers can pass a DB `craft` value straight
+  // through; unknown slugs render nothing rather than throwing.
+  slug: IconSlug | string | null | undefined;
   size?: number;
   locale?: Locale;
   className?: string;
@@ -19,6 +21,7 @@ type Props = {
  * height="100%" and a viewBox, so they fill this wrapper naturally.
  */
 export const Icon = ({ slug, size = 64, locale = 'es', className = '' }: Props) => {
+  if (!hasIcon(slug)) return null;
   const meta = iconMap[slug];
   const label = meta.name[locale];
 

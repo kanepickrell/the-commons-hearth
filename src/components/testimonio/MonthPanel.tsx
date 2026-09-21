@@ -3,7 +3,6 @@ import type { Locale, WitnessPost } from '@/lib/types';
 import { Icon } from '@/components/Icon';
 import { feasts } from '@/lib/fixtures/feasts';
 import { seasonByMonth, seasonMeta } from '@/lib/fixtures/seasons';
-import { members } from '@/lib/fixtures/members';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { WheatStem } from '@/components/testimonio/WheatStem';
 
@@ -93,24 +92,22 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
         </div>
       ))}
 
-      {/* Replication banner(s) — one per replicated post this month */}
+      {/* Replication banner(s) — one per replicated post this month.
+          `replicated` isn't populated from the DB yet; this renders nothing
+          until the witness view carries the from/to names. */}
       {heldPosts
         .filter((p) => p.replicated)
-        .map((p) => {
-          const from = members.find((m) => m.id === p.replicated!.fromMemberId);
-          const to = members.find((m) => m.id === p.replicated!.toMemberId);
-          return (
-            <div
-              key={`rep-${p.id}`}
-              className="mb-3 border-l-2 border-ocre bg-ocre/10 px-3.5 py-2.5 text-sm leading-snug text-mesquite"
-            >
-              <span className="mb-1 block font-caps text-[9px] tracking-[0.2em] text-ocre">
-                {s.replicatedLabel[locale]}
-              </span>
-              {from?.name ?? '—'} → {to?.name ?? '—'} · {p.replicated!.skill[locale]}
-            </div>
-          );
-        })}
+        .map((p) => (
+          <div
+            key={`rep-${p.id}`}
+            className="mb-3 border-l-2 border-ocre bg-ocre/10 px-3.5 py-2.5 text-sm leading-snug text-mesquite"
+          >
+            <span className="mb-1 block font-caps text-[9px] tracking-[0.2em] text-ocre">
+              {s.replicatedLabel[locale]}
+            </span>
+            {p.replicated!.skill[locale]}
+          </div>
+        ))}
 
       {/* Truly quiet month → wheat placeholder + seasons line. When gatherings
           were recorded, the recap + photos render below, so the panel adds
@@ -124,7 +121,6 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
         </div>
       ) : !hasCards ? null : (
         orderedPosts.map((post) => {
-          const host = members.find((m) => m.id === post.hostId);
           const day = new Date(post.date).getDate();
           const planned = post.planned ? ` · ${s.plannedTag[locale]}` : '';
           return (
@@ -139,16 +135,18 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
               </div>
               <div>
                 <div className="mb-0.5 font-caps text-[9px] tracking-[0.2em] text-ocre">
-                  {monthName.toUpperCase()} {day} · {host?.name.toUpperCase() ?? ''}
+                  {monthName.toUpperCase()} {day}
+                  {post.hostName ? ` · ${post.hostName.toUpperCase()}` : ''}
                   {planned}
                 </div>
                 <div className="prose-body mb-1 text-[14px] leading-snug text-mesquite">
                   “{post.body[locale]}”
                 </div>
-                <div className="text-xs italic text-piedra">
-                  {host?.parish ?? ''}
-                  {post.fruit && ` · ${post.fruit.count} ${post.fruit.unit[locale]}`}
-                </div>
+                {post.fruit.count > 0 && (
+                  <div className="text-xs italic text-piedra">
+                    {post.fruit.count} {post.fruit.unit[locale]}
+                  </div>
+                )}
               </div>
             </button>
           );

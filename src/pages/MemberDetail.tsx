@@ -17,10 +17,13 @@ import { Layout } from '@/components/Layout';
 import { Icon } from '@/components/Icon';
 import { LanguageNote } from '@/components/LanguageNote';
 import { useLocale } from '@/i18n/LocaleProvider';
+import { useAuth } from '@/hooks/useAuth';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import type { IconSlug } from '@/lib/types';
+import { craftLabel as craftName } from '@/lib/crafts';
+import { formatDate, fromDateOnly, todayLocalISO } from '@/lib/dates';
 
 type DetailRow = {
   id: string;
@@ -30,7 +33,7 @@ type DetailRow = {
   wants_to_learn: string | null;
   bio_language: 'en' | 'es' | null;
   icon_slug: IconSlug | null;
-  custom_skills: string[] | null;
+  custom_skills?: string[] | null; // absent for signed-out viewers
   parish: { name: string; city: string | null } | null;
 };
 
@@ -43,35 +46,11 @@ type HostedGathering = {
   location_text: string | null;  // null when details are gated for the viewer
 };
 
-// Kept in sync with the craft enum. Used for friendly display labels.
-const CRAFT_NAMES: Record<string, { en: string; es: string }> = {
-  'las-abejas':     { en: 'Bees',              es: 'Las Abejas' },
-  'la-gallina':     { en: 'Hens',              es: 'La Gallina' },
-  'el-pan':         { en: 'Bread',             es: 'El Pan' },
-  'la-conserva':    { en: 'Preserving',        es: 'La Conserva' },
-  'la-cisterna':    { en: 'Rainwater',         es: 'La Cisterna' },
-  'la-azuela':      { en: 'Woodwork',          es: 'La Azuela' },
-  'el-telar':       { en: 'Textiles',          es: 'El Telar' },
-  'las-yerbas':     { en: 'Herbs',             es: 'Las Yerbas' },
-  'el-huerto':      { en: 'Vegetable garden',  es: 'El Huerto' },
-  'el-invernadero': { en: 'Greenhouse',        es: 'El Invernadero' },
-  'la-milpa':       { en: 'Three-sisters field', es: 'La Milpa' },
-  'el-rebano':      { en: 'Sheep',             es: 'El Rebaño' },
-  'el-caldo':       { en: 'Broth & ferments',  es: 'El Caldo' },
-  'la-mesa':        { en: 'Scratch cooking',   es: 'La Mesa' },
-  'el-jabon':       { en: 'Soap',              es: 'El Jabón' },
-  'el-candelero':   { en: 'Candles',           es: 'El Candelero' },
-  'el-tractor':     { en: 'Land equipment',    es: 'El Tractor' },
-  'la-regla':       { en: 'Homestead rhythm',  es: 'La Regla' },
-  'las-medicinas':  { en: 'Natural medicine',  es: 'Las Medicinas' },
-  'la-escuela':     { en: 'Home schooling',    es: 'La Escuela' },
-  'el-jardin':      { en: 'Flower garden',     es: 'El Jardín' },
-  'la-mano':        { en: 'Home repair',       es: 'La Mano' },
-};
-
 const MemberDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { t, locale } = useLocale();
+  const { user, loading: authLoading } = useAuth();
+  const isAuthenticated = !!user;
   const s = uiStrings.profile;
 
   const [member, setMember] = useState<DetailRow | null>(null);
@@ -81,15 +60,19 @@ const MemberDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
-    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    if (!id || authLoading) return;
+    const today = todayLocalISO();
+    // Column-level grants: anon can't read `custom_skills`, and PostgREST
+    // rejects the whole SELECT if any requested column is denied (same issue
+    // ParishMap has with contact_email). Ask for it only when signed in.
+    const profileSelect = isAuthenticated
+      ? 'id, display_name, bio, working_on, wants_to_learn, bio_language, icon_slug, custom_skills, parish:parishes(name, city)'
+      : 'id, display_name, bio, working_on, wants_to_learn, bio_language, icon_slug, parish:parishes(name, city)';
     (async () => {
       const [profileResult, expertiseResult, upcomingResult, pastResult] = await Promise.all([
         supabase
           .from('profiles')
-          .select(
-            'id, display_name, bio, working_on, wants_to_learn, bio_language, icon_slug, custom_skills, parish:parishes(name, city)'
-          )
+          .select(profileSelect)
           .eq('id', id)
           .eq('status', 'approved')
           .maybeSingle(),
@@ -115,13 +98,14 @@ const MemberDetail = () => {
           .limit(10),
       ]);
 
+      if (profileResult.error) console.error('Failed to load member:', profileResult.error);
       if (profileResult.data) setMember(profileResult.data as unknown as DetailRow);
       if (expertiseResult.data) setExpertise(expertiseResult.data);
       if (upcomingResult.data) setUpcoming(upcomingResult.data as unknown as HostedGathering[]);
       if (pastResult.data) setPast(pastResult.data as unknown as HostedGathering[]);
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, authLoading, isAuthenticated]);
 
   if (loading) {
     return (
@@ -146,14 +130,13 @@ const MemberDetail = () => {
     );
   }
 
-  const craftLabel = (slug: string) =>
-    CRAFT_NAMES[slug] ? CRAFT_NAMES[slug][locale] : slug;
+  const craftLabel = (slug: string) => craftName(slug, locale);
 
   return (
     <Layout>
       <article className="container-prose py-20">
         <header className="flex flex-col items-center text-center">
-          {member.icon_slug && <Icon slug={member.icon_slug} size={120} locale={locale} />}
+          <Icon slug={member.icon_slug} size={120} locale={locale} />
           <h1 className="mt-8 font-heading text-4xl leading-tight text-mesquite md:text-5xl">
             {member.display_name ?? '—'}
           </h1>
@@ -251,10 +234,7 @@ const MemberDetail = () => {
                       {w.title}
                     </Link>
                     <p className="text-sm text-piedra">
-                      {new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
-                        locale === 'es' ? 'es-MX' : 'en-US',
-                        { month: 'long', day: 'numeric', year: 'numeric' }
-                      )}
+                      {formatDate(fromDateOnly(w.event_date), locale)}
                       {w.location_text ? ` — ${w.location_text}` : ''}
                     </p>
                   </li>
@@ -280,10 +260,7 @@ const MemberDetail = () => {
                       {w.title}
                     </Link>
                     <span className="font-mono text-xs italic text-piedra/70">
-                      {new Date(`${w.event_date}T00:00:00`).toLocaleDateString(
-                        locale === 'es' ? 'es-MX' : 'en-US',
-                        { month: 'short', day: 'numeric', year: 'numeric' }
-                      )}
+                      {formatDate(fromDateOnly(w.event_date), locale, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </li>
                 ))}

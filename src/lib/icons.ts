@@ -35,3 +35,9 @@ export const iconMap: Record<IconSlug, IconMeta> = {
 };
 
 export const allIcons = Object.values(iconMap);
+
+// The `craft_slug` enum has more values than we have artwork for. Anything
+// that renders an icon from DB data must check this first — indexing iconMap
+// with an unknown slug returns undefined and `.svg` on it throws.
+export const hasIcon = (slug: string | null | undefined): slug is IconSlug =>
+  !!slug && Object.prototype.hasOwnProperty.call(iconMap, slug);

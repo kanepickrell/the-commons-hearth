@@ -13,29 +13,6 @@ export type IconSlug =
   | 'el-telar'
   | 'las-yerbas';
 
-export type Member = {
-  id: string;
-  name: string;
-  parish: string;
-  parishLatLon: [number, number];
-  offering: Bilingual;
-  workingOn: Bilingual;
-  wantsToLearn: Bilingual;
-  iconSlug: IconSlug;
-};
-
-export type Workshop = {
-  id: string;
-  hostId: string;
-  title: Bilingual;
-  description: Bilingual;
-  date: string;
-  locationName: string;
-  locationLatLon: [number, number];
-  iconSlug: IconSlug;
-  rsvpCount: number;
-};
-
 /**
  * A concrete, countable output of a gathering. The count is the number;
  * the unit is bilingual prose like "jars of jelly" / "frascos de jalea".
@@ -64,6 +41,7 @@ export type WitnessPost = {
   id: string;
   workshopId: string;
   hostId: string;
+  hostName?: string | null;
   date: string;
   body: Bilingual;
   photoUrl?: string;

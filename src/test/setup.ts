@@ -13,3 +13,7 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: () => {},
   }),
 });
+
+// jsdom has no layout, so scrollTo is "not implemented" and logs on every
+// route change in tests.
+window.scrollTo = () => {};

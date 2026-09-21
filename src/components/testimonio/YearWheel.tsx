@@ -130,7 +130,6 @@ export const YearWheel = ({ posts, selectedMonth, onSelectMonth, locale }: Props
           <g key={`fruit-${i}`} pointerEvents="none" opacity={isPlanned ? 0.35 : 1}>
             <foreignObject x={pos.x - 11} y={pos.y - 11} width={22} height={22}>
               <div
-                xmlns="http://www.w3.org/1999/xhtml"
                 style={{
                   color: 'hsl(92 24% 25%)',
                   width: 22,
