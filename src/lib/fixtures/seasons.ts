@@ -1,27 +1,15 @@
-// Liturgical season per calendar month.
-// NOTE: The liturgical calendar does not align cleanly to calendar months —
-// Lent and Easter move each year, and Advent crosses into December. This
-// month-granular approximation is intentional for year-one simplicity;
-// when we have proper liturgical date math we can compute season by day.
+// Liturgical season labels and palette.
+//
+// The DATES live in src/lib/liturgical.ts, which computes them properly from
+// Easter — this file is just what each season is called and how it's colored.
+//
+// (Year one mapped one season per calendar month, with a note to replace it
+// once we had real liturgical date math. We do now: seasonOn(date) and
+// dominantSeasonOfMonth(year, month) replace the old seasonByMonth table.)
 
 import type { Bilingual } from '@/lib/types';
 
 export type LiturgicalSeason = 'advent' | 'christmas' | 'ordinary' | 'lent' | 'easter';
-
-export const seasonByMonth: Record<number, LiturgicalSeason> = {
-  0: 'christmas',  // January
-  1: 'ordinary',   // February
-  2: 'lent',       // March
-  3: 'easter',     // April
-  4: 'easter',     // May
-  5: 'ordinary',   // June
-  6: 'ordinary',   // July
-  7: 'ordinary',   // August
-  8: 'ordinary',   // September
-  9: 'ordinary',   // October
-  10: 'ordinary',  // November
-  11: 'advent',    // December
-};
 
 export const seasonMeta: Record<LiturgicalSeason, {
   fill: string;

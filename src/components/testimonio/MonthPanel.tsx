@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Locale, WitnessPost } from '@/lib/types';
 import { Icon } from '@/components/Icon';
-import { feasts } from '@/lib/fixtures/feasts';
-import { seasonByMonth, seasonMeta } from '@/lib/fixtures/seasons';
+import { seasonMeta } from '@/lib/fixtures/seasons';
+import { SEASON_COLOR, dominantSeasonOfMonth, feastsInMonth } from '@/lib/liturgical';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { WheatStem } from '@/components/testimonio/WheatStem';
 
 type Props = {
+  /** The civil year the panel is reporting on. */
+  year: number;
   month: number;
   posts: WitnessPost[];      // posts already filtered to this month
   locale: Locale;
@@ -24,17 +26,20 @@ type Props = {
  * (feast, skill replication) → one card per witness post → or, if the
  * month has nothing, a quiet "the land has seasons" line.
  */
-export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onAskMetric }: Props) => {
+export const MonthPanel = ({ year, month, posts, locale, override, onAskAboutPost, onAskMetric }: Props) => {
   const s = uiStrings.witness;
   const monthNames = locale === 'es' ? uiStrings.months.es : uiStrings.months.en;
   const monthName = monthNames[month];
-  const seasonLabel = seasonMeta[seasonByMonth[month]].label[locale];
+  // The season that owns most of this month, computed from real dates rather
+  // than the old one-season-per-month table.
+  const season = dominantSeasonOfMonth(year, month);
+  const seasonLabel = seasonMeta[season].label[locale];
 
   const heldPosts = posts.filter((p) => !p.planned);
   const plannedPosts = posts.filter((p) => p.planned);
   const neighbors = heldPosts.reduce((sum, p) => sum + p.fruit.count, 0);
   const hosts = new Set(heldPosts.map((p) => p.hostId)).size;
-  const monthFeasts = feasts.filter((f) => f.month === month);
+  const monthFeasts = feastsInMonth(month);
 
   // Sort posts within the month ascending by date so the earliest reads first.
   const orderedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
@@ -49,16 +54,27 @@ export const MonthPanel = ({ month, posts, locale, override, onAskAboutPost, onA
 
   return (
     <div className="min-h-[380px]">
-      <div className="display-caps text-[11px] tracking-[0.25em] text-ocre">
-        {seasonLabel.toUpperCase()} · {monthName.toUpperCase()} 2026
+      {/* The season in its own color, so the panel head and the wheel's ring
+          are visibly the same fact. */}
+      <div
+        className="display-caps text-[11px] tracking-[0.25em]"
+        style={{ color: SEASON_COLOR[season].ink }}
+      >
+        {seasonLabel.toUpperCase()}
       </div>
-      <div className="mt-0.5 mb-3 font-heading text-[26px] leading-none text-mesquite">
-        {monthName}
+      <div className="mt-1 flex items-baseline gap-2">
+        <h2 className="font-heading text-[30px] leading-none text-mesquite">{monthName}</h2>
+        <span className="font-caps text-[10px] tracking-[0.2em] text-piedra/70">{year}</span>
       </div>
 
       {/* Metrics — stacked editorial figures that sit alongside the wheel and
-          give the column vertical presence. Numbers count up on month select. */}
-      <div className="mb-5 divide-y divide-mesquite/10 border-y border-mesquite/10">
+          give the column vertical presence. Numbers count up on month select.
+          The scope label matters: the page also carries year totals under the
+          same three words, and without it the two blocks read as a conflict. */}
+      <p className="mt-5 font-caps text-[9px] tracking-[0.22em] text-piedra/70">
+        {locale === 'es' ? `EN ${monthName.toUpperCase()}` : `IN ${monthName.toUpperCase()}`}
+      </p>
+      <div className="mb-5 mt-1.5 divide-y divide-mesquite/10 border-y border-mesquite/10">
         <MetricRow
           n={override ? override.gatherings : heldPosts.length + (plannedPosts.length ? `+${plannedPosts.length}` : '')}
           label={override ? s.metricGatherings[locale] : (plannedPosts.length ? s.metricHeld[locale] : s.metricGatherings[locale])}

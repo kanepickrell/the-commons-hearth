@@ -16,6 +16,11 @@ export default {
         heading: ["'EB Garamond'", "Georgia", "serif"],
         body: ["'Gentium Plus'", "Georgia", "serif"],
         caps: ["'Marcellus SC'", "Georgia", "serif"],
+        // `font-serif` is used ~110 times across the pages. Without this it
+        // resolves to Tailwind's default (ui-serif/Georgia) and silently
+        // overrides the Gentium Plus set on <body>, so most of the site read
+        // in Georgia while Home read in Gentium. Point it at the body face.
+        serif: ["'Gentium Plus'", "Georgia", "serif"],
       },
       colors: {
         // Brand
