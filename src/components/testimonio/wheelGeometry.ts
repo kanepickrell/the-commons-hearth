@@ -33,13 +33,41 @@ export const arcPath = (
   return `M ${p1.x} ${p1.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${p2.x} ${p2.y} L ${p3.x} ${p3.y} A ${rInner} ${rInner} 0 ${large} 0 ${p4.x} ${p4.y} Z`;
 };
 
-// Wheel dimensions — tuned for a 380px SVG on desktop. Mobile scales via viewBox.
+/**
+ * Wheel dimensions, tuned for a 380px SVG on desktop; mobile scales via the
+ * viewBox. Read outward from the centre:
+ *
+ *   hub              the selected month, named
+ *   month wedges     twelve clickable cells, tinted where the chapter met
+ *   fruit glyphs     the craft of the month's first witness post
+ *   season band      the true liturgical year, from real dates
+ *   month labels     JAN … DEC, outside the rim
+ */
 export const WHEEL = {
   CX: 190,
   CY: 190,
-  R_OUTER: 175,
-  R_FRUITS: 140,
-  R_SEASON_INNER: 90,
-  R_HUB: 65,
-  WEDGE_ANGLE: 30,  // 360 / 12
+
+  /** Outer edge of the thin true-season ring. */
+  R_SEASON_OUTER: 174,
+  R_SEASON_INNER: 160,
+
+  /** The clickable twelve-month band. */
+  R_MONTH_OUTER: 155,
+  R_MONTH_INNER: 92,
+
+  R_FRUITS: 125,
+  R_HUB: 66,
+
+  /** Radius the month name labels sit on, outside the season ring. */
+  R_LABELS: 183,
+
+  /**
+   * Breathing room added around the viewBox. The month labels are centred on
+   * R_LABELS, so at 3 and 9 o'clock half of "SEP"/"MAR" would hang past a
+   * tight 380x380 box and get clipped. Padding the viewBox rather than pulling
+   * the labels inward keeps them clear of the season ring.
+   */
+  PAD: 18,
+
+  WEDGE_ANGLE: 30, // 360 / 12
 } as const;

@@ -18,6 +18,7 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import type { Locale } from '@/lib/types';
+import { uiStrings } from '@/lib/fixtures/uiStrings';
 
 const BUCKET = 'month-photos';
 
@@ -120,22 +121,36 @@ export const MonthDetail = ({ year, month, locale }: Props) => {
   if (loading) return null;
   if (slides.length === 0) return null;
 
+  // Name the month rather than saying "this month": the section sits a long
+  // scroll below the wheel, and by the time you reach it the selected month is
+  // off screen. (The English heading used to read "SWIPE TO VIEW CONTENT" while
+  // the Spanish read "this month's gatherings" — interface chrome in the
+  // heading slot, and only in one language.)
+  const monthName = (locale === 'es' ? uiStrings.months.es : uiStrings.months.en)[month];
   const heading =
     summaries.length > 0
       ? locale === 'es'
-        ? 'ENCUENTROS DE ESTE MES'
-        : 'SWIPE TO VIEW CONTENT'
+        ? `ENCUENTROS DE ${monthName.toUpperCase()}`
+        : `GATHERINGS IN ${monthName.toUpperCase()}`
       : locale === 'es'
-      ? 'FOTOS'
-      : 'PHOTOS';
+        ? `FOTOS DE ${monthName.toUpperCase()}`
+        : `PHOTOS FROM ${monthName.toUpperCase()}`;
 
   return (
     <div className="mx-auto mt-12 max-w-4xl border-t border-mesquite/10 pt-8 md:mt-16">
-      <p className="display-caps mb-6 text-center text-[11px] tracking-[0.25em] text-ocre">
+      <p className="display-caps text-center text-[11px] tracking-[0.25em] text-ocre">
         {heading}
       </p>
+      {/* The swipe affordance belongs here, small, not in the heading. */}
+      {slides.length > 1 && (
+        <p className="mt-1.5 text-center font-serif text-xs italic text-piedra/70">
+          {locale === 'es'
+            ? `${slides.length} en total — desliza o usa las flechas`
+            : `${slides.length} in all — swipe, or use the arrows`}
+        </p>
+      )}
 
-      <Carousel setApi={setApi} opts={{ loop: false }} className="w-full">
+      <Carousel setApi={setApi} opts={{ loop: false }} className="mt-6 w-full">
         <CarouselContent>
           {slides.map((slide) => (
             <CarouselItem key={slide.kind === 'event' ? slide.summary.id : slide.photo.id}>

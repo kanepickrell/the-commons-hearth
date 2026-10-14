@@ -87,6 +87,13 @@
     @apply mx-auto px-6;
     max-width: 680px;
   }
+  /* Between prose and wide: pages whose sections carry their own max-w-2xl
+     prose caps but still need the page gutter. Used by Vision, Participate,
+     Resources, and the onboarding flow. */
+  .container-narrow {
+    @apply mx-auto px-6;
+    max-width: 820px;
+  }
   .container-wide {
     @apply mx-auto px-6;
     max-width: 1100px;
@@ -99,6 +106,23 @@
     border: 1px solid hsl(var(--mesquite) / 0.6);
     border-radius: 9999px;
   }
+}
+
+/* Year wheel month cells. Hover/focus live in CSS because SVG elements can't
+   carry Tailwind's state variants, and the cells are real buttons for keyboard
+   users — so the focus ring has to be visible, not just the hover. */
+.wheel-month {
+  transition: fill 0.15s ease-out;
+}
+.wheel-month:hover {
+  fill: rgba(198, 139, 62, 0.1);
+}
+.wheel-month:focus {
+  outline: none;
+}
+.wheel-month:focus-visible {
+  stroke: hsl(var(--ocre));
+  stroke-width: 1.5;
 }
 
 /* Leaflet container should not impose its own font */

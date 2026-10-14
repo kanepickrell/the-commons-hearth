@@ -2,16 +2,29 @@
 // The Testimonio page — the public "evidence of communion" view.
 // Reads approved witness posts from the DB, groups by month, renders the year wheel.
 // Empty wheel is the honest state before the chapter starts posting.
+//
+// The page reads as three movements, widest to narrowest, so a visitor who
+// scrolls once gets the whole argument:
+//
+//   THE YEAR     one ledger line — gatherings, hosts, neighbours across 2026
+//   THE MONTH    the wheel, and the selected month beside it
+//   THE MOMENTS  that month's recaps and photographs, full width
+//
+// Both the year band and the month column carry the same three words
+// (gatherings / hosts / neighbours), so each is explicitly scope-labelled —
+// "THE YEAR SO FAR" against "IN OCTOBER". Without that they read as a
+// contradiction rather than a zoom.
 
 import { useEffect, useMemo, useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
-import { YearWheel } from '@/components/testimonio/YearWheel';
+import { YearWheel, SeasonKey } from '@/components/testimonio/YearWheel';
 import { MonthPanel } from '@/components/testimonio/MonthPanel';
 import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
 import { MonthDetail } from '@/components/testimonio/MonthDetail';
+import { chapterToday } from '@/lib/dates';
 
 // What comes back from the `witness_public` view — approved posts only, flat
 // columns, single-language body, plus the author's display name.
@@ -28,9 +41,9 @@ type WitnessRow = {
   occurred_at: string;
 };
 
-// near the top of the file, above the component — the year the wheel represents.
-// The wheel hardcodes 2026 in its hub, so the carousel matches it. Switch to
-// new Date().getFullYear() if you'd rather it track the live year.
+// The year the wheel represents. The wheel, the hub and the month totals all
+// read from this one constant; switch to chapterToday().getFullYear() when the
+// chapter is ready for the page to roll over on its own.
 const WHEEL_YEAR = 2026;
 
 // Convert a DB row into the shape the wheel/panel components already expect.
@@ -62,9 +75,17 @@ const Testimonio = () => {
   const { t, locale } = useLocale();
   const s = uiStrings.witness;
 
+  // Today in CHAPTER time, not the viewer's — the same convention the rest of
+  // the site uses for gathering times.
+  const today = useMemo(() => chapterToday(), []);
+
   const [posts, setPosts] = useState<WitnessPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState<number>(() => new Date().getMonth());
+  // Open on the current month when the wheel is showing the live year;
+  // otherwise start the year at its beginning.
+  const [selectedMonth, setSelectedMonth] = useState<number>(() =>
+    today.getFullYear() === WHEEL_YEAR ? today.getMonth() : 0
+  );
 
   // Headline chapter metrics — sourced from the live tables, not from witness
   // posts: gatherings + hosts from approved gatherings, neighbors from the
@@ -148,40 +169,77 @@ const Testimonio = () => {
     return { gatherings, hosts };
   }, [monthTotals]);
 
+  // Months the chapter actually met in — a recorded gathering counts even with
+  // no witness post written yet. The wheel tints these so the year visibly
+  // fills in.
+  const activeMonths = useMemo(() => {
+    const set = new Set<number>();
+    for (const [m, totals] of Object.entries(monthTotals)) {
+      if (totals.gatherings > 0) set.add(Number(m));
+    }
+    return set;
+  }, [monthTotals]);
+
   return (
     <Layout>
-      <section className="container-wide pb-24 pt-20">
-        <header className="mb-8 text-center">
+      <section className="container-wide pb-24 pt-16 md:pt-20">
+        {/* ---------------------------------------------------------------- */}
+        {/* Masthead                                                         */}
+        {/* ---------------------------------------------------------------- */}
+        <header className="mx-auto max-w-2xl text-center">
           <p className="display-caps text-[11px] tracking-[0.3em] text-ocre">
             {t(s.eyebrow)}
           </p>
-          <h1 className="mt-2 font-heading text-[30px] leading-[1.15] text-mesquite md:text-4xl">
+          <h1 className="mt-3 font-heading text-[32px] leading-[1.15] text-mesquite md:text-[42px]">
             {t(s.heading)}
           </h1>
-          <p className="prose-body mt-1 text-sm italic text-piedra">{t(s.subhead)}</p>
+          <p className="prose-body mt-4 text-base italic leading-relaxed text-piedra">
+            {t(s.subhead)}
+          </p>
         </header>
 
         {loading ? (
           <p className="mt-16 text-center font-serif italic text-piedra/60">…</p>
         ) : (
           <>
-            <div className="mx-auto mb-10 grid max-w-2xl grid-cols-3 gap-3">
-              <Stat n={yearTotals.gatherings} label={t(s.statGatherings)} />
-              <Stat n={yearTotals.hosts} label={t(s.statHosts)} />
-              <Stat n={neighbors} label={t(s.statNeighbors)} />
+            {/* -------------------------------------------------------------- */}
+            {/* I. The year — one ledger line                                  */}
+            {/* -------------------------------------------------------------- */}
+            <div className="mx-auto mt-14 max-w-2xl">
+              <p className="mb-3 text-center font-caps text-[9px] tracking-[0.25em] text-piedra/70">
+                {t(s.yearSoFar)}
+              </p>
+              <dl className="grid grid-cols-3 border-y border-mesquite/15">
+                <YearStat n={yearTotals.gatherings} label={t(s.statGatherings)} />
+                <YearStat n={yearTotals.hosts} label={t(s.statHosts)} divided />
+                <YearStat n={neighbors} label={t(s.statNeighbors)} divided />
+              </dl>
             </div>
 
-            <div className="mx-auto grid max-w-4xl grid-cols-1 items-start gap-8 md:grid-cols-[380px_1fr]">
+            {/* -------------------------------------------------------------- */}
+            {/* II. The month — the wheel, and the month beside it             */}
+            {/* -------------------------------------------------------------- */}
+            <div className="mx-auto mt-16 grid max-w-4xl grid-cols-1 items-start gap-10 md:mt-20 md:grid-cols-[380px_1fr] md:gap-12">
               <div>
                 <YearWheel
                   posts={posts}
+                  year={WHEEL_YEAR}
                   selectedMonth={selectedMonth}
                   onSelectMonth={setSelectedMonth}
                   locale={locale}
+                  activeMonths={activeMonths}
+                  today={today}
                 />
+                <SeasonKey year={WHEEL_YEAR} locale={locale} />
+                {/* The instruction lives with the thing it describes, not up in
+                    the masthead where it was competing with the headline. */}
+                <p className="mt-4 text-center font-serif text-xs italic leading-relaxed text-piedra/80">
+                  {t(s.pickMonth)}
+                </p>
               </div>
               <div>
                 <MonthPanel
+                  year={WHEEL_YEAR}
                   month={selectedMonth}
                   posts={monthPosts}
                   locale={locale}
@@ -192,9 +250,9 @@ const Testimonio = () => {
               </div>
             </div>
 
-            {/* The month's gathering recaps + photo gallery, full-width beneath
-                the wheel so they read as one composed section instead of two
-                cramped columns. */}
+            {/* -------------------------------------------------------------- */}
+            {/* III. The moments — recaps + photographs, full width            */}
+            {/* -------------------------------------------------------------- */}
             <MonthDetail year={WHEEL_YEAR} month={selectedMonth} locale={locale} />
 
             {posts.length === 0 && yearTotals.gatherings === 0 && (
@@ -211,12 +269,27 @@ const Testimonio = () => {
   );
 };
 
-const Stat = ({ n, label }: { n: number; label: string }) => (
-  <div className="border border-mesquite/12 bg-cal/40 px-3 py-2.5 text-center">
-    <div className="font-heading text-[22px] leading-none text-mesquite">{n}</div>
-    <div className="mt-1 font-caps text-[9px] tracking-[0.15em] text-ocre">
+/**
+ * One figure in the year ledger. Horizontal and rule-bounded, where the month
+ * column's figures are a vertical stack — the different axis is what keeps the
+ * two blocks from reading as the same table twice.
+ */
+const YearStat = ({
+  n,
+  label,
+  divided = false,
+}: {
+  n: number;
+  label: string;
+  divided?: boolean;
+}) => (
+  <div className={`px-3 py-4 text-center ${divided ? 'border-l border-mesquite/12' : ''}`}>
+    <dd className="font-heading text-[30px] leading-none text-mesquite tabular-nums md:text-[36px]">
+      {n}
+    </dd>
+    <dt className="mt-2 font-caps text-[9px] tracking-[0.18em] text-ocre">
       {label.toUpperCase()}
-    </div>
+    </dt>
   </div>
 );
 

@@ -98,6 +98,19 @@ export const dateOnlyInZone = (iso: string, tz: string = CHAPTER_TZ): string => 
   return `${w.y}-${pad2(w.m)}-${pad2(w.d)}`;
 };
 
+/**
+ * Today's calendar day *in the chapter's timezone*, as a local-midnight Date.
+ *
+ * Use this for anything that asks "what day is it for the chapter" — the
+ * liturgical season, the feast coming up, which month the wheel opens on. A
+ * member reading from Manila should see the chapter's Tuesday, not their
+ * Wednesday, the same way gathering times are always Central.
+ */
+export const chapterToday = (now: Date = new Date(), tz: string = CHAPTER_TZ): Date => {
+  const w = wallClockIn(now.getTime(), tz);
+  return new Date(w.y, w.m - 1, w.d);
+};
+
 // --- formatting -------------------------------------------------------------
 
 export const formatDate = (
