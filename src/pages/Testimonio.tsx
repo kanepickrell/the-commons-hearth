@@ -24,10 +24,11 @@ import { MonthPanel } from '@/components/testimonio/MonthPanel';
 import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
 import { MonthDetail } from '@/components/testimonio/MonthDetail';
-import { chapterToday } from '@/lib/dates';
+import { chapterToday, formatDate } from '@/lib/dates';
 import { Icon } from '@/components/Icon';
 import { hasIcon } from '@/lib/icons';
 import { useScrollShrink } from '@/hooks/useScrollShrink';
+import { askChesterAbout } from '@/lib/chesterAsk';
 import type { ReactNode } from 'react';
 
 // What comes back from the `witness_public` view — approved posts only, flat
@@ -450,8 +451,23 @@ const Testimonio = () => {
                   posts={monthPosts}
                   locale={locale}
                   override={monthTotals[selectedMonth] ?? null}
-                  onAskAboutPost={() => {}}
-                  onAskMetric={() => {}}
+                  onAskAboutPost={(post) =>
+                    askChesterAbout(
+                      `${t(s.promptGathering)} ${formatDate(post.date, locale)}?`
+                    )
+                  }
+                  onAskMetric={(kind) => {
+                    const prompt =
+                      kind === 'gatherings'
+                        ? s.promptMetricGatherings
+                        : kind === 'neighbors'
+                          ? s.promptMetricNeighbors
+                          : s.promptMetricHosts;
+                    const month = (locale === 'es' ? uiStrings.months.es : uiStrings.months.en)[
+                      selectedMonth
+                    ];
+                    askChesterAbout(`${t(prompt)} ${month} ${year}?`);
+                  }}
                 />
               </div>
             </div>

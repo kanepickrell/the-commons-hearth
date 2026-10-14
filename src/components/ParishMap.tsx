@@ -27,6 +27,7 @@ import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import type { IconSlug } from '@/lib/types';
+import { ContactModal } from '@/components/ContactModal';
 import { todayLocalISO } from '@/lib/dates';
 
 type ProfileWithParish = {
@@ -121,6 +122,8 @@ export const ParishMap = () => {
   const [workshops, setWorkshops] = useState<WorkshopMarker[]>([]);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
   const [segments, setSegments] = useState<ChapterSegment[]>([]);
+  // Parish whose "would you be the contact?" offer is open, if any.
+  const [pocOffer, setPocOffer] = useState<string | null>(null);
 
   // Chapter community areas, drawn by a Mayordomo in the admin editor.
   useEffect(() => {
@@ -397,6 +400,19 @@ export const ParishMap = () => {
                     ? 'Aún no hay un contacto designado para esta parroquia.'
                     : 'No point of contact listed yet for this parish.'}
                 </p>
+                {/* This used to be where the panel stopped. Someone who just
+                    clicked their own parish and found it unclaimed is the best
+                    candidate the chapter will ever get for the role the whole
+                    directory depends on, so ask them. */}
+                <button
+                  type="button"
+                  onClick={() => setPocOffer(selected.parishName)}
+                  className="mt-3 font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
+                >
+                  {locale === 'es'
+                    ? '¿Te gustaría serlo? →'
+                    : 'Would you be the one? →'}
+                </button>
               </>
             )}
           </>
@@ -415,6 +431,22 @@ export const ParishMap = () => {
           </div>
         )}
       </aside>
+
+      {/* Offer to serve as a parish's point of contact. The form opens on the
+          parish-partnership category with the parish already named, so the
+          visitor only has to say yes. */}
+      <ContactModal
+        open={pocOffer !== null}
+        onClose={() => setPocOffer(null)}
+        defaultCategory="parish"
+        defaultMessage={
+          pocOffer
+            ? locale === 'es'
+              ? `Me gustaría ser el contacto del capítulo en ${pocOffer}.`
+              : `I would like to be the chapter's point of contact for ${pocOffer}.`
+            : undefined
+        }
+      />
     </div>
   );
 };

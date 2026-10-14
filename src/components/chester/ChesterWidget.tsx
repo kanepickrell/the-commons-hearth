@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { useLocation } from 'react-router-dom';
+import { onChesterAsk } from '@/lib/chesterAsk';
 import {
   askChester, ChesterError, getSessionId, loadHistory, saveHistory,
   type ChesterMessage,
@@ -126,6 +127,17 @@ export const ChesterWidget = () => {
       abortRef.current = null;
     }
   }, [busy, messages, locale, t]);
+
+  // A page can hand Chester a question (the Witness figures do). Open the
+  // panel and ask it. Guarded on `hidden` so the steward dashboard, where the
+  // widget isn't rendered, can't silently swallow one.
+  useEffect(() => {
+    if (hidden) return;
+    return onChesterAsk((question) => {
+      setOpen(true);
+      void send(question);
+    });
+  }, [hidden, send]);
 
   const reset = () => {
     abortRef.current?.abort();

@@ -6,7 +6,8 @@
 //   2. Pillars — Resettlement, Education, Fellowship, Glorification
 //   3. A single recent witness, large, as evidence
 //   4. The chapter map
-//   5. Closing CTA — members → profile, visitors → onboarding
+//   5. The patron — the one line that names whose care this work is under
+//   6. Closing CTA — members → profile, visitors → onboarding
 //
 // Notes:
 //   - Vision owns the deeper exposition of the four pillars; Home
@@ -23,6 +24,7 @@ import { SignInModal } from '@/components/SignInModal';
 import { Icon } from '@/components/Icon';
 import { LanguageNote } from '@/components/LanguageNote';
 import { useLocale } from '@/i18n/LocaleProvider';
+import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
@@ -97,6 +99,18 @@ const copy = {
   mapHeading: {
     en: 'The chapter, on the land',
     es: 'El capítulo, en la tierra',
+  } satisfies Bilingual,
+
+  // ---------------------------------------------------------------------
+  // 5. The patron
+  // ---------------------------------------------------------------------
+  patronLine: {
+    en: 'A hired hand outside Madrid who went to Mass before the fields and prayed behind the plough. The chapter has placed its work under his care.',
+    es: 'Un jornalero de las afueras de Madrid que iba a Misa antes de los campos y rezaba tras el arado. El capítulo ha puesto su labor bajo su cuidado.',
+  } satisfies Bilingual,
+  patronMore: {
+    en: 'His life, and the prayer',
+    es: 'Su vida, y la oración',
   } satisfies Bilingual,
 };
 
@@ -290,7 +304,37 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 5. Closing CTA                                                   */}
+      {/* 5. The patron                                                     */}
+      {/*                                                                   */}
+      {/* Nothing else on the site says "this is a CATHOLIC land movement"  */}
+      {/* as immediately as Isidore does, and the page that carries him —   */}
+      {/* the retablo, the prayer — sat fifth in the nav with nothing       */}
+      {/* pointing at it. One line here; the dateline already counts down   */}
+      {/* to his feast.                                                     */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-prose py-16 text-center">
+        <p className="display-caps text-xs tracking-[0.3em] text-ocre">
+          {t(uiStrings.patron.feastDay).toUpperCase()}
+        </p>
+        <h2 className="mt-4 font-heading text-3xl text-mesquite">
+          {t(uiStrings.patron.heading)}
+        </h2>
+        <p className="prose-body mx-auto mt-4 max-w-md text-base italic leading-relaxed text-piedra">
+          {t(copy.patronLine)}
+        </p>
+        <Link
+          to={buildPath('santo', locale)}
+          className="mt-6 inline-block display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
+          style={{ textDecoration: 'none' }}
+        >
+          {t(copy.patronMore)} →
+        </Link>
+      </section>
+
+      <div className="rule container-prose" />
+
+      {/* ---------------------------------------------------------------- */}
+      {/* 6. Closing CTA                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose py-24 text-center">
         {user ? (

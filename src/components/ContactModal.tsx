@@ -21,9 +21,16 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Props = {
   open: boolean;
   onClose: () => void;
+  /**
+   * Seed the form when it opens. The parish map uses these to turn "no point
+   * of contact yet" into an offer the visitor can accept without composing a
+   * message from scratch.
+   */
+  defaultCategory?: Category;
+  defaultMessage?: string;
 };
 
-export const ContactModal = ({ open, onClose }: Props) => {
+export const ContactModal = ({ open, onClose, defaultCategory, defaultMessage }: Props) => {
   const { t, locale } = useLocale();
   const s = uiStrings.contact;
 
@@ -36,6 +43,14 @@ export const ContactModal = ({ open, onClose }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  // Seed the form each time it opens, so a second visit to a different parish
+  // doesn't carry the first one's message.
+  useEffect(() => {
+    if (!open) return;
+    if (defaultCategory) setCategory(defaultCategory);
+    if (defaultMessage) setMessage(defaultMessage);
+  }, [open, defaultCategory, defaultMessage]);
+
   // Lock page scroll while open so the centered modal stays in view.
   useEffect(() => {
     if (!open) return;
@@ -47,8 +62,8 @@ export const ContactModal = ({ open, onClose }: Props) => {
   if (!open) return null;
 
   const reset = () => {
-    setName(''); setEmail(''); setCategory('general');
-    setMessage(''); setWebsite(''); setError(null); setDone(false);
+    setName(''); setEmail(''); setCategory(defaultCategory ?? 'general');
+    setMessage(defaultMessage ?? ''); setWebsite(''); setError(null); setDone(false);
   };
 
   const close = () => {

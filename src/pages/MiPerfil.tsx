@@ -177,6 +177,16 @@ export default function MiPerfil() {
 
   const craftLabel = (slug: string) => craftName(slug, locale);
   const customSkills = profile.custom_skills ?? [];
+
+  // What's still blank on this profile. Order matters: the things that make a
+  // member findable by a neighbour come first.
+  const missing = [
+    { key: 'skills', have: expertise.length > 0 || customSkills.length > 0, label: uiStrings.profile.missingSkills },
+    { key: 'mark', have: hasIcon(profile.icon_slug), label: uiStrings.profile.missingMark },
+    { key: 'bio', have: !!profile.bio, label: uiStrings.profile.missingBio },
+    { key: 'building', have: !!profile.working_on, label: uiStrings.profile.missingBuilding },
+    { key: 'learning', have: !!profile.wants_to_learn, label: uiStrings.profile.missingLearning },
+  ].filter((f) => !f.have);
   const contribLabel = (slug: string) => CONTRIBUTION_LABELS[slug]?.[locale] ?? slug;
 
   const hasAnyRsvps = Object.values(hostedRsvps).some((rs) => rs.length > 0);
@@ -187,6 +197,32 @@ export default function MiPerfil() {
         {profile.status === 'pending' && (
           <div className="mb-8 rounded-sm border border-ocre/30 bg-ocre/5 p-4 font-serif text-sm italic text-mesquite/80">
             {t(uiStrings.auth.pendingNotice)}
+          </div>
+        )}
+
+        {/* The directory, the skills network and the map pins are all only as
+            good as the profiles behind them, and most of the roster was added
+            by a steward and never filled anything in. Nothing anywhere asked
+            them to. This asks — once, quietly, and only while something is
+            actually missing. */}
+        {missing.length > 0 && (
+          <div className="mb-8 border-l-2 border-ocre bg-ocre/[0.06] px-4 py-3">
+            <p className="font-serif text-sm leading-relaxed text-mesquite/90">
+              {t(uiStrings.profile.finishPrompt)}
+            </p>
+            <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              {missing.map((m) => (
+                <li key={m.key} className="font-serif text-xs italic text-piedra">
+                  — {t(m.label)}
+                </li>
+              ))}
+            </ul>
+            <Link
+              to={`${buildPath('bienvenido', locale)}?redo=1`}
+              className="mt-3 inline-block font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
+            >
+              {t(uiStrings.profile.finishCta)} →
+            </Link>
           </div>
         )}
 

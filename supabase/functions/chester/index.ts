@@ -11,10 +11,16 @@
 // prompt caching works):
 //   1. persona + rules (this file)
 //   2. chester_knowledge rows (stewards edit them in Mayordomo)  ← cache breakpoint
-//   3. today's date + upcoming gatherings, read through `gatherings_public`
+//   3. the year so far — what the chapter actually did, from month_summaries
+//   4. today's date + upcoming gatherings, read through `gatherings_public`
 //      AS THE ANON ROLE — so Chester can never see, and never leak, the exact
 //      address/time of an upcoming gathering. Same redaction a signed-out
 //      visitor gets.
+//
+// (3) matters more than it looks: Chester used to load upcoming gatherings
+// only, which for most of the year is one or two events. Asked "what has the
+// chapter done this year?" he had nothing to answer with, while the chapter's
+// whole record sat in month_summaries. Those recaps are already public.
 //
 // Public endpoint (verify_jwt = false). Abuse controls: message/size caps,
 // a per-IP hourly limit and a global daily cap, both counted from the
@@ -73,10 +79,11 @@ const PERSONA = `You are Chester, the guide for the website of the Central Texas
 
 Voice: warm, plain-spoken, a neighbor at a parish potluck rather than a customer-service bot. Confident about the chapter and the Church's teaching, never preachy or defensive. Brief by default — two or three short paragraphs at most for a chat window; use a short list only when listing things. Match the visitor's language: reply in Spanish when LANG is "es" or when they write in Spanish, otherwise English. Be at ease switching if they switch.
 
-What you know comes from the CHAPTER NOTES and the UPCOMING GATHERINGS below, plus your general knowledge of Catholic Social Teaching, distributism, and the history of the Catholic Land Movement. Rules:
+What you know comes from the CHAPTER NOTES, THE YEAR SO FAR, and the UPCOMING GATHERINGS below, plus your general knowledge of Catholic Social Teaching, distributism, and the history of the Catholic Land Movement. Rules:
 
 - Ground chapter facts (mission, leadership, gatherings, how to join) strictly in the notes. If the notes don't say, say you don't know and point to the contact form in the site footer or clmcentraltexas@gmail.com. Never invent a leader's name, a date, a place, or a policy.
-- For gatherings, use only the UPCOMING GATHERINGS list. It already hides exact times and addresses that are reserved for signed-in approved members; if asked for those, explain that members see them after signing in, and never guess.
+- For gatherings still to come, use only the UPCOMING GATHERINGS list. It already hides exact times and addresses that are reserved for signed-in approved members; if asked for those, explain that members see them after signing in, and never guess.
+- For what the chapter has already done, use THE YEAR SO FAR — the steward's own write-up of each month. Quote it gladly and name the month. These are past events, so there is no address or time to protect. If someone asks what a gathering is actually like, a sentence from a real recap answers better than a description. The full record lives at /witness (/testimonio).
 - When a question touches Catholic Social Teaching or distributism, connect it to the sources: name the document and paragraph (e.g. Rerum Novarum §46, Quadragesimo Anno §79) so the person can read the original. Quote briefly and accurately; if unsure of a paragraph number, name the document and the idea rather than fabricating a number.
 - Go beyond logistics when it fits: a question about workshops is also a chance, in one sentence, to say why the chapter does this — households becoming producers, neighbors teaching neighbors, work offered to God. Don't force it into every answer.
 - Point people to site pages with relative links: /workshops (/talleres), /participate (/participar), /vision, /resources (/recursos), /witness (/testimonio), /patron (/santo). Sign-in is the button in the header.
@@ -110,6 +117,41 @@ type Gathering = {
 const todayInChapterTz = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: CHAPTER_TZ, year: 'numeric', month: '2-digit', day: '2-digit' })
     .format(new Date());
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/**
+ * The chapter's year as it was lived: the steward-written recap of each month,
+ * newest first. Public rows, so this leaks nothing a visitor can't already read
+ * on the Witness page. Capped so the prompt stays bounded.
+ */
+async function loadYearSoFar(): Promise<string> {
+  const thisYear = Number(todayInChapterTz().slice(0, 4));
+  const { data, error } = await publicDb
+    .from('month_summaries')
+    .select('year, month, title, body')
+    .gte('year', thisYear - 1)
+    .order('year', { ascending: false })
+    .order('month', { ascending: false })
+    .limit(24);
+  if (error) {
+    console.error('month_summaries read failed:', error);
+    return '(could not load the chapter record right now)';
+  }
+  const rows = (data ?? []) as Array<{ year: number; month: number; title: string | null; body: string }>;
+  if (rows.length === 0) return '(no gatherings have been written up yet)';
+
+  return rows
+    .map((r) => {
+      const when = `${MONTH_NAMES[r.month] ?? ''} ${r.year}`.trim();
+      const head = r.title ? `${when} — ${r.title}` : when;
+      return `## ${head}\n${r.body}`;
+    })
+    .join('\n\n');
+}
 
 async function loadGatherings(): Promise<string> {
   const today = todayInChapterTz();
@@ -216,7 +258,11 @@ Deno.serve(async (req: Request) => {
   const limited = await overLimit(ipHash);
   if (limited) return json({ error: limited }, 429);
 
-  const [knowledge, gatherings] = await Promise.all([loadKnowledge(), loadGatherings()]);
+  const [knowledge, yearSoFar, gatherings] = await Promise.all([
+    loadKnowledge(),
+    loadYearSoFar(),
+    loadGatherings(),
+  ]);
   const todayLine = new Date().toLocaleDateString('en-US', {
     timeZone: CHAPTER_TZ, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   });
@@ -233,35 +279,83 @@ Deno.serve(async (req: Request) => {
     async start(controller) {
       const send = (obj: unknown) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
       let answer = '';
-      try {
-        const run = client.beta.messages.stream({
-          model: MODEL,
-          max_tokens: MAX_OUTPUT_TOKENS,
-          // Chat Q&A: adaptive thinking at medium effort keeps answers quick
-          // and cheap while still reasoning through CST questions.
-          thinking: { type: 'adaptive' },
-          output_config: { effort: 'medium' },
-          // Server-side fallback: if a safety classifier declines, re-run on
-          // the default fallback model inside the same call instead of
-          // leaving the visitor with nothing.
-          betas: ['server-side-fallback-2026-07-01'],
-          fallbacks: 'default',
-          system: [
-            // Stable prefix — persona + steward notes — cached for an hour.
-            { type: 'text', text: `${PERSONA}\n\n# CHAPTER NOTES\n\n${knowledge}`, cache_control: { type: 'ephemeral', ttl: '1h' } },
-            // Volatile tail — changes daily / whenever gatherings change.
-            { type: 'text', text: `# TODAY\n\n${todayLine} (Central Time). LANG: ${lang}\n\n# UPCOMING GATHERINGS\n\n${gatherings}` },
-          ],
-          messages,
-        });
 
+      // Request shape, split out so it can be retried without the optional
+      // extras. `fallbacks` + its beta are a resilience feature, not the point
+      // of the call: if the account can't use them the whole request 400s and
+      // Chester goes silent sitewide, which is a worse failure than losing the
+      // refusal rescue. Built once, sent twice at most.
+      const base = {
+        model: MODEL,
+        max_tokens: MAX_OUTPUT_TOKENS,
+        // Chat Q&A: adaptive thinking at medium effort keeps answers quick
+        // and cheap while still reasoning through CST questions.
+        thinking: { type: 'adaptive' as const },
+        output_config: { effort: 'medium' as const },
+        system: [
+          // Stable prefix — persona + steward notes — cached for an hour.
+          // The record changes about once a month, so it rides in the
+          // cached prefix with the persona, not the volatile tail.
+          {
+            type: 'text' as const,
+            text:
+              `${PERSONA}
+
+# CHAPTER NOTES
+
+${knowledge}
+
+# THE YEAR SO FAR — WHAT THE CHAPTER HAS ACTUALLY DONE
+
+${yearSoFar}`,
+            cache_control: { type: 'ephemeral' as const, ttl: '1h' as const },
+          },
+          // Volatile tail — changes daily / whenever gatherings change.
+          { type: 'text' as const, text: `# TODAY
+
+${todayLine} (Central Time). LANG: ${lang}
+
+# UPCOMING GATHERINGS
+
+${gatherings}` },
+        ],
+        messages,
+      };
+
+      // One attempt: stream it through to the caller and hand back the final
+      // message. Returns only after the stream is fully consumed.
+      type Params = Parameters<typeof client.beta.messages.stream>[0];
+      const attempt = async (params: Params) => {
+        const run = client.beta.messages.stream(params);
         for await (const event of run) {
           if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
             answer += event.delta.text;
             send({ text: event.delta.text });
           }
         }
-        const final = await run.finalMessage();
+        return await run.finalMessage();
+      };
+
+      try {
+        let final;
+        try {
+          // Server-side fallback: if a safety classifier declines, re-run on
+          // the default fallback model inside the same call instead of
+          // leaving the visitor with nothing.
+          final = await attempt({
+            ...base,
+            betas: ['server-side-fallback-2026-07-01'],
+            fallbacks: 'default',
+          });
+        } catch (first) {
+          // Retry only on a rejected request that produced nothing: a 400 is
+          // raised before any tokens, so a second send can't duplicate output.
+          // `answer` is the guard — if anything reached the visitor, rethrow.
+          if (!(first instanceof Anthropic.BadRequestError) || answer !== '') throw first;
+          console.error('chester: retrying without server-side fallback:', first);
+          final = await attempt(base);
+        }
+
         if (final.stop_reason === 'refusal') {
           const note = lang === 'es'
             ? 'Lo siento, no puedo ayudar con eso. ¿Hay algo sobre el capítulo en lo que pueda ayudarte?'
