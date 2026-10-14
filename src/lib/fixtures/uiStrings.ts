@@ -249,7 +249,8 @@ export const uiStrings = {
                       es: 'Tu perfil espera aprobación.' },
   },
   witness: {
-    eyebrow:   { en: 'OUR WITNESS · A.D. 2026',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR 2026' },
+    // The year is appended by the page — the wheel can show more than 2026 now.
+    eyebrow:   { en: 'OUR WITNESS · A.D.',       es: 'EL TESTIMONIO · AÑO DEL SEÑOR' },
     heading:   { en: 'Our year, in the making', es: 'El año, tal como el capítulo lo ha vivido' },
     // Says what the page IS. The old subhead was an instruction in lowercase
     // ("click any liturgical wedge..."); that work now happens next to the
@@ -257,6 +258,13 @@ export const uiStrings = {
     subhead:   { en: 'Twelve months, the feasts we keep, and what the chapter did in each.',
                  es: 'Doce meses, las fiestas que guardamos, y lo que el capítulo hizo en cada uno.' },
     yearSoFar: { en: 'THE YEAR SO FAR', es: 'EL AÑO HASTA AHORA' },
+    yearComplete: { en: 'THE YEAR', es: 'EL AÑO' },
+    prevYear: { en: 'Previous year', es: 'Año anterior' },
+    nextYear: { en: 'Next year', es: 'Año siguiente' },
+    notYet:   { en: 'still to come', es: 'aún por venir' },
+    // Hedged on purpose: the host total is entered by a steward while the names
+    // come from witness posts, so the list is illustrative, not exhaustive.
+    including: { en: 'including', es: 'entre ellos' },
     pickMonth: { en: 'Choose a month — the wheel fills in as the year is lived.',
                  es: 'Elige un mes — la rueda se llena conforme se vive el año.' },
     statGatherings:  { en: 'gatherings',  es: 'reuniones' },

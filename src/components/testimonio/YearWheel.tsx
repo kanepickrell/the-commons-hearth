@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { Locale, WitnessPost } from '@/lib/types';
-import { iconMap } from '@/lib/icons';
+import { iconMap, hasIcon } from '@/lib/icons';
 import { feasts } from '@/lib/fixtures/feasts';
 import { seasonMeta } from '@/lib/fixtures/seasons';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
@@ -27,8 +27,29 @@ type Props = {
    * post yet, and those months should still read as lived-in.
    */
   activeMonths?: ReadonlySet<number>;
+  /**
+   * Craft per month taken from the gatherings themselves, used when a month
+   * has no witness post to supply one. The chapter records gatherings long
+   * before anyone writes a witness post, so without this the rim sits empty
+   * through a year that was in fact fully lived.
+   */
+  craftByMonth?: Readonly<Record<number, string>>;
   /** Today, in chapter time. Marked on the rim when it falls inside `year`. */
   today?: Date;
+  /**
+   * Last month that may be selected. Months after it haven't happened yet, so
+   * they render as bare outlines and refuse clicks and focus. -1 disables the
+   * whole year (a year entirely in the future).
+   */
+  maxMonth?: number;
+  /**
+   * Multiplier for every text size in the wheel. The SVG scales with its
+   * container, so a wheel rendered at half width halves its type too and the
+   * month labels become specks. The Witness page shrinks the wheel as you
+   * scroll and passes the inverse ratio here, keeping the labels at a constant
+   * on-screen size while the drawing itself gets smaller.
+   */
+  textScale?: number;
 };
 
 /**
@@ -52,8 +73,25 @@ export const YearWheel = ({
   onSelectMonth,
   locale,
   activeMonths,
+  craftByMonth,
   today,
+  maxMonth = 11,
+  textScale = 1,
 }: Props) => {
+  // Clamped: past roughly double, labels start crowding the rim.
+  const ts = Math.min(Math.max(textScale, 1), 1.9);
+  // Month labels sit outside the drawing and can counter-scale freely. The hub
+  // text cannot — it is bounded by a circle that shrinks with everything else,
+  // and at full counter-scale "ORDINARY TIME" spills across the wedges.
+  //
+  // So as the wheel becomes a dial rather than a diagram, the hub sheds what it
+  // doesn't need: the season line and the year fade out, and the month name's
+  // counter-scaling is damped so a long name ("Septiembre") still fits. Both are
+  // continuous functions of `ts` rather than threshold switches — a switch makes
+  // the text pop mid-scroll.
+  const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+  const hubDetailOpacity = clamp01((1.3 - ts) / 0.2);
+  const monthDamping = 1 - 0.38 * clamp01((ts - 1) / 0.6);
   const postsByMonth = useMemo(() => {
     const map: Record<number, WitnessPost[]> = {};
     for (const p of posts) {
@@ -122,46 +160,68 @@ export const YearWheel = ({
         const endA = startA + WHEEL.WEDGE_ANGLE;
         const isSelected = i === selectedMonth;
         const lived = isLived(i);
+        const future = i > maxMonth;
 
         // A month the chapter met in carries a visible wash; a quiet month is
-        // nearly bare. The year fills in as it is lived, which is the whole
-        // promise of the page.
-        const fill = isSelected
-          ? 'rgba(198,139,62,0.16)'
-          : lived
-            ? 'rgba(62,79,47,0.09)'
-            : 'rgba(62,79,47,0.025)';
+        // nearly bare; a month that hasn't happened yet is left empty. The year
+        // fills in as it is lived, which is the whole promise of the page.
+        const fill = future
+          ? 'transparent'
+          : isSelected
+            ? 'rgba(198,139,62,0.16)'
+            : lived
+              ? 'rgba(62,79,47,0.14)'
+              : 'rgba(62,79,47,0.03)';
+
+        // Step to the nearest selectable month in a direction, skipping the
+        // ones that haven't happened and wrapping within what's available.
+        const step = (delta: number) => {
+          const last = Math.min(maxMonth, 11);
+          if (last < 0) return;
+          const next = i + delta;
+          onSelectMonth(next < 0 ? last : next > last ? 0 : next);
+        };
 
         return (
           <path
             key={`month-${i}`}
-            className="wheel-month"
+            className={future ? undefined : 'wheel-month'}
             d={arcPath(WHEEL.CX, WHEEL.CY, WHEEL.R_MONTH_OUTER, WHEEL.R_MONTH_INNER, startA, endA)}
             fill={fill}
-            stroke="rgba(62,79,47,0.18)"
+            stroke={future ? 'rgba(62,79,47,0.10)' : 'rgba(62,79,47,0.18)'}
             strokeWidth={0.5}
-            role="button"
-            tabIndex={0}
-            aria-pressed={isSelected}
+            strokeDasharray={future ? '2,3' : undefined}
+            role={future ? undefined : 'button'}
+            tabIndex={future ? undefined : 0}
+            aria-disabled={future || undefined}
+            aria-pressed={future ? undefined : isSelected}
             aria-label={`${monthNames[i]} ${year}`}
-            style={{ cursor: 'pointer' }}
-            onClick={() => onSelectMonth(i)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onSelectMonth(i);
-              }
-              if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                e.preventDefault();
-                onSelectMonth((i + 1) % 12);
-              }
-              if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                e.preventDefault();
-                onSelectMonth((i + 11) % 12);
-              }
-            }}
+            style={{ cursor: future ? 'default' : 'pointer' }}
+            onClick={future ? undefined : () => onSelectMonth(i)}
+            onKeyDown={
+              future
+                ? undefined
+                : (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelectMonth(i);
+                    }
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      step(1);
+                    }
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      step(-1);
+                    }
+                  }
+            }
           >
-            <title>{`${monthNames[i]} · ${seasonMeta[dominantSeasonOfMonth(year, i)].label[locale]}`}</title>
+            <title>
+              {future
+                ? monthNames[i]
+                : `${monthNames[i]} · ${seasonMeta[dominantSeasonOfMonth(year, i)].label[locale]}`}
+            </title>
           </path>
         );
       })}
@@ -197,10 +257,10 @@ export const YearWheel = ({
             textAnchor="middle"
             dominantBaseline="middle"
             fontFamily="'Marcellus SC', Georgia, serif"
-            fontSize={9.5}
+            fontSize={9.5 * ts}
             letterSpacing="0.12em"
             fill={isSelected ? 'hsl(32 56% 51%)' : 'hsl(92 24% 25%)'}
-            opacity={isSelected ? 1 : 0.65}
+            opacity={isSelected ? 1 : i > maxMonth ? 0.28 : 0.65}
             pointerEvents="none"
           >
             {shortNames[i].toUpperCase()}
@@ -213,13 +273,15 @@ export const YearWheel = ({
       {/* ---------------------------------------------------------------- */}
       {Array.from({ length: 12 }, (_, i) => {
         const ps = postsByMonth[i] || [];
-        if (ps.length === 0) return null;
         const primary = ps[0];
-        const glyph = iconMap[primary.iconSlug]?.svg;
+        // A witness post's craft wins; otherwise fall back to the craft of the
+        // month's gathering.
+        const slug = primary?.iconSlug ?? craftByMonth?.[i];
+        const glyph = slug && hasIcon(slug) ? iconMap[slug].svg : undefined;
         if (!glyph) return null;
         const angle = i * WHEEL.WEDGE_ANGLE + WHEEL.WEDGE_ANGLE / 2;
         const pos = polar(WHEEL.CX, WHEEL.CY, WHEEL.R_FRUITS, angle);
-        const isPlanned = primary.planned === true;
+        const isPlanned = primary?.planned === true;
         const countPos = polar(WHEEL.CX, WHEEL.CY, WHEEL.R_FRUITS - 21, angle);
         return (
           <g key={`fruit-${i}`} pointerEvents="none" opacity={isPlanned ? 0.35 : 1}>
@@ -343,39 +405,45 @@ export const YearWheel = ({
         stroke="rgba(62,79,47,0.25)"
         strokeWidth={0.5}
       />
+      {hubDetailOpacity > 0 && (
+        <text
+          x={WHEEL.CX}
+          y={WHEEL.CY - 15}
+          textAnchor="middle"
+          fontFamily="'Marcellus SC', Georgia, serif"
+          fontSize={8 * ts}
+          letterSpacing="0.16em"
+          opacity={hubDetailOpacity}
+          fill={SEASON_COLOR[selectedSeason].ink}
+        >
+          {selectedSeasonLabel.toUpperCase()}
+        </text>
+      )}
       <text
         x={WHEEL.CX}
-        y={WHEEL.CY - 15}
-        textAnchor="middle"
-        fontFamily="'Marcellus SC', Georgia, serif"
-        fontSize={8}
-        letterSpacing="0.16em"
-        fill={SEASON_COLOR[selectedSeason].ink}
-      >
-        {selectedSeasonLabel.toUpperCase()}
-      </text>
-      <text
-        x={WHEEL.CX}
-        y={WHEEL.CY + 7}
+        y={WHEEL.CY + 7 + 2 * (1 - hubDetailOpacity)}
         textAnchor="middle"
         fontFamily="'EB Garamond', Georgia, serif"
-        fontSize={22}
+        fontSize={22 * ts * monthDamping}
         fontStyle="italic"
         fill="hsl(92 24% 25%)"
       >
         {monthNames[selectedMonth]}
       </text>
-      <text
-        x={WHEEL.CX}
-        y={WHEEL.CY + 27}
-        textAnchor="middle"
-        fontFamily="'Marcellus SC', Georgia, serif"
-        fontSize={9}
-        letterSpacing="0.2em"
-        fill="hsl(218 17% 35%)"
-      >
-        {year}
-      </text>
+      {hubDetailOpacity > 0 && (
+        <text
+          x={WHEEL.CX}
+          y={WHEEL.CY + 27}
+          textAnchor="middle"
+          fontFamily="'Marcellus SC', Georgia, serif"
+          fontSize={9 * ts}
+          letterSpacing="0.2em"
+          opacity={hubDetailOpacity}
+          fill="hsl(218 17% 35%)"
+        >
+          {year}
+        </text>
+      )}
     </svg>
   );
 };

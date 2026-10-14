@@ -14,7 +14,7 @@ function builder(table: string) {
   const result = { data: rows[table] ?? [], error: null };
   const b: Record<string, unknown> = {};
   const chain = () => b;
-  for (const m of ['select', 'eq', 'in', 'gte', 'lt', 'gt', 'not', 'order', 'limit', 'insert', 'update', 'delete']) {
+  for (const m of ['select', 'eq', 'in', 'gte', 'lte', 'lt', 'gt', 'not', 'order', 'limit', 'insert', 'update', 'delete']) {
     b[m] = chain;
   }
   b.maybeSingle = () => Promise.resolve({ data: (rows[table] ?? [])[0] ?? null, error: null });
@@ -73,6 +73,57 @@ describe('app renders', () => {
   it('witness page with the year wheel', async () => {
     visit('/witness');
     await waitFor(() => expect(screen.getByText(/No witness posts yet/)).toBeInTheDocument());
+  });
+
+  it('witness year figures carry their human evidence', async () => {
+    // Sourced from gatherings, not witness posts: the chapter records
+    // gatherings continuously and has written no witness posts at all, so
+    // witness-sourced evidence would render empty forever.
+    rows.gatherings_public = [
+      { craft: 'las-abejas', host_name: 'Ana M.', event_date: '2026-04-12' },
+      { craft: 'el-pan', host_name: 'Thomas R.', event_date: '2026-05-02' },
+      // Repeat host and craft — both lists must de-duplicate.
+      { craft: 'el-pan', host_name: 'Ana M.', event_date: '2026-06-02' },
+    ];
+    rows.month_metrics = [
+      { month: 3, gatherings: 2, neighbors: 11, hosts: 1 },
+      { month: 4, gatherings: 1, neighbors: 7, hosts: 2 },
+    ];
+    // Two parishes have members; the empty one must not be counted.
+    rows.parish_member_counts = [
+      { parish_id: 'p1', member_count: 5 },
+      { parish_id: 'p2', member_count: 2 },
+      { parish_id: 'p3', member_count: 0 },
+    ];
+
+    visit('/witness');
+
+    // The hosts figure resolves to the people behind it, hedged as "including"
+    // because the total is steward-entered and runs ahead of the gatherings.
+    await waitFor(() => expect(screen.getByText(/including/)).toBeInTheDocument());
+    expect(screen.getByText(/Ana M\./)).toBeInTheDocument();
+    // The neighbours figure resolves to how far the households are spread.
+    expect(screen.getByText('in 2 parishes')).toBeInTheDocument();
+    // And the gatherings figure to what was actually made.
+    expect(screen.getAllByRole('img', { name: /bee/i }).length).toBeGreaterThan(0);
+  });
+
+  it('witness wheel refuses months that have not happened yet', async () => {
+    rows.month_metrics = [{ month: 0, gatherings: 1, neighbors: 4, hosts: 1 }];
+    visit('/witness');
+
+    await waitFor(() => expect(screen.getByLabelText('January 2026')).toBeInTheDocument());
+
+    const now = new Date();
+    const thisMonth = now.getFullYear() === 2026 ? now.getMonth() : 11;
+    // Every month up to the present is a real control...
+    expect(screen.getByLabelText(`January 2026`)).toHaveAttribute('role', 'button');
+    // ...and December of a year still in progress is not.
+    if (thisMonth < 11) {
+      const future = screen.getByLabelText('December 2026');
+      expect(future).toHaveAttribute('aria-disabled', 'true');
+      expect(future).not.toHaveAttribute('role', 'button');
+    }
   });
 
   it('member page for a signed-out visitor', async () => {
