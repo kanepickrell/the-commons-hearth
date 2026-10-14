@@ -10,12 +10,20 @@ vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_test');
 
 // A chainable query builder that resolves to canned rows per relation.
 const rows: Record<string, unknown[]> = {};
+// Writes the app makes, so a test can assert what actually reached the DB.
+const writes: { table: string; op: string; payload: unknown }[] = [];
 function builder(table: string) {
   const result = { data: rows[table] ?? [], error: null };
   const b: Record<string, unknown> = {};
   const chain = () => b;
-  for (const m of ['select', 'eq', 'in', 'gte', 'lte', 'lt', 'gt', 'not', 'order', 'limit', 'insert', 'update', 'delete']) {
+  for (const m of ['select', 'eq', 'in', 'gte', 'lte', 'lt', 'gt', 'not', 'order', 'limit', 'delete']) {
     b[m] = chain;
+  }
+  for (const m of ['insert', 'update']) {
+    b[m] = (payload: unknown) => {
+      writes.push({ table, op: m, payload });
+      return b;
+    };
   }
   b.maybeSingle = () => Promise.resolve({ data: (rows[table] ?? [])[0] ?? null, error: null });
   b.then = (res: (v: unknown) => unknown) => Promise.resolve(result).then(res);
@@ -46,6 +54,7 @@ const visit = (path: string) => {
 
 beforeEach(() => {
   for (const k of Object.keys(rows)) delete rows[k];
+  writes.length = 0;
   window.localStorage.clear();
 });
 

@@ -82,6 +82,11 @@ export const uiStrings = {
       en: 'One thing you want a teacher for — today, not someday.',
       es: 'Una cosa para la que quieres un maestro — hoy, no algún día.',
     },
+    markLabel: { en: 'YOUR MARK', es: 'TU SEÑAL' },
+    markHelp: {
+      en: 'The drawing that stands for you on your page and on the chapter map.',
+      es: 'El dibujo que te representa en tu página y en el mapa del capítulo.',
+    },
     q3:     { en: 'Where do you worship?', es: '¿Dónde adoras?' },
     q3Help: { en: 'Your parish — this is how we find your neighbors.', es: 'Tu parroquia — así es como encontramos a tus vecinos.' },
     qCraftsHeading: { en: 'Your crafts', es: 'Tus oficios' },

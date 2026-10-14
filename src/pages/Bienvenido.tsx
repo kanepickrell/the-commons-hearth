@@ -29,7 +29,9 @@ import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
 import { Icon } from '@/components/Icon';
 import type { Database, CraftSlug } from '@/lib/database.types';
-import { ILLUSTRATED_CRAFTS, SIGNUP_MORE_CRAFTS } from '@/lib/crafts';
+import type { IconSlug } from '@/lib/types';
+import { ILLUSTRATED_CRAFTS, SIGNUP_MORE_CRAFTS, markableCrafts, resolveMark } from '@/lib/crafts';
+import { hasIcon } from '@/lib/icons';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
 
@@ -63,6 +65,10 @@ export default function Bienvenido() {
   const [workingOn, setWorkingOn] = useState('');
   const [wantsToLearn, setWantsToLearn] = useState('');
   const [crafts, setCrafts] = useState<Set<CraftSlug>>(new Set());
+  // The member's profile mark — the craft drawn at 120px on their page and on
+  // their map pin. Stored as profiles.icon_slug, which nothing in the app used
+  // to write, so every member page rendered a blank where the artwork goes.
+  const [mark, setMark] = useState<IconSlug | null>(null);
   const [customSkills, setCustomSkills] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState('');
   const [saving, setSaving] = useState(false);
@@ -94,6 +100,9 @@ export default function Bienvenido() {
       if (profile.working_on) setWorkingOn(profile.working_on);
       if (profile.wants_to_learn) setWantsToLearn(profile.wants_to_learn);
       if (profile.custom_skills?.length) setCustomSkills(profile.custom_skills);
+      // icon_slug is a craft_slug, which is wider than the eight with artwork.
+      // Ignore a stored value we can't draw rather than render a blank.
+      if (hasIcon(profile.icon_slug)) setMark(profile.icon_slug);
     }
   }, [profile]);
 
@@ -161,6 +170,13 @@ export default function Bienvenido() {
     setParishOpen(false);
   };
 
+  // Only an illustrated craft can be a mark, and only one the member claims.
+  // See resolveMark in lib/crafts.ts for the rule.
+  const markable = markableCrafts(crafts);
+  useEffect(() => {
+    setMark((current) => resolveMark(current, crafts));
+  }, [markable.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const toggleCraft = (slug: CraftSlug) => {
     setCrafts((prev) => {
       const next = new Set(prev);
@@ -201,6 +217,7 @@ export default function Bienvenido() {
           working_on: trimmedWorking || null,
           wants_to_learn: trimmedLearning || null,
           custom_skills: customSkills,
+          icon_slug: mark,
         })
         .eq('id', user.id);
 
@@ -544,6 +561,46 @@ export default function Bienvenido() {
                 );
               })}
             </div>
+
+            {/* The profile mark. Shown only once there's something to choose:
+                it's the craft drawn at 120px on the member's page and on their
+                map pin, so the member should see which one it will be rather
+                than have it picked silently. */}
+            {markable.length > 0 && (
+              <div className="mb-10 border-y border-mesquite/10 py-5">
+                <p className="display-caps mb-3 text-[11px] tracking-[0.2em] text-mesquite/50">
+                  {t(s.markLabel)}
+                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  {markable.map((slug) => {
+                    const chosen = slug === mark;
+                    return (
+                      <button
+                        key={slug}
+                        type="button"
+                        onClick={() => setMark(slug)}
+                        aria-pressed={chosen}
+                        className={`flex items-center gap-2 rounded-sm border px-3 py-2 transition ${
+                          chosen
+                            ? 'border-ocre bg-ocre/10 text-mesquite'
+                            : 'border-mesquite/15 bg-cal/40 text-mesquite/60 hover:border-mesquite/40 hover:text-mesquite'
+                        }`}
+                      >
+                        <Icon slug={slug} size={28} locale={locale} />
+                        <span className="font-heading text-sm leading-tight">
+                          {locale === 'es'
+                            ? ILLUSTRATED_CRAFTS.find((c) => c.slug === slug)!.es
+                            : ILLUSTRATED_CRAFTS.find((c) => c.slug === slug)!.en}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 font-serif text-xs italic text-piedra/80">
+                  {t(s.markHelp)}
+                </p>
+              </div>
+            )}
 
             {/* More crafts — text tags, no artwork. Same expertise pipeline. */}
             <div className="mb-8">

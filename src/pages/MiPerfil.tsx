@@ -18,6 +18,8 @@ import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
 import type { Database } from '@/lib/database.types';
 import { craftLabel as craftName } from '@/lib/crafts';
+import { Icon } from '@/components/Icon';
+import { hasIcon } from '@/lib/icons';
 import { formatDate } from '@/lib/dates';
 
 type Parish = Database['public']['Tables']['parishes']['Row'];
@@ -192,9 +194,16 @@ export default function MiPerfil() {
           {t({ en: 'MY PROFILE', es: 'MI PERFIL' })}
         </p>
 
-        <h1 className="mb-2 font-heading text-4xl text-mesquite md:text-5xl">
-          {profile.display_name ?? user?.email}
-        </h1>
+        <div className="mb-2 flex items-center gap-4">
+          {/* The member's mark, the same drawing their public page shows at
+              120px. Chosen during onboarding; blank until they pick one. */}
+          {hasIcon(profile.icon_slug) && (
+            <Icon slug={profile.icon_slug} size={56} locale={locale} />
+          )}
+          <h1 className="font-heading text-4xl text-mesquite md:text-5xl">
+            {profile.display_name ?? user?.email}
+          </h1>
+        </div>
 
         {parish && (
           <p className="mb-10 font-serif text-lg italic text-mesquite/70">

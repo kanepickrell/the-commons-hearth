@@ -169,3 +169,34 @@ describe('liturgical calendar', async () => {
     expect(L.daysBetween(L.civil(2026, 2, 7), L.civil(2026, 2, 9))).toBe(2);
   });
 });
+
+describe('profile mark', async () => {
+  const { markableCrafts, resolveMark } = await import('@/lib/crafts');
+
+  it('offers only claimed crafts that have artwork', () => {
+    // el-huerto and la-escuela are real crafts with no drawing.
+    expect(markableCrafts(['el-huerto', 'las-abejas', 'la-escuela', 'el-pan'])).toEqual([
+      'las-abejas',
+      'el-pan',
+    ]);
+    expect(markableCrafts(['el-huerto', 'la-escuela'])).toEqual([]);
+  });
+
+  it('orders candidates canonically, not by click order', () => {
+    // Same two crafts claimed in the opposite order give the same answer, so a
+    // redo of onboarding doesn't silently move someone's mark.
+    expect(markableCrafts(['el-pan', 'las-abejas'])).toEqual(
+      markableCrafts(['las-abejas', 'el-pan'])
+    );
+  });
+
+  it('holds a valid mark and replaces one that was dropped', () => {
+    expect(resolveMark('el-pan', ['las-abejas', 'el-pan'])).toBe('el-pan');
+    // Deselecting el-pan falls back to the first remaining markable craft.
+    expect(resolveMark('el-pan', ['las-abejas'])).toBe('las-abejas');
+    // Claiming nothing drawable leaves the member without a mark.
+    expect(resolveMark('el-pan', ['el-huerto'])).toBeNull();
+    expect(resolveMark(null, ['la-conserva'])).toBe('la-conserva');
+    expect(resolveMark(null, [])).toBeNull();
+  });
+});

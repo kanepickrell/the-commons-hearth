@@ -52,6 +52,31 @@ export const CRAFT_NAMES: Record<CraftSlug, Bilingual> = Object.fromEntries(
   [...ILLUSTRATED_CRAFTS, ...MORE_CRAFTS].map((c) => [c.slug, { en: c.en, es: c.es }])
 ) as Record<CraftSlug, Bilingual>;
 
+/**
+ * The crafts a member claims that actually have artwork, in the canonical
+ * display order of ILLUSTRATED_CRAFTS — the candidates for their profile mark.
+ * Order comes from the list, not from the order they were clicked, so the
+ * choice is stable across a redo of onboarding.
+ */
+export const markableCrafts = (claimed: Iterable<CraftSlug>): IconSlug[] => {
+  const set = new Set(claimed);
+  return ILLUSTRATED_CRAFTS.filter((c) => set.has(c.slug)).map((c) => c.slug);
+};
+
+/**
+ * Keep a profile mark valid as the claimed crafts change: hold the current one
+ * while it's still claimed, otherwise fall back to the first markable craft,
+ * and return null when the member claims nothing we can draw.
+ */
+export const resolveMark = (
+  current: IconSlug | null | undefined,
+  claimed: Iterable<CraftSlug>
+): IconSlug | null => {
+  const options = markableCrafts(claimed);
+  if (current && options.includes(current)) return current;
+  return options[0] ?? null;
+};
+
 /** Friendly label for a craft slug; falls back to the raw slug for unknown values. */
 export const craftLabel = (slug: string, locale: 'en' | 'es'): string =>
   (CRAFT_NAMES as Record<string, Bilingual | undefined>)[slug]?.[locale] ?? slug;
