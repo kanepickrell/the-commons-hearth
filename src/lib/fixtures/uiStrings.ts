@@ -257,6 +257,9 @@ export const uiStrings = {
     subhead:   { en: 'Twelve months, the feasts we keep, and what the chapter did in each.',
                  es: 'Doce meses, las fiestas que guardamos, y lo que el capítulo hizo en cada uno.' },
     yearSoFar: { en: 'THE YEAR SO FAR', es: 'EL AÑO HASTA AHORA' },
+    // Hedged on purpose: the host total is entered by a steward while the names
+    // come from witness posts, so the list is illustrative, not exhaustive.
+    including: { en: 'including', es: 'entre ellos' },
     pickMonth: { en: 'Choose a month — the wheel fills in as the year is lived.',
                  es: 'Elige un mes — la rueda se llena conforme se vive el año.' },
     statGatherings:  { en: 'gatherings',  es: 'reuniones' },

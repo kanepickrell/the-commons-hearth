@@ -25,6 +25,10 @@ import { supabase } from '@/lib/supabase';
 import type { WitnessPost, IconSlug, Bilingual } from '@/lib/types';
 import { MonthDetail } from '@/components/testimonio/MonthDetail';
 import { chapterToday } from '@/lib/dates';
+import { Icon } from '@/components/Icon';
+import { hasIcon } from '@/lib/icons';
+import { useScrollShrink } from '@/hooks/useScrollShrink';
+import type { ReactNode } from 'react';
 
 // What comes back from the `witness_public` view — approved posts only, flat
 // columns, single-language body, plus the author's display name.
@@ -123,6 +127,23 @@ const Testimonio = () => {
     })();
   }, []);
 
+  // How many parishes those neighbours are spread across. `parish_member_counts`
+  // is the anon-safe view the map already reads — totals only, no identities.
+  const [parishCount, setParishCount] = useState(0);
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('parish_member_counts')
+        .select('parish_id, member_count');
+      if (error) {
+        console.error('metrics: parishes', error);
+        return;
+      }
+      const rows = (data ?? []) as Array<{ member_count: number | null }>;
+      setParishCount(rows.filter((r) => (r.member_count ?? 0) > 0).length);
+    })();
+  }, []);
+
   // Only this year's posts belong on this year's wheel; a 2025 post would
   // otherwise land in its month slot as if it happened in 2026.
   const postsByMonth = useMemo(() => {
@@ -169,6 +190,52 @@ const Testimonio = () => {
     return { gatherings, hosts };
   }, [monthTotals]);
 
+  // ---------------------------------------------------------------------
+  // Evidence behind the year's three figures.
+  //
+  // "40 neighbours" is an abstraction; the chapter is households. Each figure
+  // carries the human fact underneath it: what was actually made, who actually
+  // opened their home, how far across the diocese those households sit.
+  //
+  // These are illustrative, never a restatement of the counts — the gathering
+  // and host totals are entered by a steward (month_metrics) while the names
+  // and crafts come from witness posts, so the two will not always agree. The
+  // copy says "including" for that reason, and every strip hides itself when
+  // it has nothing honest to show.
+  // ---------------------------------------------------------------------
+  const yearPosts = useMemo(
+    () => posts.filter((p) => new Date(p.date).getFullYear() === WHEEL_YEAR),
+    [posts]
+  );
+
+  const yearCrafts = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const p of yearPosts) {
+      if (hasIcon(p.iconSlug) && !seen.has(p.iconSlug)) {
+        seen.add(p.iconSlug);
+        out.push(p.iconSlug);
+      }
+    }
+    return out;
+  }, [yearPosts]);
+
+  const yearHosts = useMemo(() => {
+    const seen = new Set<string>();
+    for (const p of yearPosts) if (p.hostName) seen.add(p.hostName);
+    return [...seen];
+  }, [yearPosts]);
+
+  // The wheel pins and compacts as the reader moves toward the gatherings, so
+  // the page hands off from "the year" to "this month" without a lurch.
+  const { ref: wheelTrackRef, progress } = useScrollShrink();
+  const WHEEL_FULL = 380;
+  const WHEEL_COMPACT = 215;
+  const wheelScale = (WHEEL_FULL - (WHEEL_FULL - WHEEL_COMPACT) * progress) / WHEEL_FULL;
+  // Counter-scale the wheel's type so the month names stay the same size on
+  // screen as the drawing shrinks, instead of dwindling into specks.
+  const wheelTextScale = 1 / wheelScale;
+
   // Months the chapter actually met in — a recorded gathering counts even with
   // no witness post written yet. The wheel tints these so the year visibly
   // fills in.
@@ -210,32 +277,108 @@ const Testimonio = () => {
                 {t(s.yearSoFar)}
               </p>
               <dl className="grid grid-cols-3 border-y border-mesquite/15">
-                <YearStat n={yearTotals.gatherings} label={t(s.statGatherings)} />
-                <YearStat n={yearTotals.hosts} label={t(s.statHosts)} divided />
-                <YearStat n={neighbors} label={t(s.statNeighbors)} divided />
+                <YearStat
+                  n={yearTotals.gatherings}
+                  label={t(s.statGatherings)}
+                  evidence={
+                    yearCrafts.length > 0 && (
+                      <span className="mt-2 flex flex-wrap items-center justify-center gap-1.5 text-mesquite/70">
+                        {yearCrafts.slice(0, 6).map((c) => (
+                          <Icon key={c} slug={c} size={20} locale={locale} />
+                        ))}
+                      </span>
+                    )
+                  }
+                />
+                <YearStat
+                  n={yearTotals.hosts}
+                  label={t(s.statHosts)}
+                  divided
+                  evidence={
+                    yearHosts.length > 0 && (
+                      <span className="mt-2 block font-serif text-[11px] not-italic leading-snug text-piedra/80">
+                        {t(s.including)} {yearHosts.slice(0, 2).join(', ')}
+                        {yearHosts.length > 2 && ` +${yearHosts.length - 2}`}
+                      </span>
+                    )
+                  }
+                />
+                <YearStat
+                  n={neighbors}
+                  label={t(s.statNeighbors)}
+                  divided
+                  evidence={
+                    parishCount > 0 && (
+                      <span className="mt-2 block font-serif text-[11px] not-italic leading-snug text-piedra/80">
+                        {locale === 'es'
+                          ? `en ${parishCount} ${parishCount === 1 ? 'parroquia' : 'parroquias'}`
+                          : `in ${parishCount} ${parishCount === 1 ? 'parish' : 'parishes'}`}
+                      </span>
+                    )
+                  }
+                />
               </dl>
             </div>
 
             {/* -------------------------------------------------------------- */}
             {/* II. The month — the wheel, and the month beside it             */}
             {/* -------------------------------------------------------------- */}
-            <div className="mx-auto mt-16 grid max-w-4xl grid-cols-1 items-start gap-10 md:mt-20 md:grid-cols-[380px_1fr] md:gap-12">
-              <div>
-                <YearWheel
-                  posts={posts}
-                  year={WHEEL_YEAR}
-                  selectedMonth={selectedMonth}
-                  onSelectMonth={setSelectedMonth}
-                  locale={locale}
-                  activeMonths={activeMonths}
-                  today={today}
-                />
-                <SeasonKey year={WHEEL_YEAR} locale={locale} />
-                {/* The instruction lives with the thing it describes, not up in
-                    the masthead where it was competing with the headline. */}
-                <p className="mt-4 text-center font-serif text-xs italic leading-relaxed text-piedra/80">
-                  {t(s.pickMonth)}
-                </p>
+            <div
+              ref={wheelTrackRef}
+              className="mx-auto mt-16 grid max-w-4xl grid-cols-1 items-start gap-10 md:mt-20 md:grid-cols-[380px_1fr] md:gap-12"
+            >
+              {/* The wheel pins at the top of the viewport and compacts as the
+                  reader scrolls, so it stays available as a dial while the
+                  month reads past it, and has already stepped out of the way by
+                  the time the gatherings arrive. Mobile and reduced-motion get
+                  progress 0 — a plain, full-size, unpinned wheel. */}
+              <div className="md:sticky md:top-6">
+                {/* Fixed-height track at md+ so the shrinking wheel cannot change
+                    the document height. Animating the WIDTH here caused a genuine
+                    feedback loop: a narrower wheel shortened the page, which moved
+                    scrollY, which fired another scroll event, which resized the
+                    wheel again. Transform is purely visual — no reflow, no loop,
+                    and it composites instead of re-laying-out every frame. */}
+                <div className="md:h-[380px]">
+                  <div
+                    className="mx-auto w-full md:w-[380px]"
+                    style={{
+                      transform: `scale(${wheelScale})`,
+                      transformOrigin: 'top center',
+                      // No CSS transition: progress already updates per frame,
+                      // and a transition on top of it lags behind the scroll.
+                      willChange: progress > 0 && progress < 1 ? 'transform' : undefined,
+                    }}
+                  >
+                  <YearWheel
+                    posts={posts}
+                    year={WHEEL_YEAR}
+                    selectedMonth={selectedMonth}
+                    onSelectMonth={setSelectedMonth}
+                    locale={locale}
+                    activeMonths={activeMonths}
+                    today={today}
+                      textScale={wheelTextScale}
+                    />
+                  </div>
+                </div>
+                {/* Key and instruction belong to the full-size wheel; once it
+                    has compacted they are noise, so they fade and stop taking
+                    pointer events. `hidden` would collapse the layout mid-scroll. */}
+                <div
+                  style={{
+                    opacity: 1 - progress,
+                    pointerEvents: progress > 0.5 ? 'none' : undefined,
+                  }}
+                  aria-hidden={progress > 0.5}
+                >
+                  <SeasonKey year={WHEEL_YEAR} locale={locale} />
+                  {/* The instruction lives with the thing it describes, not up in
+                      the masthead where it was competing with the headline. */}
+                  <p className="mt-4 text-center font-serif text-xs italic leading-relaxed text-piedra/80">
+                    {t(s.pickMonth)}
+                  </p>
+                </div>
               </div>
               <div>
                 <MonthPanel
@@ -278,10 +421,17 @@ const YearStat = ({
   n,
   label,
   divided = false,
+  evidence,
 }: {
   n: number;
   label: string;
   divided?: boolean;
+  /**
+   * The human fact under the figure — crafts practised, hosts named, parishes
+   * reached. Lives inside the <dt> because a <dl> may only contain dt/dd/div.
+   * Pass a falsy value and nothing renders.
+   */
+  evidence?: ReactNode;
 }) => (
   <div className={`px-3 py-4 text-center ${divided ? 'border-l border-mesquite/12' : ''}`}>
     <dd className="font-heading text-[30px] leading-none text-mesquite tabular-nums md:text-[36px]">
@@ -289,6 +439,7 @@ const YearStat = ({
     </dd>
     <dt className="mt-2 font-caps text-[9px] tracking-[0.18em] text-ocre">
       {label.toUpperCase()}
+      {evidence || null}
     </dt>
   </div>
 );

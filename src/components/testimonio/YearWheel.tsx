@@ -29,6 +29,14 @@ type Props = {
   activeMonths?: ReadonlySet<number>;
   /** Today, in chapter time. Marked on the rim when it falls inside `year`. */
   today?: Date;
+  /**
+   * Multiplier for every text size in the wheel. The SVG scales with its
+   * container, so a wheel rendered at half width halves its type too and the
+   * month labels become specks. The Witness page shrinks the wheel as you
+   * scroll and passes the inverse ratio here, keeping the labels at a constant
+   * on-screen size while the drawing itself gets smaller.
+   */
+  textScale?: number;
 };
 
 /**
@@ -53,7 +61,22 @@ export const YearWheel = ({
   locale,
   activeMonths,
   today,
+  textScale = 1,
 }: Props) => {
+  // Clamped: past roughly double, labels start crowding the rim.
+  const ts = Math.min(Math.max(textScale, 1), 1.9);
+  // Month labels sit outside the drawing and can counter-scale freely. The hub
+  // text cannot — it is bounded by a circle that shrinks with everything else,
+  // and at full counter-scale "ORDINARY TIME" spills across the wedges.
+  //
+  // So as the wheel becomes a dial rather than a diagram, the hub sheds what it
+  // doesn't need: the season line and the year fade out, and the month name's
+  // counter-scaling is damped so a long name ("Septiembre") still fits. Both are
+  // continuous functions of `ts` rather than threshold switches — a switch makes
+  // the text pop mid-scroll.
+  const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+  const hubDetailOpacity = clamp01((1.3 - ts) / 0.2);
+  const monthDamping = 1 - 0.38 * clamp01((ts - 1) / 0.6);
   const postsByMonth = useMemo(() => {
     const map: Record<number, WitnessPost[]> = {};
     for (const p of posts) {
@@ -197,7 +220,7 @@ export const YearWheel = ({
             textAnchor="middle"
             dominantBaseline="middle"
             fontFamily="'Marcellus SC', Georgia, serif"
-            fontSize={9.5}
+            fontSize={9.5 * ts}
             letterSpacing="0.12em"
             fill={isSelected ? 'hsl(32 56% 51%)' : 'hsl(92 24% 25%)'}
             opacity={isSelected ? 1 : 0.65}
@@ -343,39 +366,45 @@ export const YearWheel = ({
         stroke="rgba(62,79,47,0.25)"
         strokeWidth={0.5}
       />
+      {hubDetailOpacity > 0 && (
+        <text
+          x={WHEEL.CX}
+          y={WHEEL.CY - 15}
+          textAnchor="middle"
+          fontFamily="'Marcellus SC', Georgia, serif"
+          fontSize={8 * ts}
+          letterSpacing="0.16em"
+          opacity={hubDetailOpacity}
+          fill={SEASON_COLOR[selectedSeason].ink}
+        >
+          {selectedSeasonLabel.toUpperCase()}
+        </text>
+      )}
       <text
         x={WHEEL.CX}
-        y={WHEEL.CY - 15}
-        textAnchor="middle"
-        fontFamily="'Marcellus SC', Georgia, serif"
-        fontSize={8}
-        letterSpacing="0.16em"
-        fill={SEASON_COLOR[selectedSeason].ink}
-      >
-        {selectedSeasonLabel.toUpperCase()}
-      </text>
-      <text
-        x={WHEEL.CX}
-        y={WHEEL.CY + 7}
+        y={WHEEL.CY + 7 + 2 * (1 - hubDetailOpacity)}
         textAnchor="middle"
         fontFamily="'EB Garamond', Georgia, serif"
-        fontSize={22}
+        fontSize={22 * ts * monthDamping}
         fontStyle="italic"
         fill="hsl(92 24% 25%)"
       >
         {monthNames[selectedMonth]}
       </text>
-      <text
-        x={WHEEL.CX}
-        y={WHEEL.CY + 27}
-        textAnchor="middle"
-        fontFamily="'Marcellus SC', Georgia, serif"
-        fontSize={9}
-        letterSpacing="0.2em"
-        fill="hsl(218 17% 35%)"
-      >
-        {year}
-      </text>
+      {hubDetailOpacity > 0 && (
+        <text
+          x={WHEEL.CX}
+          y={WHEEL.CY + 27}
+          textAnchor="middle"
+          fontFamily="'Marcellus SC', Georgia, serif"
+          fontSize={9 * ts}
+          letterSpacing="0.2em"
+          opacity={hubDetailOpacity}
+          fill="hsl(218 17% 35%)"
+        >
+          {year}
+        </text>
+      )}
     </svg>
   );
 };

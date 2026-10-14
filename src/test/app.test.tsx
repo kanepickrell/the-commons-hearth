@@ -75,6 +75,38 @@ describe('app renders', () => {
     await waitFor(() => expect(screen.getByText(/No witness posts yet/)).toBeInTheDocument());
   });
 
+  it('witness year figures carry their human evidence', async () => {
+    rows.witness_public = [
+      { id: 'w1', author_id: 'a1', author_display_name: 'Ana M.', workshop_id: null,
+        craft: 'las-abejas', body: 'We split a hive.', language: 'en',
+        fruit_count: 3, fruit_unit: 'jars', occurred_at: '2026-04-12T00:00:00Z' },
+      { id: 'w2', author_id: 'a2', author_display_name: 'Thomas R.', workshop_id: null,
+        craft: 'el-pan', body: 'Bread for the feast.', language: 'en',
+        fruit_count: 0, fruit_unit: null, occurred_at: '2026-05-02T00:00:00Z' },
+    ];
+    rows.month_metrics = [
+      { month: 3, gatherings: 2, neighbors: 11, hosts: 1 },
+      { month: 4, gatherings: 1, neighbors: 7, hosts: 2 },
+    ];
+    // Two parishes have members; the empty one must not be counted.
+    rows.parish_member_counts = [
+      { parish_id: 'p1', member_count: 5 },
+      { parish_id: 'p2', member_count: 2 },
+      { parish_id: 'p3', member_count: 0 },
+    ];
+
+    visit('/witness');
+
+    // The hosts figure resolves to the people behind it, hedged as "including"
+    // because the total is steward-entered while the names come from posts.
+    await waitFor(() => expect(screen.getByText(/including/)).toBeInTheDocument());
+    expect(screen.getByText(/Ana M\./)).toBeInTheDocument();
+    // The neighbours figure resolves to how far the households are spread.
+    expect(screen.getByText('in 2 parishes')).toBeInTheDocument();
+    // And the gatherings figure to what was actually made.
+    expect(screen.getAllByRole('img', { name: /bee/i }).length).toBeGreaterThan(0);
+  });
+
   it('member page for a signed-out visitor', async () => {
     rows.profiles = [{ id: 'p1', display_name: 'Thomas', bio: 'Bees.', working_on: null,
       wants_to_learn: null, bio_language: 'en', icon_slug: 'el-rebano', parish: null }];
