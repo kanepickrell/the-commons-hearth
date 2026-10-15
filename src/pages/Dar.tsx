@@ -1,133 +1,62 @@
 // src/pages/Dar.tsx
 // Giving — "Support the chapter".
 //
-// ⚠️ NOT READY TO SHIP. Every amount on this page is INERT: no payment
-// processor is wired, and the buttons do nothing. Before this route goes
-// live, three things have to happen:
+// ⚠️ DRAFT. Nothing here can take money: no processor is provisioned, and every
+// give control says so when pressed rather than failing silently. Before this
+// route shows anyone:
 //
-//   1. Provision Stripe through the Vercel Marketplace (`vercel integration
-//      add stripe`). Donations with no product catalog are the `payments`
-//      category; Stripe is the provider this project standardises on. Do not
-//      hand-roll a checkout or npm-install the SDK directly.
-//   2. Settle the tax language. The chapter is described as a non-profit LLC,
-//      which is NOT automatically a 501(c)(3) — and gifts to an entity that
-//      isn't one are generally not deductible. There is deliberately no
-//      "tax-deductible" claim anywhere on this page. Add one only on an
-//      accountant's word, not a developer's.
-//   3. Replace the placeholder figures in TOOL_COMMONS and the monthly tiers
-//      with real numbers. They are invented, and marked as such.
+//   1. Provision Stripe via the Vercel Marketplace (`vercel integration add
+//      stripe`). Donations with no catalog are the `payments` category. Don't
+//      hand-roll a checkout or npm-install the SDK.
+//   2. Settle the tax language with an accountant. A non-profit LLC is NOT
+//      automatically a 501(c)(3), and gifts to an entity that isn't one are
+//      generally not deductible. There is deliberately no deductibility claim
+//      on this page. Add one on an accountant's word, never a developer's.
+//   3. Replace every invented figure — see PLACEHOLDER markers below.
 //
-// The structure is the argument: a CLM chapter asking for money should ask
-// for it the way distributism asks for it — gifts that become productive
-// property the chapter holds in common, not gifts that disappear into
-// overhead. Hence the tool commons sitting above the general fund.
+// ---------------------------------------------------------------------------
+// What the layout is doing, and why (patterns from how good donation pages are
+// actually built, adapted to a chapter that is not a disaster charity):
+//
+//   · A real photograph, not a stock one. The chapter has a year of gathering
+//     photos in Supabase; the hero pulls the most recent rather than shipping
+//     an illustration of a thing that didn't happen.
+//   · Amounts translated into the chapter's own units. Donors think in meals,
+//     or seats, or tools — not dollars. Every amount carries what it buys.
+//   · One-time / monthly on the SAME control. Sending recurring donors to a
+//     separate page is the most common way to lose them.
+//   · The transparency promise stated three times — hero, beside the button,
+//     and in full at the end. Repetition is the mechanism, not clutter.
+//   · Live chapter numbers as social proof, read from the database, so the page
+//     cannot drift from the truth.
+//   · Exactly one optional question. Not five.
+// ---------------------------------------------------------------------------
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { ContactModal } from '@/components/ContactModal';
+import { WheatMeter, FurrowMeter } from '@/components/giving/WheatMeter';
 import { useLocale } from '@/i18n/LocaleProvider';
-import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
 import { chapterToday, formatDate } from '@/lib/dates';
 import { nextFeast } from '@/lib/liturgical';
+import { supabase } from '@/lib/supabase';
 import type { Bilingual } from '@/lib/types';
 
+const PHOTO_BUCKET = 'month-photos';
+
 // ---------------------------------------------------------------------------
-// Copy — authored inline like Home.tsx, since it's editorial and will be
-// revised often.
+// PLACEHOLDER DATA — none of these numbers are real. Cost the tools, set the
+// goals, and wire `raised` to wherever giving is actually tracked before this
+// page faces a donor.
 // ---------------------------------------------------------------------------
-const copy = {
-  eyebrow: { en: 'SUPPORT THE CHAPTER', es: 'APOYA AL CAPÍTULO' } satisfies Bilingual,
-  heading: { en: 'Give toward something that lasts', es: 'Da hacia algo que permanece' } satisfies Bilingual,
-  lede: {
-    en: 'The movement’s whole argument is that ordinary families should own the things they work with. So most of what we ask for isn’t overhead — it’s tools, equipment and land that the chapter holds in common and puts into members’ hands.',
-    es: 'Todo el argumento del movimiento es que las familias comunes deben poseer aquello con lo que trabajan. Por eso casi todo lo que pedimos no son gastos administrativos — son herramientas, equipo y tierra que el capítulo guarda en común y pone en manos de sus miembros.',
-  } satisfies Bilingual,
-
-  monthlyEyebrow: { en: 'MONTHLY', es: 'CADA MES' } satisfies Bilingual,
-  monthlyHeading: { en: 'Steady giving', es: 'Dar con constancia' } satisfies Bilingual,
-  monthlyLede: {
-    en: 'A gathering every month needs someone paying for it every month. Steady gifts are what let a host say yes without counting the cost of the meal.',
-    es: 'Una reunión cada mes necesita que alguien la sostenga cada mes. Los dones constantes son los que permiten a un anfitrión decir que sí sin contar el costo de la comida.',
-  } satisfies Bilingual,
-
-  commonsEyebrow: { en: 'THE TOOL COMMONS', es: 'LAS HERRAMIENTAS COMUNES' } satisfies Bilingual,
-  commonsHeading: { en: 'Buy a thing the chapter keeps', es: 'Compra algo que el capítulo guarda' } satisfies Bilingual,
-  commonsLede: {
-    en: 'Equipment no single household would buy alone, bought once and lent out all year. A gift here doesn’t get spent — it becomes a thing with a name, kept by the chapter and used by whoever needs it next.',
-    es: 'Equipo que ninguna familia compraría sola, comprado una vez y prestado todo el año. Un don aquí no se gasta — se convierte en algo con nombre, guardado por el capítulo y usado por quien lo necesite.',
-  } satisfies Bilingual,
-  commonsGoal: { en: 'of', es: 'de' } satisfies Bilingual,
-
-  gatheringEyebrow: { en: 'UNDERWRITE A GATHERING', es: 'PATROCINA UNA REUNIÓN' } satisfies Bilingual,
-  gatheringBody: {
-    en: 'Cover the food and materials for one month’s gathering. We’ll name the month you carried in the year’s record — or leave you out of it entirely, if you’d rather it stay between you and God.',
-    es: 'Cubre la comida y los materiales de la reunión de un mes. Nombraremos el mes que sostuviste en el registro del año — o te dejaremos fuera por completo, si prefieres que quede entre tú y Dios.',
-  } satisfies Bilingual,
-  gatheringLink: { en: 'See what a month looks like', es: 'Mira cómo es un mes' } satisfies Bilingual,
-
-  feastEyebrow: { en: 'GIVE ON A FEAST', es: 'DA EN UNA FIESTA' } satisfies Bilingual,
-  feastBody: {
-    en: 'The chapter keeps the farmers’ feasts. Some households would rather give on one of them than on the first of the month — an offering with a day attached to it.',
-    es: 'El capítulo guarda las fiestas de los labradores. Hay hogares que prefieren dar en una de ellas y no el primero del mes — una ofrenda con un día propio.',
-  } satisfies Bilingual,
-  feastNext: { en: 'Next', es: 'Próxima' } satisfies Bilingual,
-
-  kindEyebrow: { en: 'GIVE WHAT YOU HAVE', es: 'DA LO QUE TIENES' } satisfies Bilingual,
-  kindBody: {
-    en: 'Not everything worth giving is money. A trailer for a weekend, a freezer, seed stock, a ram at breeding time, an acre someone can practise on, a Saturday of your hands. Tell us what you’ve got and we’ll find who needs it.',
-    es: 'No todo lo que vale la pena dar es dinero. Un remolque por un fin de semana, un congelador, semilla, un carnero en temporada, un acre donde alguien pueda practicar, un sábado de tus manos. Dinos qué tienes y encontraremos quién lo necesita.',
-  } satisfies Bilingual,
-  kindCta: { en: 'Offer something', es: 'Ofrece algo' } satisfies Bilingual,
-
-  landEyebrow: { en: 'THE LAND FUND', es: 'EL FONDO DE LA TIERRA' } satisfies Bilingual,
-  landBody: {
-    en: 'Resettlement is the first pillar and the slowest one. The land fund is a long patience: money set aside toward helping a family onto working ground. It is not a campaign with a deadline, and we would rather say so than invent urgency.',
-    es: 'El reasentamiento es el primer pilar y el más lento. El fondo de la tierra es una paciencia larga: dinero apartado para ayudar a una familia a establecerse en tierra de labor. No es una campaña con fecha límite, y preferimos decirlo a inventar urgencia.',
-  } satisfies Bilingual,
-
-  whereEyebrow: { en: 'WHERE IT GOES', es: 'A DÓNDE VA' } satisfies Bilingual,
-  whereBody: {
-    en: 'The chapter is run by its members; no one draws a salary. Gifts are reported to the chapter at the start of each year, and anything given toward a named tool is spent on that tool or returned.',
-    es: 'El capítulo lo llevan sus miembros; nadie cobra sueldo. Los donativos se informan al capítulo al comenzar cada año, y lo que se da para una herramienta nombrada se gasta en ella o se devuelve.',
-  } satisfies Bilingual,
-};
-
-// Monthly tiers. Names are agrarian rather than Bronze/Silver/Gold — the
-// chapter's own idiom. AMOUNTS ARE REAL; the "what it covers" lines are
-// PLACEHOLDERS until someone costs a gathering properly.
-const TIERS: { amount: number; name: Bilingual; covers: Bilingual }[] = [
-  {
-    amount: 5,
-    name: { en: 'The seed', es: 'La semilla' },
-    covers: {
-      en: 'Seed and starts passed around at a gathering.',
-      es: 'Semilla y plántulas que se reparten en una reunión.',
-    },
-  },
-  {
-    amount: 25,
-    name: { en: 'The row', es: 'El surco' },
-    covers: {
-      en: 'A share of the food on the table each month.',
-      es: 'Parte de la comida en la mesa cada mes.',
-    },
-  },
-  {
-    amount: 100,
-    name: { en: 'The field', es: 'El campo' },
-    covers: {
-      en: 'A month’s gathering, carried end to end.',
-      es: 'La reunión de un mes, sostenida de principio a fin.',
-    },
-  },
-];
-
-// PLACEHOLDER DATA. Replace with real items the chapter actually wants, real
-// prices, and a real `raised` figure from wherever giving is tracked. Shipping
-// invented targets on a live fundraising page would be a lie to donors.
-const TOOL_COMMONS: { name: Bilingual; note: Bilingual; goal: number; raised: number }[] = [
+const TOOL_COMMONS: {
+  name: Bilingual;
+  note: Bilingual;
+  goal: number;
+  raised: number;
+}[] = [
   {
     name: { en: 'Walk-behind tractor', es: 'Tractor de dos ruedas' },
     note: {
@@ -135,7 +64,7 @@ const TOOL_COMMONS: { name: Bilingual; note: Bilingual; goal: number; raised: nu
       es: 'Abre un cuarto de acre sin pagar un tractor entero.',
     },
     goal: 4200,
-    raised: 0,
+    raised: 1580,
   },
   {
     name: { en: 'Butchering kit', es: 'Equipo de matanza' },
@@ -144,7 +73,7 @@ const TOOL_COMMONS: { name: Bilingual; note: Bilingual; goal: number; raised: nu
       es: 'Gancho, sierra, cuchillos y una hielera — el día que Doug lo enseña.',
     },
     goal: 650,
-    raised: 0,
+    raised: 540,
   },
   {
     name: { en: 'Grain mill', es: 'Molino de grano' },
@@ -153,7 +82,7 @@ const TOOL_COMMONS: { name: Bilingual; note: Bilingual; goal: number; raised: nu
       es: 'De trigo entero a harina, para los hogares que hornean.',
     },
     goal: 900,
-    raised: 0,
+    raised: 210,
   },
   {
     name: { en: 'Canning setup', es: 'Equipo de conservas' },
@@ -162,111 +91,284 @@ const TOOL_COMMONS: { name: Bilingual; note: Bilingual; goal: number; raised: nu
       es: 'Ollas a presión y frascos que circulan en la cosecha.',
     },
     goal: 500,
-    raised: 0,
+    raised: 500,
   },
 ];
+
+// Amounts carry what they buy, in the chapter's units. PLACEHOLDER impact lines.
+const AMOUNTS: { value: number; buys: Bilingual }[] = [
+  { value: 10, buys: { en: 'Seed for a bed', es: 'Semilla para una cama' } },
+  { value: 25, buys: { en: 'A seat at the table', es: 'Un lugar en la mesa' } },
+  { value: 50, buys: { en: 'Materials for a demonstration', es: 'Materiales para una demostración' } },
+  { value: 100, buys: { en: 'A whole month’s gathering', es: 'La reunión de todo un mes' } },
+];
+
+const copy = {
+  eyebrow: { en: 'SUPPORT THE CHAPTER', es: 'APOYA AL CAPÍTULO' },
+  heading: { en: 'Give toward something that lasts', es: 'Da hacia algo que permanece' },
+  lede: {
+    en: 'The movement’s whole argument is that ordinary families should own the things they work with. So most of what we ask for isn’t overhead — it’s tools, equipment and land the chapter holds in common and puts into members’ hands.',
+    es: 'Todo el argumento del movimiento es que las familias comunes deben poseer aquello con lo que trabajan. Por eso casi todo lo que pedimos no son gastos administrativos — son herramientas, equipo y tierra que el capítulo guarda en común y pone en manos de sus miembros.',
+  },
+  promise: {
+    en: 'No one here draws a salary.',
+    es: 'Aquí nadie cobra sueldo.',
+  },
+
+  onceLabel: { en: 'Once', es: 'Una vez' },
+  monthlyLabel: { en: 'Every month', es: 'Cada mes' },
+  chooseAmount: { en: 'CHOOSE AN AMOUNT', es: 'ELIGE UNA CANTIDAD' },
+  other: { en: 'Other', es: 'Otra' },
+  giveOnce: { en: 'Give', es: 'Dar' },
+  giveMonthly: { en: 'Give every month', es: 'Dar cada mes' },
+  nameMe: {
+    en: 'You may name me in the year’s record.',
+    es: 'Pueden nombrarme en el registro del año.',
+  },
+
+  statsEyebrow: { en: 'WHAT YOUR GIVING JOINS', es: 'A LO QUE SE SUMA TU DONATIVO' },
+  statNeighbors: { en: 'neighbors', es: 'vecinos' },
+  statParishes: { en: 'parishes', es: 'parroquias' },
+  statGatherings: { en: 'gatherings this year', es: 'reuniones este año' },
+
+  commonsEyebrow: { en: 'THE TOOL COMMONS', es: 'LAS HERRAMIENTAS COMUNES' },
+  commonsHeading: { en: 'Buy a thing the chapter keeps', es: 'Compra algo que el capítulo guarda' },
+  commonsLede: {
+    en: 'Equipment no single household would buy alone, bought once and lent out all year. A gift here doesn’t get spent — it becomes a thing with a name, kept by the chapter and used by whoever needs it next.',
+    es: 'Equipo que ninguna familia compraría sola, comprado una vez y prestado todo el año. Un don aquí no se gasta — se convierte en algo con nombre, guardado por el capítulo y usado por quien lo necesite.',
+  },
+  funded: { en: 'Fully given', es: 'Completo' },
+  toGo: { en: 'to go', es: 'faltan' },
+
+  gatheringEyebrow: { en: 'UNDERWRITE A GATHERING', es: 'PATROCINA UNA REUNIÓN' },
+  gatheringBody: {
+    en: 'Cover the food and materials for one month’s gathering. We’ll name the month you carried in the year’s record — or leave you out of it entirely, if you’d rather it stay between you and God.',
+    es: 'Cubre la comida y los materiales de la reunión de un mes. Nombraremos el mes que sostuviste en el registro del año — o te dejaremos fuera por completo, si prefieres que quede entre tú y Dios.',
+  },
+  gatheringLink: { en: 'See what a month looks like', es: 'Mira cómo es un mes' },
+
+  feastEyebrow: { en: 'GIVE ON A FEAST', es: 'DA EN UNA FIESTA' },
+  feastBody: {
+    en: 'The chapter keeps the farmers’ feasts. Some households would rather give on one of them than on the first of the month — an offering with a day attached to it.',
+    es: 'El capítulo guarda las fiestas de los labradores. Hay hogares que prefieren dar en una de ellas y no el primero del mes — una ofrenda con un día propio.',
+  },
+  feastNext: { en: 'Next', es: 'Próxima' },
+
+  kindEyebrow: { en: 'GIVE WHAT YOU HAVE', es: 'DA LO QUE TIENES' },
+  kindBody: {
+    en: 'Not everything worth giving is money. A trailer for a weekend, a freezer, seed stock, a ram at breeding time, an acre someone can practise on, a Saturday of your hands. Tell us what you’ve got and we’ll find who needs it.',
+    es: 'No todo lo que vale la pena dar es dinero. Un remolque por un fin de semana, un congelador, semilla, un carnero en temporada, un acre donde alguien pueda practicar, un sábado de tus manos. Dinos qué tienes y encontraremos quién lo necesita.',
+  },
+  kindCta: { en: 'Offer something', es: 'Ofrece algo' },
+
+  landEyebrow: { en: 'THE LAND FUND', es: 'EL FONDO DE LA TIERRA' },
+  landBody: {
+    en: 'Resettlement is the first pillar and the slowest one. The land fund is a long patience: money set aside toward helping a family onto working ground. It is not a campaign with a deadline, and we would rather say so than invent urgency.',
+    es: 'El reasentamiento es el primer pilar y el más lento. El fondo de la tierra es una paciencia larga: dinero apartado para ayudar a una familia a establecerse en tierra de labor. No es una campaña con fecha límite, y preferimos decirlo a inventar urgencia.',
+  },
+
+  whereEyebrow: { en: 'WHERE IT GOES', es: 'A DÓNDE VA' },
+  whereBody: {
+    en: 'The chapter is run by its members; no one draws a salary. Gifts are reported to the chapter at the start of each year, and anything given toward a named tool is spent on that tool or returned.',
+    es: 'El capítulo lo llevan sus miembros; nadie cobra sueldo. Los donativos se informan al capítulo al comenzar cada año, y lo que se da para una herramienta nombrada se gasta en ella o se devuelve.',
+  },
+} satisfies Record<string, Bilingual>;
 
 const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 const Dar = () => {
   const { t, locale } = useLocale();
   const [offerOpen, setOfferOpen] = useState(false);
-
   const feast = useMemo(() => nextFeast(chapterToday()), []);
+
+  // --- live chapter numbers: social proof that can't drift from the truth ---
+  const [neighbors, setNeighbors] = useState<number | null>(null);
+  const [parishes, setParishes] = useState<number | null>(null);
+  const [gatherings, setGatherings] = useState<number | null>(null);
+  const [heroPhoto, setHeroPhoto] = useState<string | null>(null);
+  const [heroCaption, setHeroCaption] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const year = chapterToday().getFullYear();
+      const [members, parishRows, months, photos] = await Promise.all([
+        supabase.rpc('approved_member_count'),
+        supabase.from('parish_member_counts').select('member_count'),
+        supabase.from('month_metrics').select('gatherings').eq('year', year),
+        // Captioned photos only. "Most recent" picked the September upload,
+        // which is an event FLYER — a wall of text that fought the headline.
+        // A caption means a steward looked at the image and described it, which
+        // is the closest signal we have to "this is a photograph". No caption
+        // anywhere, no hero image; the page reads fine without one.
+        supabase
+          .from('month_photos')
+          .select('storage_path, caption')
+          .not('caption', 'is', null)
+          .order('year', { ascending: false })
+          .order('month', { ascending: false })
+          .limit(1),
+      ]);
+
+      if (!members.error) setNeighbors((members.data as number) ?? 0);
+      if (!parishRows.error) {
+        const rows = (parishRows.data ?? []) as Array<{ member_count: number | null }>;
+        setParishes(rows.filter((r) => (r.member_count ?? 0) > 0).length);
+      }
+      if (!months.error) {
+        const rows = (months.data ?? []) as Array<{ gatherings: number }>;
+        setGatherings(rows.reduce((sum, r) => sum + (r.gatherings ?? 0), 0));
+      }
+      if (!photos.error && photos.data?.length) {
+        const row = photos.data[0] as { storage_path: string; caption: string | null };
+        setHeroPhoto(supabase.storage.from(PHOTO_BUCKET).getPublicUrl(row.storage_path).data.publicUrl);
+        setHeroCaption(row.caption);
+      }
+    })();
+  }, []);
+
+  const commonsTotal = TOOL_COMMONS.reduce((s, i) => s + i.goal, 0);
+  const commonsRaised = TOOL_COMMONS.reduce((s, i) => s + i.raised, 0);
+  const commonsPct = (commonsRaised / commonsTotal) * 100;
 
   return (
     <Layout>
       {/* ---------------------------------------------------------------- */}
-      {/* Masthead                                                          */}
+      {/* Hero — a real photograph of a real gathering                      */}
       {/* ---------------------------------------------------------------- */}
-      <section className="container-prose pb-10 pt-20 text-center">
-        <p className="display-caps text-[11px] tracking-[0.3em] text-ocre">{t(copy.eyebrow)}</p>
-        <h1 className="mt-4 font-heading text-[34px] leading-[1.15] text-mesquite md:text-[44px]">
-          {t(copy.heading)}
-        </h1>
-        <p className="prose-body mx-auto mt-6 max-w-xl text-lg leading-relaxed text-mesquite/85">
-          {t(copy.lede)}
-        </p>
+      {/* ---------------------------------------------------------------- */}
+      {/* Hero — words on cream, photograph beside them.                    */}
+      {/*                                                                   */}
+      {/* The photo started out BEHIND the headline with a wash over it,    */}
+      {/* which is the usual pattern and was wrong here: the library holds  */}
+      {/* event flyers as well as photographs, and a wall of poster type    */}
+      {/* showing through a headline is unreadable. Beside, never behind —  */}
+      {/* then no image can break the words, whatever a steward uploads.    */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-wide pt-16 md:pt-20">
+        <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-14">
+          <div className="text-center md:text-left">
+            <p className="display-caps text-[11px] tracking-[0.3em] text-ocre">{t(copy.eyebrow)}</p>
+            <h1 className="mt-4 font-heading text-[34px] leading-[1.12] text-mesquite md:text-[46px]">
+              {t(copy.heading)}
+            </h1>
+            <p className="prose-body mt-6 text-lg leading-relaxed text-mesquite/85">
+              {t(copy.lede)}
+            </p>
+            {/* Promise, first of three statements. */}
+            <p className="mt-5 font-caps text-[10px] tracking-[0.2em] text-ocre">
+              {t(copy.promise).toUpperCase()}
+            </p>
+          </div>
+
+          {heroPhoto && (
+            <figure className="min-w-0">
+              <div className="overflow-hidden rounded-sm border border-mesquite/15 bg-mesquite/[0.04]">
+                <img
+                  src={heroPhoto}
+                  alt={heroCaption ?? ''}
+                  className="h-64 w-full object-cover md:h-[22rem]"
+                  loading="eager"
+                />
+              </div>
+              {heroCaption && (
+                <figcaption className="mt-2 font-serif text-xs italic text-piedra">
+                  {heroCaption}
+                </figcaption>
+              )}
+            </figure>
+          )}
+        </div>
       </section>
 
-      <div className="rule container-prose" />
+      {/* ---------------------------------------------------------------- */}
+      {/* The ask — amounts, cadence, one question                          */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-prose pb-16">
+        <GiveBox />
+      </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Monthly tiers                                                     */}
+      {/* Live chapter figures                                              */}
       {/* ---------------------------------------------------------------- */}
-      <section className="container-wide py-16">
-        <header className="mx-auto mb-10 max-w-xl text-center">
-          <p className="display-caps text-xs tracking-[0.25em] text-ocre">{t(copy.monthlyEyebrow)}</p>
-          <h2 className="mt-3 font-heading text-3xl text-mesquite">{t(copy.monthlyHeading)}</h2>
-          <p className="prose-body mt-4 text-base italic leading-relaxed text-piedra">
-            {t(copy.monthlyLede)}
-          </p>
-        </header>
-
-        <div className="mx-auto grid max-w-3xl grid-cols-1 gap-5 sm:grid-cols-3">
-          {TIERS.map((tier) => (
-            <div
-              key={tier.amount}
-              className="flex flex-col items-center border border-mesquite/15 bg-cal/40 px-5 py-7 text-center"
-            >
-              <p className="font-caps text-[10px] tracking-[0.2em] text-ocre">{t(tier.name)}</p>
-              <p className="mt-3 font-heading text-[40px] leading-none text-mesquite tabular-nums">
-                {usd(tier.amount)}
-              </p>
-              <p className="mt-1 font-serif text-xs italic text-piedra">
-                {locale === 'es' ? 'al mes' : 'a month'}
-              </p>
-              <p className="prose-body mt-4 flex-1 text-sm leading-relaxed text-mesquite/80">
-                {t(tier.covers)}
-              </p>
-              <GiveButton label={locale === 'es' ? 'Dar cada mes' : 'Give monthly'} />
-            </div>
-          ))}
-        </div>
+      <section className="container-wide pb-16">
+        <p className="mb-4 text-center font-caps text-[9px] tracking-[0.25em] text-piedra/70">
+          {t(copy.statsEyebrow)}
+        </p>
+        <dl className="mx-auto grid max-w-2xl grid-cols-3 border-y border-mesquite/15">
+          <Stat n={neighbors} label={t(copy.statNeighbors)} />
+          <Stat n={parishes} label={t(copy.statParishes)} divided />
+          <Stat n={gatherings} label={t(copy.statGatherings)} divided />
+        </dl>
       </section>
 
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* The tool commons — the distributist heart of the page             */}
+      {/* The tool commons                                                  */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-16">
-        <header className="mx-auto mb-10 max-w-xl text-center">
-          <p className="display-caps text-xs tracking-[0.25em] text-ocre">{t(copy.commonsEyebrow)}</p>
-          <h2 className="mt-3 font-heading text-3xl text-mesquite">{t(copy.commonsHeading)}</h2>
-          <p className="prose-body mt-4 text-base italic leading-relaxed text-piedra">
-            {t(copy.commonsLede)}
-          </p>
-        </header>
+        <div className="mx-auto grid max-w-4xl grid-cols-1 items-center gap-10 md:grid-cols-[150px_1fr]">
+          {/* The chapter-wide meter, as a filling stalk of wheat. */}
+          <div className="flex justify-center">
+            <WheatMeter
+              percent={commonsPct}
+              size={120}
+              label={`${t(copy.commonsEyebrow)}: ${Math.round(commonsPct)}%`}
+            />
+          </div>
+          <header>
+            <p className="display-caps text-xs tracking-[0.25em] text-ocre">
+              {t(copy.commonsEyebrow)}
+            </p>
+            <h2 className="mt-3 font-heading text-3xl text-mesquite">{t(copy.commonsHeading)}</h2>
+            <p className="prose-body mt-4 text-base italic leading-relaxed text-piedra">
+              {t(copy.commonsLede)}
+            </p>
+            <p className="mt-4 font-serif text-sm text-mesquite tabular-nums">
+              <span className="font-heading text-2xl text-mesquite">{usd(commonsRaised)}</span>
+              <span className="text-piedra"> / {usd(commonsTotal)}</span>
+            </p>
+          </header>
+        </div>
 
-        <ul className="mx-auto max-w-2xl divide-y divide-mesquite/10 border-y border-mesquite/15">
+        <ul className="mx-auto mt-12 max-w-2xl divide-y divide-mesquite/10 border-y border-mesquite/15">
           {TOOL_COMMONS.map((item) => {
-            const pct = Math.min(100, Math.round((item.raised / item.goal) * 100));
+            const pct = (item.raised / item.goal) * 100;
+            const done = item.raised >= item.goal;
+            const remaining = Math.max(0, item.goal - item.raised);
             return (
               <li key={item.name.en} className="py-6">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h3 className="font-heading text-xl text-mesquite">{t(item.name)}</h3>
-                  <p className="font-serif text-sm text-piedra tabular-nums">
-                    {usd(item.raised)} {t(copy.commonsGoal)} {usd(item.goal)}
+                  <p className="font-serif text-sm tabular-nums text-piedra">
+                    {done ? (
+                      <span className="font-caps text-[10px] tracking-[0.18em] text-ocre">
+                        {t(copy.funded).toUpperCase()}
+                      </span>
+                    ) : (
+                      <>
+                        {usd(item.raised)} <span className="text-piedra/60">/ {usd(item.goal)}</span>
+                      </>
+                    )}
                   </p>
                 </div>
                 <p className="prose-body mt-1 text-sm leading-relaxed text-mesquite/80">
                   {t(item.note)}
                 </p>
-                {/* Progress rail. Reads as a furrow rather than a candy bar. */}
-                <div
-                  className="mt-3 h-[3px] w-full bg-mesquite/10"
-                  role="progressbar"
-                  aria-valuenow={pct}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={t(item.name)}
-                >
-                  <div className="h-full bg-ocre" style={{ width: `${pct}%` }} />
-                </div>
                 <div className="mt-3">
-                  <GiveButton label={locale === 'es' ? 'Dar hacia esto' : 'Give toward this'} quiet />
+                  <FurrowMeter percent={pct} label={`${t(item.name)} — ${Math.round(pct)}%`} />
                 </div>
+                {!done && (
+                  <div className="mt-3 flex items-center justify-between gap-4">
+                    <span className="font-serif text-xs italic text-piedra/80">
+                      {usd(remaining)} {t(copy.toGo)}
+                    </span>
+                    <InertGive
+                      label={locale === 'es' ? 'Dar hacia esto' : 'Give toward this'}
+                      quiet
+                    />
+                  </div>
+                )}
               </li>
             );
           })}
@@ -280,7 +382,6 @@ const Dar = () => {
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-16">
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-10 md:grid-cols-3">
-          {/* Underwrite a gathering */}
           <article className="flex flex-col">
             <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
               {t(copy.gatheringEyebrow)}
@@ -297,7 +398,6 @@ const Dar = () => {
             </Link>
           </article>
 
-          {/* Feast-day giving — uses the liturgical calendar the site keeps */}
           <article className="flex flex-col">
             <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
               {t(copy.feastEyebrow)}
@@ -313,7 +413,6 @@ const Dar = () => {
             )}
           </article>
 
-          {/* In kind */}
           <article className="flex flex-col">
             <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
               {t(copy.kindEyebrow)}
@@ -335,7 +434,7 @@ const Dar = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* The land fund + where it goes                                     */}
+      {/* Land fund + transparency                                          */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose py-16">
         <p className="display-caps text-xs tracking-[0.25em] text-ocre">{t(copy.landEyebrow)}</p>
@@ -343,7 +442,7 @@ const Dar = () => {
           {t(copy.landBody)}
         </p>
         <div className="mt-5">
-          <GiveButton label={locale === 'es' ? 'Dar al fondo' : 'Give to the fund'} quiet />
+          <InertGive label={locale === 'es' ? 'Dar al fondo' : 'Give to the fund'} quiet />
         </div>
 
         <div className="rule my-12" />
@@ -354,8 +453,6 @@ const Dar = () => {
         </p>
       </section>
 
-      {/* Reuses the chapter contact form; the offer arrives as a normal
-          message so a steward can reply by hitting Reply. */}
       <ContactModal
         open={offerOpen}
         onClose={() => setOfferOpen(false)}
@@ -370,26 +467,139 @@ const Dar = () => {
   );
 };
 
+// ---------------------------------------------------------------------------
+// The ask itself. Cadence and amount live on one control; sending recurring
+// donors to a second page is the most reliable way to lose them.
+// ---------------------------------------------------------------------------
+const GiveBox = () => {
+  const { t, locale } = useLocale();
+  const [monthly, setMonthly] = useState(true); // recurring pre-selected
+  const [amount, setAmount] = useState<number | null>(25);
+  const [custom, setCustom] = useState('');
+
+  // Number('') is 0 and Number('abc') is NaN — neither is nullish, so `??`
+  // would never have caught them and a bad entry would render "$NaN".
+  const typed = Number(custom);
+  const chosen = amount ?? (Number.isFinite(typed) && typed > 0 ? typed : 0);
+  const buys = AMOUNTS.find((a) => a.value === amount)?.buys ?? null;
+
+  return (
+    <div className="mx-auto max-w-xl border border-mesquite/15 bg-cal/50 p-6 md:p-8">
+      {/* Cadence */}
+      <div
+        className="mb-6 grid grid-cols-2 gap-1 rounded-sm bg-mesquite/[0.06] p-1"
+        role="group"
+        aria-label={locale === 'es' ? 'Frecuencia' : 'Frequency'}
+      >
+        {[
+          { on: false, label: t(copy.onceLabel) },
+          { on: true, label: t(copy.monthlyLabel) },
+        ].map((opt) => (
+          <button
+            key={String(opt.on)}
+            type="button"
+            onClick={() => setMonthly(opt.on)}
+            aria-pressed={monthly === opt.on}
+            className={`rounded-sm py-2 font-heading text-sm transition ${
+              monthly === opt.on
+                ? 'bg-cal text-mesquite shadow-sm'
+                : 'text-mesquite/60 hover:text-mesquite'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      <p className="mb-3 font-caps text-[9px] tracking-[0.22em] text-piedra/70">
+        {t(copy.chooseAmount)}
+      </p>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {AMOUNTS.map((a) => (
+          <button
+            key={a.value}
+            type="button"
+            onClick={() => {
+              setAmount(a.value);
+              setCustom('');
+            }}
+            aria-pressed={amount === a.value}
+            className={`rounded-sm border py-3 font-heading text-lg tabular-nums transition ${
+              amount === a.value
+                ? 'border-ocre bg-ocre/10 text-mesquite'
+                : 'border-mesquite/15 bg-cal/60 text-mesquite/70 hover:border-mesquite/40 hover:text-mesquite'
+            }`}
+          >
+            {usd(a.value)}
+          </button>
+        ))}
+      </div>
+
+      {/* Impact line — what this amount buys, in the chapter's units. */}
+      <p className="mt-3 min-h-[1.25rem] text-center font-serif text-sm italic text-piedra">
+        {buys ? t(buys) : ' '}
+      </p>
+
+      <label className="mt-4 flex items-center gap-2">
+        <span className="font-serif text-sm text-piedra">{t(copy.other)}</span>
+        <span className="flex flex-1 items-center border-b border-mesquite/25 px-1">
+          <span className="font-heading text-mesquite">$</span>
+          <input
+            type="number"
+            min={1}
+            inputMode="numeric"
+            value={custom}
+            onChange={(e) => {
+              setCustom(e.target.value);
+              setAmount(null);
+            }}
+            className="w-full bg-transparent px-1 py-1 font-heading text-mesquite outline-none"
+          />
+        </span>
+      </label>
+
+      {/* Exactly one optional question. */}
+      <label className="mt-5 flex items-start gap-2.5">
+        <input type="checkbox" className="mt-1 accent-[hsl(32_56%_51%)]" />
+        <span className="prose-body text-sm leading-snug text-mesquite/80">{t(copy.nameMe)}</span>
+      </label>
+
+      <InertGive
+        label={`${monthly ? t(copy.giveMonthly) : t(copy.giveOnce)}${
+          chosen ? ` ${usd(chosen)}` : ''
+        }`}
+      />
+
+      {/* Promise, second of three statements — beside the button, where the
+          hesitation actually happens. */}
+      <p className="mt-3 text-center font-serif text-xs italic text-piedra">
+        {t(copy.promise)}
+      </p>
+    </div>
+  );
+};
+
 /**
- * A giving button that does not yet take money.
+ * A give control that cannot take money, and admits it on press.
  *
- * Deliberately inert: no processor is provisioned, and a button that looks
- * live but silently fails is worse than one that says so. Swap the onClick
- * for a Stripe checkout session once the integration exists.
+ * A button that looks live and silently fails is worse than one that tells the
+ * truth. Replace the onClick with a Stripe checkout session once the
+ * integration is provisioned.
  */
-const GiveButton = ({ label, quiet = false }: { label: string; quiet?: boolean }) => {
+const InertGive = ({ label, quiet = false }: { label: string; quiet?: boolean }) => {
   const { locale } = useLocale();
   const [touched, setTouched] = useState(false);
 
   return (
-    <div className={quiet ? '' : 'mt-5 w-full'}>
+    <div className={quiet ? 'text-right' : 'mt-5'}>
       <button
         type="button"
         onClick={() => setTouched(true)}
         className={
           quiet
             ? 'font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline'
-            : 'w-full rounded-sm bg-ocre px-5 py-2.5 font-heading text-base text-cal transition hover:bg-mesquite'
+            : 'w-full rounded-sm bg-ocre px-5 py-3 font-heading text-lg text-cal transition hover:bg-mesquite'
         }
       >
         {label}
@@ -405,5 +615,15 @@ const GiveButton = ({ label, quiet = false }: { label: string; quiet?: boolean }
     </div>
   );
 };
+
+/** One live figure. A stat tile, not a chart — there's no shape to plot. */
+const Stat = ({ n, label, divided = false }: { n: number | null; label: string; divided?: boolean }) => (
+  <div className={`px-3 py-5 text-center ${divided ? 'border-l border-mesquite/12' : ''}`}>
+    <dd className="font-heading text-[30px] leading-none text-mesquite tabular-nums md:text-[36px]">
+      {n === null ? '—' : n}
+    </dd>
+    <dt className="mt-2 font-caps text-[9px] tracking-[0.18em] text-ocre">{label.toUpperCase()}</dt>
+  </div>
+);
 
 export default Dar;
