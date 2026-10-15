@@ -1,10 +1,12 @@
 import { createElement, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
+import { buildPath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { ContactModal } from '@/components/ContactModal';
 
 export const Footer = () => {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const s = uiStrings.footer;
   const [contactOpen, setContactOpen] = useState(false);
 
@@ -35,6 +37,17 @@ export const Footer = () => {
         {/* <p className="font-heading italic text-mesquite/80">{t(s.underPatronage)}</p> */}
 
         {nationalLink}
+
+        {/* Giving. Footer rather than the main nav on purpose: putting
+            "Donate" beside Vision and Patron changes what the site is for at a
+            glance, and that's the chapter's call, not a developer's. */}
+        <Link
+          to={buildPath('dar', locale)}
+          className="font-heading text-sm text-mesquite/70 no-underline underline-offset-4 transition hover:text-ocre hover:underline"
+          style={{ textDecoration: 'none' }}
+        >
+          {t({ en: 'Support the chapter', es: 'Apoya al capítulo' })}
+        </Link>
 
         {/* Inbound channel for non-members — opens the contact form. */}
         <button

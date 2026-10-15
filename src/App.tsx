@@ -21,6 +21,7 @@ const Talleres     = lazy(() => import("./pages/Talleres.tsx"));
 const TallerDetail = lazy(() => import("./pages/TallerDetail.tsx"));
 const Testimonio   = lazy(() => import("./pages/Testimonio.tsx"));
 const Santo        = lazy(() => import("./pages/Santo.tsx"));
+const Dar          = lazy(() => import("./pages/Dar.tsx"));
 const Bienvenido   = lazy(() => import("./pages/Bienvenido.tsx"));
 const MiPerfil     = lazy(() => import("./pages/MiPerfil.tsx"));
 const Mayordomo    = lazy(() => import("./pages/Mayordomo.tsx"));
@@ -82,6 +83,10 @@ const App = () => (
                   <Route path={routes.testimonio.en} element={<Testimonio />} />
 
                   <Route path={routes.santo.es} element={<Santo />} />
+
+                  {/* Giving — separate EN and ES slugs */}
+                  <Route path={routes.dar.en} element={<Dar />} />
+                  <Route path={routes.dar.es} element={<Dar />} />
                   <Route path={routes.santo.en} element={<Santo />} />
 
                   <Route path={routes.bienvenido.es} element={<Bienvenido />} />

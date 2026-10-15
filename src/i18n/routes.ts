@@ -17,6 +17,7 @@ export type RouteKey =
   | 'bienvenido'
   | 'miPerfil'
   | 'mayordomo'
+  | 'dar'
   | 'nuevaReunion';
 
 export const routes: Record<RouteKey, { en: string; es: string }> = {
@@ -30,6 +31,7 @@ export const routes: Record<RouteKey, { en: string; es: string }> = {
   tallerDetail:  { en: '/workshops/:id',   es: '/talleres/:id' },
   testimonio:    { en: '/witness',         es: '/testimonio' },
   santo:         { en: '/patron',          es: '/santo' },
+  dar:           { en: '/give',            es: '/dar' },
   bienvenido:    { en: '/welcome',         es: '/bienvenido' },
   miPerfil:      { en: '/my-profile',      es: '/mi-perfil' },
   mayordomo:     { en: '/stewardship',     es: '/mayordomo' },
