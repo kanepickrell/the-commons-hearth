@@ -14,6 +14,20 @@ const FROM_EMAIL     = Deno.env.get('FROM_EMAIL')     ?? 'CLM Central Texas <onb
 // Where contact messages land. Falls back to the chapter inbox used elsewhere.
 const CONTACT_INBOX  = Deno.env.get('CONTACT_INBOX')  ?? Deno.env.get('REPLY_TO') ?? 'clmcentraltexas@gmail.com';
 
+// Anything involving someone outside the chapter — a parish wanting to
+// partner, a region wanting to start its own chapter, a reporter — goes to
+// whoever handles outside relations, with the chapter inbox copied so the
+// stewards still see it. Everything else goes to the chapter inbox alone.
+//
+// Set as a Supabase secret, NOT hardcoded: this repository is public and the
+// address is personal. Unset, partnership mail simply keeps going to the
+// chapter inbox, which is the behaviour before this split — a safe default
+// rather than a silent misdelivery.
+//   supabase secrets set PARTNER_INBOX=someone@example.com
+const PARTNER_INBOX  = Deno.env.get('PARTNER_INBOX') ?? CONTACT_INBOX;
+
+const PARTNER_CATEGORIES: ReadonlySet<Category> = new Set<Category>(['parish', 'chapter', 'press']);
+
 // CORS so the browser preflight (OPTIONS) succeeds when the public site
 // calls this function via supabase.functions.invoke().
 const CORS_HEADERS = {
@@ -122,6 +136,13 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: 'invalid_message' }), { status: 422, headers: JSON_HEADERS });
   }
 
+  // Route by category. When PARTNER_INBOX is unset it equals CONTACT_INBOX,
+  // so the cc is dropped rather than copying an address to itself.
+  const outward = PARTNER_CATEGORIES.has(category);
+  const recipients = outward && PARTNER_INBOX !== CONTACT_INBOX
+    ? { to: PARTNER_INBOX, cc: CONTACT_INBOX }
+    : { to: CONTACT_INBOX, cc: null as string | null };
+
   const subject = `[Contact · ${CATEGORY_LABELS[category]}] ${name}`;
   const html = renderHtml({ name, email, category, message, lang });
   const text = renderText({ name, email, category, message, lang });
@@ -135,7 +156,10 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
-        to: CONTACT_INBOX,
+        to: recipients.to,
+        // Resend rejects an empty cc array, so only include the key when
+        // there's somewhere to copy.
+        ...(recipients.cc ? { cc: recipients.cc } : {}),
         reply_to: email,
         subject,
         html,

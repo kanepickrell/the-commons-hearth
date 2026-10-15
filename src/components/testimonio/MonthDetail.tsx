@@ -141,12 +141,12 @@ export const MonthDetail = ({ year, month, locale }: Props) => {
       <p className="display-caps text-center text-[11px] tracking-[0.25em] text-ocre">
         {heading}
       </p>
-      {/* The swipe affordance belongs here, small, not in the heading. */}
+      {/* The swipe affordance belongs here, small, not in the heading. The
+          count and the arrows are both already visible below — saying them
+          again in words was clutter. */}
       {slides.length > 1 && (
         <p className="mt-1.5 text-center font-serif text-xs italic text-piedra/70">
-          {locale === 'es'
-            ? `${slides.length} en total — desliza o usa las flechas`
-            : `${slides.length} in all — swipe, or use the arrows`}
+          {locale === 'es' ? 'Desliza para ver más' : 'Swipe to see more'}
         </p>
       )}
 

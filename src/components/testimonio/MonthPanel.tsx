@@ -129,11 +129,11 @@ export const MonthPanel = ({ year, month, posts, locale, override, onAskAboutPos
           were recorded, the recap + photos render below, so the panel adds
           nothing here. Otherwise → the witness cards. */}
       {isQuiet ? (
+        /* A month with nothing recorded gets the wheat and nothing else. The
+           line that used to sit under it ("A quiet month. The land has its
+           seasons.") explained an absence the drawing already says. */
         <div className="flex flex-col items-center py-6 text-center">
           <WheatStem size={76} className="text-ocre/45" />
-          <p className="prose-body mt-3 max-w-[16rem] text-sm italic leading-relaxed text-piedra whitespace-pre-line">
-            {s.emptyMonth[locale]}
-          </p>
         </div>
       ) : !hasCards ? null : (
         orderedPosts.map((post) => {

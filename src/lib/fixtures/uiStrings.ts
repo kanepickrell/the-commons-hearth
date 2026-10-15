@@ -292,8 +292,6 @@ export const uiStrings = {
     feastLabel:      { en: 'FEAST',       es: 'FIESTA' },
     replicatedLabel: { en: 'SKILL REPLICATED', es: 'HABILIDAD REPLICADA' },
     plannedTag:      { en: 'PLANNED',     es: 'PLANEADO' },
-    emptyMonth:      { en: 'A quiet month.\nThe land has its seasons.',
-                       es: 'Un mes en silencio no es un mes fallido.\nLa tierra tiene sus estaciones; también nosotros.' },
     promptMetricGatherings: { en: 'Show me all the gatherings in',  es: 'Muéstrame todas las reuniones de' },
     promptMetricNeighbors:  { en: 'Who came to the gatherings in',  es: '¿Quiénes vinieron a las reuniones de' },
     promptMetricHosts:      { en: 'Which members hosted in',        es: '¿Qué miembros ofrecieron reuniones en' },
