@@ -49,8 +49,12 @@ const Mapa = () => {
             : 'Each stamp is a parish, and the number is its members. Move the map and the address above keeps the view — share it and it opens right here.'}
         </p>
 
+        {/* drawTools lives here and nowhere else: annotations are read on
+            every map, but a steward draws them where the map is the subject,
+            not where it is one section of the homepage they also read as an
+            ordinary visitor. */}
         <div className="mt-10">
-          <ParishMap syncUrl />
+          <ParishMap syncUrl drawTools />
         </div>
       </section>
     </Layout>

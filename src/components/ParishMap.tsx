@@ -313,13 +313,26 @@ type ParishMapProps = {
    * the point.
    */
   syncUrl?: boolean;
+  /**
+   * Offer a steward the drawing toolbar and the annotation panel. On for the
+   * dedicated map page only: annotations are read everywhere, but drawing
+   * them belongs where the map is the subject rather than one section of the
+   * homepage, which a steward also reads as an ordinary visitor. Keeping it
+   * off here is also what stops the homepage fetching Geoman at all.
+   */
+  drawTools?: boolean;
   /** Presentation mode: the map alone, with a title, a legend and the mark. */
   presentation?: boolean;
   /** Shown as the title in presentation mode. */
   title?: string;
 };
 
-export const ParishMap = ({ syncUrl = false, presentation = false, title }: ParishMapProps) => {
+export const ParishMap = ({
+  syncUrl = false,
+  drawTools = false,
+  presentation = false,
+  title,
+}: ParishMapProps) => {
   const { t, locale } = useLocale();
   const { user, profile, isAdmin } = useAuth();
   const isAuthenticated = !!user;
@@ -368,7 +381,7 @@ export const ParishMap = ({ syncUrl = false, presentation = false, title }: Pari
   // Getting this wrong is not a degraded toolbar. Geoman's own layeradd
   // handler reads map.pm on every marker added, so a map without it throws
   // on the next render and the page's error boundary eats the whole site.
-  const needsDrawTools = isAdmin && !presentation;
+  const needsDrawTools = drawTools && isAdmin && !presentation;
   const [drawToolsReady, setDrawToolsReady] = useState(false);
 
   useEffect(() => {
@@ -829,7 +842,7 @@ export const ParishMap = ({ syncUrl = false, presentation = false, title }: Pari
               shape never sits on top of a parish. */}
           {activeLayers.has('annotations') && <AnnotationLayer annotations={annotations} />}
 
-          {isAdmin && !presentation && (
+          {needsDrawTools && (
             <AnnotationTools
               locale={locale}
               onDraw={handleDraw}
@@ -1198,7 +1211,7 @@ export const ParishMap = ({ syncUrl = false, presentation = false, title }: Pari
           above the map rather than inside a Leaflet pane. */}
       <RsvpModal open={rsvp.modalOpen} onClose={rsvp.closeModal} onSubmit={rsvp.submit} />
 
-      {isAdmin && !presentation && (
+      {needsDrawTools && (
         <AnnotationAdmin
           locale={locale}
           annotations={annotations}

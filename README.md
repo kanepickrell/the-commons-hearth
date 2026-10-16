@@ -149,9 +149,12 @@ already set — without it the canvas is tainted and the PNG comes out empty.
 
 ### Drawing annotations (stewards)
 
-Signed in as an admin, the map grows a Geoman toolbar (top left) and a panel
-underneath it. Draw an area, a line or a point; the panel then asks for the
-text in both languages, a palette token for the color, and **who sees it**:
+Go to `/map` signed in as an admin and the map grows a Geoman toolbar (top
+left) with a panel underneath it. It appears **only there** — the homepage
+map renders annotations but never offers to edit them, which also keeps
+Geoman out of the homepage's downloads. Draw an area, a line or a point; the
+panel then asks for the text in both languages, a palette token for the
+color, and **who sees it**:
 
 | Visibility | Who reads the row |
 |---|---|
