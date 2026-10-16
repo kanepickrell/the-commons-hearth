@@ -15,7 +15,8 @@
 // contact_email only when the viewer is authenticated; anon users get the
 // non-sensitive subset and simply never see POC emails.
 
-import { MapContainer, TileLayer, CircleMarker, Marker, Popup, Polygon, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { listSegments, type ChapterSegment } from '@/lib/segments';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -54,6 +55,18 @@ type Member = {
   contactEmail: string | null;
 };
 
+// A cluster has to show the number of PEOPLE it covers, not the number of
+// parish stamps inside it, so each marker carries its parish's count in its
+// Leaflet options and the cluster adds them up. react-leaflet hands every
+// prop except `position` straight to the L.Marker constructor as an option,
+// so augmenting MarkerOptions is what makes `memberCount` a typed prop here
+// and readable as `child.options.memberCount` in the cluster icon builder.
+declare module 'leaflet' {
+  interface MarkerOptions {
+    memberCount?: number;
+  }
+}
+
 type ParishCluster = {
   key: string;
   parishName: string;
@@ -62,31 +75,62 @@ type ParishCluster = {
   members: Member[];     // identities we may show: everyone (signed in) or POCs only (signed out)
 };
 
-const buildWorkshopIcon = (slug: IconSlug) => {
-  const meta = iconMap[slug];
-  const html = `
-    <div style="
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      background: hsl(42 47% 92%);
-      border: 1px solid hsl(92 24% 25% / 0.4);
-      border-radius: 9999px;
-      box-shadow: 0 1px 2px rgba(62,79,47,0.18);
-      color: hsl(92 24% 25%);
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    ">
-      <span style="display:inline-block;width:28px;height:28px;line-height:0;">
-        ${meta.svg}
-      </span>
-    </div>`;
-  return L.divIcon({
-    html,
+const buildWorkshopIcon = (slug: IconSlug) =>
+  L.divIcon({
+    html: iconMap[slug].svg,
     className: 'clm-workshop-pin',
     iconSize: [40, 40],
     iconAnchor: [20, 20],
     popupAnchor: [0, -18],
+  });
+
+// Stamp sizes step with the count in three tiers. The pixel size lives here
+// rather than in CSS because Leaflet writes width/height inline from
+// iconSize, where it would beat a stylesheet rule anyway; index.css carries
+// the matching typography.
+type Tier = { upTo: number; size: number; cls: string };
+
+const STAMP_TIERS: Tier[] = [
+  { upTo: 2, size: 30, cls: 'clm-stamp--sm' },
+  { upTo: 6, size: 38, cls: 'clm-stamp--md' },
+  { upTo: Infinity, size: 46, cls: 'clm-stamp--lg' },
+];
+
+// Clusters stand for several parishes at once and carry a larger number, so
+// they get their own, roomier scale.
+const CLUSTER_TIERS: Tier[] = [
+  { upTo: 9, size: 42, cls: 'clm-cluster--sm' },
+  { upTo: 24, size: 52, cls: 'clm-cluster--md' },
+  { upTo: Infinity, size: 62, cls: 'clm-cluster--lg' },
+];
+
+const tierFor = (tiers: Tier[], count: number) =>
+  tiers.find((t) => count <= t.upTo) ?? tiers[tiers.length - 1];
+
+const buildParishStamp = (memberCount: number, selected: boolean) => {
+  const tier = tierFor(STAMP_TIERS, memberCount);
+  return L.divIcon({
+    html: `<span>${memberCount}</span>`,
+    className: ['clm-stamp', tier.cls, selected ? 'is-selected' : ''].filter(Boolean).join(' '),
+    iconSize: [tier.size, tier.size],
+    iconAnchor: [tier.size / 2, tier.size / 2],
+    popupAnchor: [0, -tier.size / 2],
+  });
+};
+
+// Leaflet.markercluster calls this for every cluster it forms. Summing
+// options.memberCount (rather than using getChildCount()) is what makes the
+// number on a cluster mean "people here", consistent with a single stamp.
+const buildClusterIcon = (cluster: L.MarkerCluster) => {
+  const total = cluster
+    .getAllChildMarkers()
+    .reduce((sum, m) => sum + (m.options.memberCount ?? 0), 0);
+  const tier = tierFor(CLUSTER_TIERS, total);
+  return L.divIcon({
+    html: `<span>${total}</span>`,
+    className: `clm-stamp clm-cluster ${tier.cls}`,
+    iconSize: [tier.size, tier.size],
+    iconAnchor: [tier.size / 2, tier.size / 2],
   });
 };
 
@@ -288,40 +332,42 @@ export const ParishMap = () => {
             </Polygon>
           ))}
 
-          {clusters.map((c) => (
-            <CircleMarker
-              key={c.key}
-              center={c.latLon}
-              radius={Math.max(8, 6 + c.memberCount * 2)}
-              pathOptions={{
-                className: 'parish-dot',
-                color: 'hsl(92 24% 25%)',
-                weight: 1.5,
-                fillColor: 'hsl(32 56% 51%)',
-                fillOpacity: 0.82,
-              }}
-              eventHandlers={{
-                click: () => setSelectedParish(c.key),
-                mouseover: (e) => e.target.setStyle({ fillOpacity: 1, weight: 2.5 }),
-                mouseout: (e) => e.target.setStyle({ fillOpacity: 0.82, weight: 1.5 }),
-              }}
-            >
-              <Popup>
-                <div className="font-heading text-mesquite">
-                  <div className="text-base">{c.parishName}</div>
-                  <div className="text-sm text-piedra">
-                    {c.memberCount}{' '}
-                    {c.memberCount === 1
-                      ? t(uiStrings.common.member)
-                      : t(uiStrings.common.members)}
+          {/* Parish stamps, gathered into cluster stamps while the view is
+              wide. Clustering switches off at z13, where parishes in the same
+              town have separated enough to stand on their own. */}
+          <MarkerClusterGroup
+            iconCreateFunction={buildClusterIcon}
+            disableClusteringAtZoom={13}
+            showCoverageOnHover={false}
+            spiderfyOnMaxZoom={false}
+            maxClusterRadius={48}
+            chunkedLoading
+          >
+            {clusters.map((c) => (
+              <Marker
+                key={c.key}
+                position={c.latLon}
+                memberCount={c.memberCount}
+                icon={buildParishStamp(c.memberCount, c.key === selectedParish)}
+                eventHandlers={{ click: () => setSelectedParish(c.key) }}
+              >
+                <Popup>
+                  <div className="font-heading text-mesquite">
+                    <div className="text-base">{c.parishName}</div>
+                    <div className="text-sm text-piedra">
+                      {c.memberCount}{' '}
+                      {c.memberCount === 1
+                        ? t(uiStrings.common.member)
+                        : t(uiStrings.common.members)}
+                    </div>
+                    {c.members[0] && (
+                      <div className="text-sm text-piedra">{c.members[0].name}</div>
+                    )}
                   </div>
-                  {c.members[0] && (
-                    <div className="text-sm text-piedra">{c.members[0].name}</div>
-                  )}
-                </div>
-              </Popup>
-            </CircleMarker>
-          ))}
+                </Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
 
           {workshops.map((w) =>
             hasIcon(w.craft) ? (

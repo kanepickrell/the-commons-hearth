@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Marcellus+SC&display=swap');
 @import 'leaflet/dist/leaflet.css';
 @import 'leaflet-draw/dist/leaflet.draw.css';
+/* Cluster spiderfy/zoom transitions only. The package's companion
+   MarkerCluster.Default.css is deliberately NOT imported — it paints the
+   stock blue bubbles, and every cluster here is drawn by our own divIcon. */
+@import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 
 @tailwind base;
 @tailwind components;
@@ -161,31 +165,78 @@
   background: hsl(var(--cal));
 }
 
-/* Parish dots — styled as soft "live" lights: a warm ocre glow that gently
-   breathes, lifting them off the open parchment. A crisper glow on hover
-   invites the click. Adapted from live-map treatments to the chapter palette. */
-.parish-dot {
-  filter: drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
-  animation: parish-breathe 4s ease-in-out infinite;
-  transition: filter 150ms ease;
+/* Parish stamps — each parish is struck as a letterpress mark: a limestone
+   disc inside an ocre ring, carrying its approved-member count in the display
+   face. Three sizes step with the count so the map reads at a glance.
+
+   These replaced soft "breathing" circle markers. Every dot used to glow on a
+   loop, which left nothing for a real signal to say: the pulse is now spent
+   only on parishes with a gathering coming up (see .clm-stamp--upcoming).
+
+   The box size is written inline by Leaflet from the icon's iconSize, so the
+   tier classes below carry only the typography — STAMP_TIERS in ParishMap.tsx
+   is the single source of truth for the pixel size. */
+.clm-stamp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  background: hsl(var(--cal));
+  border: 1.5px solid hsl(var(--ocre));
+  box-shadow: 0 1px 2px hsl(var(--mesquite) / 0.3);
+  color: hsl(var(--mesquite));
+  font-family: 'Marcellus SC', Georgia, serif;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.clm-stamp:hover,
+.clm-stamp.is-selected {
+  border-color: hsl(var(--mesquite));
+  box-shadow: 0 0 0 3px hsl(var(--ocre) / 0.25),
+              0 2px 4px hsl(var(--mesquite) / 0.4);
+}
+.clm-stamp--sm { font-size: 12px; }
+.clm-stamp--md { font-size: 14px; }
+.clm-stamp--lg { font-size: 16px; }
+
+/* Cluster stamps — the same mark struck heavier, carrying the summed member
+   count of every parish folded inside it. The outer ring is what tells a sum
+   apart from a single parish. */
+.clm-cluster {
+  box-shadow: 0 0 0 1.5px hsl(var(--cal)),
+              0 0 0 3px hsl(var(--ocre) / 0.45),
+              0 2px 4px hsl(var(--mesquite) / 0.3);
+}
+.clm-cluster:hover {
+  box-shadow: 0 0 0 1.5px hsl(var(--cal)),
+              0 0 0 3px hsl(var(--ocre) / 0.75),
+              0 2px 5px hsl(var(--mesquite) / 0.45);
+}
+.clm-cluster--sm { font-size: 15px; }
+.clm-cluster--md { font-size: 18px; }
+.clm-cluster--lg { font-size: 21px; }
+
+/* Gathering pins — the craft's own line drawing on a lighter disc, so a
+   gathering reads as a different kind of thing from a parish stamp. */
+.clm-workshop-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--mesquite) / 0.4);
+  box-shadow: 0 1px 2px hsl(var(--mesquite) / 0.25);
+  color: hsl(var(--mesquite));
+  overflow: hidden;
   cursor: pointer;
 }
-.parish-dot:hover {
-  animation: none;
-  filter: drop-shadow(0 0 6px hsl(var(--ocre) / 0.6))
-          drop-shadow(0 2px 4px hsl(var(--mesquite) / 0.45));
-}
-@keyframes parish-breathe {
-  0%, 100% {
-    filter: drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
-  }
-  50% {
-    filter: drop-shadow(0 0 5px hsl(var(--ocre) / 0.45))
-            drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .parish-dot { animation: none; }
+.clm-workshop-pin svg {
+  display: block;
+  width: 28px;
+  height: 28px;
 }
 
 /* Framing vignette over the basemap: a faint inset shadow settles the empty
