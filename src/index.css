@@ -201,6 +201,32 @@
 .clm-stamp--md { font-size: 14px; }
 .clm-stamp--lg { font-size: 16px; }
 
+/* A parish with a gathering inside the next 30 days sends out a slow ocre
+   ring. Leaflet positions marker icons absolutely, so ::after has a
+   containing block to sit in without any help. */
+.clm-stamp--upcoming::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--ocre));
+  pointer-events: none;
+  animation: clm-pulse 2s ease-out infinite;
+}
+@keyframes clm-pulse {
+  0%        { transform: scale(0.9);  opacity: 0.85; }
+  70%, 100% { transform: scale(1.28); opacity: 0; }
+}
+/* Reduced motion keeps the signal and drops the movement: the same ring,
+   held still. */
+@media (prefers-reduced-motion: reduce) {
+  .clm-stamp--upcoming::after {
+    animation: none;
+    transform: none;
+    opacity: 0.8;
+  }
+}
+
 /* Cluster stamps — the same mark struck heavier, carrying the summed member
    count of every parish folded inside it. The outer ring is what tells a sum
    apart from a single parish. */
@@ -217,6 +243,22 @@
 .clm-cluster--sm { font-size: 15px; }
 .clm-cluster--md { font-size: 18px; }
 .clm-cluster--lg { font-size: 21px; }
+
+/* A cluster hiding at least one parish with a gathering coming up wears a
+   single ocre dot. A pulse here would be a lie about where the gathering
+   is — the dot just says "open me". */
+.clm-cluster--upcoming::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: hsl(var(--ocre));
+  box-shadow: 0 0 0 2px hsl(var(--cal));
+  pointer-events: none;
+}
 
 /* Gathering pins — the craft's own line drawing on a lighter disc, so a
    gathering reads as a different kind of thing from a parish stamp. */

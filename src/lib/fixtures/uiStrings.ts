@@ -253,6 +253,18 @@ export const uiStrings = {
     members:        { en: 'members',         es: 'miembros' },
     member:         { en: 'member',          es: 'miembro' },
   },
+  map: {
+    filterAll:      { en: 'All parishes',        es: 'Todas las parroquias' },
+    filterUpcoming: { en: 'Upcoming gatherings', es: 'Próximas reuniones' },
+    upcomingRing: {
+      en: 'A ring marks a parish with a gathering in the next 30 days.',
+      es: 'Un anillo marca una parroquia con reunión en los próximos 30 días.',
+    },
+    noneUpcoming: {
+      en: 'No gatherings in the next 30 days.',
+      es: 'No hay reuniones en los próximos 30 días.',
+    },
+  },
   auth: {
     signIn:         { en: 'Sign in',    es: 'Entrar' },
     signOut:        { en: 'Sign out',   es: 'Salir' },

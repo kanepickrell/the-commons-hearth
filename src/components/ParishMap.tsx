@@ -29,7 +29,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import type { IconSlug } from '@/lib/types';
 import { ContactModal } from '@/components/ContactModal';
-import { todayLocalISO } from '@/lib/dates';
+import { chapterToday, todayLocalISO } from '@/lib/dates';
 
 type ProfileWithParish = {
   id: string;
@@ -64,8 +64,26 @@ type Member = {
 declare module 'leaflet' {
   interface MarkerOptions {
     memberCount?: number;
+    hasUpcoming?: boolean;
   }
 }
+
+// How far ahead a gathering counts as "coming up". Inclusive at both ends:
+// something happening today shows, and so does day 30; day 31 does not.
+const EVENT_WINDOW_DAYS = 30;
+
+// The soonest gathering at a parish inside that window. Non-members get the
+// title and the date but not `locationText` — gatherings_public withholds
+// held_at/location_text/lat/lng on upcoming gatherings from anyone who isn't
+// an approved member, which is why the ring is pinned to the PARISH's
+// coordinates rather than the gathering's. Everyone, signed in or out, can
+// then be told the same true thing: something is happening here soon.
+type UpcomingGathering = {
+  id: string;
+  title: string;
+  eventDate: string;
+  locationText: string | null;
+};
 
 type ParishCluster = {
   key: string;
@@ -107,11 +125,14 @@ const CLUSTER_TIERS: Tier[] = [
 const tierFor = (tiers: Tier[], count: number) =>
   tiers.find((t) => count <= t.upTo) ?? tiers[tiers.length - 1];
 
-const buildParishStamp = (memberCount: number, selected: boolean) => {
+const buildParishStamp = (memberCount: number, selected: boolean, hasUpcoming: boolean) => {
   const tier = tierFor(STAMP_TIERS, memberCount);
+  const className = ['clm-stamp', tier.cls];
+  if (selected) className.push('is-selected');
+  if (hasUpcoming) className.push('clm-stamp--upcoming');
   return L.divIcon({
     html: `<span>${memberCount}</span>`,
-    className: ['clm-stamp', tier.cls, selected ? 'is-selected' : ''].filter(Boolean).join(' '),
+    className: className.join(' '),
     iconSize: [tier.size, tier.size],
     iconAnchor: [tier.size / 2, tier.size / 2],
     popupAnchor: [0, -tier.size / 2],
@@ -122,13 +143,15 @@ const buildParishStamp = (memberCount: number, selected: boolean) => {
 // options.memberCount (rather than using getChildCount()) is what makes the
 // number on a cluster mean "people here", consistent with a single stamp.
 const buildClusterIcon = (cluster: L.MarkerCluster) => {
-  const total = cluster
-    .getAllChildMarkers()
-    .reduce((sum, m) => sum + (m.options.memberCount ?? 0), 0);
+  const children = cluster.getAllChildMarkers();
+  const total = children.reduce((sum, m) => sum + (m.options.memberCount ?? 0), 0);
+  const anyUpcoming = children.some((m) => m.options.hasUpcoming);
   const tier = tierFor(CLUSTER_TIERS, total);
+  const className = ['clm-stamp', 'clm-cluster', tier.cls];
+  if (anyUpcoming) className.push('clm-cluster--upcoming');
   return L.divIcon({
     html: `<span>${total}</span>`,
-    className: `clm-stamp clm-cluster ${tier.cls}`,
+    className: className.join(' '),
     iconSize: [tier.size, tier.size],
     iconAnchor: [tier.size / 2, tier.size / 2],
   });
@@ -164,6 +187,8 @@ export const ParishMap = () => {
 
   const [clusters, setClusters] = useState<ParishCluster[]>([]);
   const [workshops, setWorkshops] = useState<WorkshopMarker[]>([]);
+  const [upcoming, setUpcoming] = useState<Map<string, UpcomingGathering>>(new Map());
+  const [onlyUpcoming, setOnlyUpcoming] = useState(false);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
   const [segments, setSegments] = useState<ChapterSegment[]>([]);
   // Parish whose "would you be the contact?" offer is open, if any.
@@ -240,6 +265,44 @@ export const ParishMap = () => {
     })();
   }, [isAuthenticated]);
 
+  // Which parishes have something coming up. One query for every parish and
+  // every viewer — the window is filtered in Postgres, and the rows anon gets
+  // back are the redacted ones, so signed-in and signed-out run exactly the
+  // same code path. Ordering by date means the first row seen for a parish is
+  // its soonest, so a plain "first wins" insert finds the next gathering.
+  useEffect(() => {
+    (async () => {
+      const from = todayLocalISO(chapterToday());
+      const until = new Date(chapterToday());
+      until.setDate(until.getDate() + EVENT_WINDOW_DAYS);
+
+      const { data, error } = await supabase
+        .from('gatherings_public')
+        .select('id, title, event_date, parish_id, location_text')
+        .gte('event_date', from)
+        .lte('event_date', todayLocalISO(until))
+        .order('event_date', { ascending: true });
+
+      if (error) {
+        console.error('Failed to load upcoming gatherings for map:', error);
+        return;
+      }
+
+      const next = new Map<string, UpcomingGathering>();
+      for (const g of data ?? []) {
+        if (!g.parish_id || !g.id || !g.title || !g.event_date) continue;
+        if (next.has(g.parish_id)) continue;
+        next.set(g.parish_id, {
+          id: g.id,
+          title: g.title,
+          eventDate: g.event_date,
+          locationText: g.location_text,
+        });
+      }
+      setUpcoming(next);
+    })();
+  }, []);
+
   useEffect(() => {
     if (!isApprovedMember) {
       setWorkshops([]);
@@ -268,12 +331,34 @@ export const ParishMap = () => {
     })();
   }, [isApprovedMember]);
 
-  const allPoints: [number, number][] = useMemo(
-    () => [...clusters.map((c) => c.latLon), ...workshops.map((w) => [w.lat, w.lng] as [number, number])],
-    [clusters, workshops]
+  // Parishes that can actually show a ring. Not every gathering inside the
+  // window produces one: a gathering with no parish, or at a parish with no
+  // approved members (which keeps it out of parish_member_counts, and so off
+  // the map), has nowhere to put the mark. Deriving this instead of reading
+  // upcoming.size is what stops the legend promising a ring that cannot
+  // appear.
+  const parishesWithUpcoming = useMemo(
+    () => clusters.filter((c) => upcoming.has(c.key)),
+    [clusters, upcoming]
   );
 
-  const selected = clusters.find((c) => c.key === selectedParish) ?? null;
+  // The "upcoming" filter hides parishes rather than dimming them, so the
+  // clusters recount themselves around what is left and the numbers keep
+  // meaning "members you can see".
+  const visibleParishes = onlyUpcoming ? parishesWithUpcoming : clusters;
+
+  const allPoints: [number, number][] = useMemo(
+    () => [
+      ...visibleParishes.map((c) => c.latLon),
+      ...workshops.map((w) => [w.lat, w.lng] as [number, number]),
+    ],
+    [visibleParishes, workshops]
+  );
+
+  // Resolved against the VISIBLE set: filtering to "upcoming" should not
+  // leave the sidebar describing a parish whose stamp is no longer on the
+  // map. The key stays in state, so switching back to "all" restores it.
+  const selected = visibleParishes.find((c) => c.key === selectedParish) ?? null;
   // Only POCs are ever loaded, so every listed name is a point of contact.
   const selectedPocs = selected?.members ?? [];
 
@@ -336,6 +421,15 @@ export const ParishMap = () => {
               wide. Clustering switches off at z13, where parishes in the same
               town have separated enough to stand on their own. */}
           <MarkerClusterGroup
+            /* Remount the group whenever the marker set or the upcoming set
+               changes. Two things make this necessary rather than tidy:
+               markercluster caches the icon it built for a cluster, so a
+               badge arriving with the later gatherings query would never be
+               painted; and react-leaflet's updateMarker only ever reassigns
+               position/icon/zIndex/opacity/draggable, so memberCount and
+               hasUpcoming are fixed at construction. The set is a dozen
+               markers, so rebuilding is free. */
+            key={`${onlyUpcoming}:${visibleParishes.length}:${upcoming.size}`}
             iconCreateFunction={buildClusterIcon}
             disableClusteringAtZoom={13}
             showCoverageOnHover={false}
@@ -343,12 +437,13 @@ export const ParishMap = () => {
             maxClusterRadius={48}
             chunkedLoading
           >
-            {clusters.map((c) => (
+            {visibleParishes.map((c) => (
               <Marker
                 key={c.key}
                 position={c.latLon}
                 memberCount={c.memberCount}
-                icon={buildParishStamp(c.memberCount, c.key === selectedParish)}
+                hasUpcoming={upcoming.has(c.key)}
+                icon={buildParishStamp(c.memberCount, c.key === selectedParish, upcoming.has(c.key))}
                 eventHandlers={{ click: () => setSelectedParish(c.key) }}
               >
                 <Popup>
@@ -398,6 +493,29 @@ export const ParishMap = () => {
         {/* Soft inner vignette frames the open parchment so the wide,
             zoomed-out view reads as intentional rather than empty. */}
         <div className="map-vignette pointer-events-none absolute inset-0 z-[500] rounded" />
+
+        {/* Filter. Sits above the vignette but below Leaflet's popups (z700)
+            so a popup opening near this corner is never covered. */}
+        <div className="absolute right-3 top-3 z-[600] flex overflow-hidden rounded-sm border border-mesquite/20 bg-cal/95 shadow-sm">
+          {([false, true] as const).map((wantsUpcoming) => {
+            const active = onlyUpcoming === wantsUpcoming;
+            return (
+              <button
+                key={String(wantsUpcoming)}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setOnlyUpcoming(wantsUpcoming)}
+                className={`px-3 py-1.5 font-heading text-xs transition ${
+                  active
+                    ? 'bg-ocre/15 text-mesquite'
+                    : 'text-mesquite/60 hover:bg-ocre/5 hover:text-mesquite'
+                }`}
+              >
+                {t(wantsUpcoming ? uiStrings.map.filterUpcoming : uiStrings.map.filterAll)}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <aside className="rounded border border-mesquite/20 bg-cal/50 p-5">
@@ -465,10 +583,17 @@ export const ParishMap = () => {
         ) : (
           <div>
             <p className="font-heading italic text-piedra">
-              {locale === 'es'
-                ? 'Toca una parroquia para ver a sus miembros.'
-                : 'Tap a parish to see its members.'}
+              {onlyUpcoming && visibleParishes.length === 0
+                ? t(uiStrings.map.noneUpcoming)
+                : locale === 'es'
+                  ? 'Toca una parroquia para ver a sus miembros.'
+                  : 'Tap a parish to see its members.'}
             </p>
+            {parishesWithUpcoming.length > 0 && (
+              <p className="mt-3 font-serif text-xs italic text-piedra/70">
+                {t(uiStrings.map.upcomingRing)}
+              </p>
+            )}
             {!isApprovedMember && !user && (
               <p className="mt-4 border-t border-mesquite/10 pt-4 font-serif text-xs italic text-piedra/70">
                 {t(uiStrings.workshop.memberOnlyMap)}
