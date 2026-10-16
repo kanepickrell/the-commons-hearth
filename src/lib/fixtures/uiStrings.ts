@@ -264,6 +264,13 @@ export const uiStrings = {
       en: 'No gatherings in the next 30 days.',
       es: 'No hay reuniones en los próximos 30 días.',
     },
+    parishList:    { en: 'Parishes',       es: 'Parroquias' },
+    nextGathering: { en: 'Next gathering', es: 'Próxima reunión' },
+    showList:      { en: 'Parish list',    es: 'Lista de parroquias' },
+    listHint: {
+      en: 'Sorted by members. Choose one to find it on the map.',
+      es: 'Ordenadas por miembros. Elige una para encontrarla en el mapa.',
+    },
   },
   auth: {
     signIn:         { en: 'Sign in',    es: 'Entrar' },

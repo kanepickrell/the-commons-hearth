@@ -29,7 +29,9 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import type { IconSlug } from '@/lib/types';
 import { ContactModal } from '@/components/ContactModal';
-import { chapterToday, todayLocalISO } from '@/lib/dates';
+import { RsvpModal } from '@/components/RsvpModal';
+import { useRsvp } from '@/hooks/useRsvp';
+import { chapterToday, formatDate, fromDateOnly, todayLocalISO } from '@/lib/dates';
 
 type ProfileWithParish = {
   id: string;
@@ -157,6 +159,83 @@ const buildClusterIcon = (cluster: L.MarkerCluster) => {
   });
 };
 
+/**
+ * What a parish stamp says when you open it, and the same body the sidebar
+ * shows for the selected parish. Names here are POCs only — `members` never
+ * holds anyone else (see the note at the top of this file).
+ */
+const ParishCard = ({
+  parish,
+  next,
+  onRsvp,
+}: {
+  parish: ParishCluster;
+  next: UpcomingGathering | null;
+  onRsvp: (gatheringId: string) => void;
+}) => {
+  const { t, locale } = useLocale();
+
+  return (
+    <div className="font-heading text-mesquite">
+      <div className="text-base leading-tight">{parish.parishName}</div>
+      <div className="text-sm text-piedra">
+        {parish.memberCount}{' '}
+        {parish.memberCount === 1 ? t(uiStrings.common.member) : t(uiStrings.common.members)}
+      </div>
+
+      {parish.members.length > 0 && (
+        <ul className="mt-2 space-y-0.5">
+          {parish.members.map((m) => (
+            <li key={m.id} className="text-sm">
+              <Link
+                to={buildPath('memberDetail', locale, { id: m.id })}
+                className="text-piedra no-underline hover:text-ocre"
+                style={{ textDecoration: 'none' }}
+              >
+                {m.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {next && (
+        <div className="mt-3 border-t border-mesquite/15 pt-2">
+          <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
+            {t(uiStrings.map.nextGathering)}
+          </p>
+          <Link
+            to={buildPath('tallerDetail', locale, { id: next.id })}
+            className="mt-1 block text-sm leading-tight text-mesquite no-underline hover:text-ocre"
+            style={{ textDecoration: 'none' }}
+          >
+            {next.title}
+          </Link>
+          <p className="text-sm text-piedra">
+            {formatDate(fromDateOnly(next.eventDate), locale, {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </p>
+          {/* Withheld from non-members by gatherings_public, so it is simply
+              absent rather than explained away. */}
+          {next.locationText && (
+            <p className="font-serif text-xs italic text-piedra/80">{next.locationText}</p>
+          )}
+          <button
+            type="button"
+            onClick={() => onRsvp(next.id)}
+            className="mt-2 rounded-sm bg-ocre px-3 py-1 font-heading text-xs text-cal transition hover:bg-mesquite"
+          >
+            {t(uiStrings.workshop.rsvp)}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const FitBounds = ({ points }: { points: [number, number][] }) => {
   const map = useMap();
   const lastSig = useRef<string>('');
@@ -191,6 +270,26 @@ export const ParishMap = () => {
   const [onlyUpcoming, setOnlyUpcoming] = useState(false);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
   const [segments, setSegments] = useState<ChapterSegment[]>([]);
+  // Which gathering the RSVP modal is for. One modal serves every popup:
+  // the button in a popup names its parish's next gathering and opens it.
+  const [rsvpTarget, setRsvpTarget] = useState<string | null>(null);
+  // Mobile only — the parish list collapses so the map keeps the screen.
+  const [listOpen, setListOpen] = useState(false);
+
+  const mapRef = useRef<L.Map | null>(null);
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
+  const markerRefs = useRef(new Map<string, L.Marker>());
+  const rowRefs = useRef(new Map<string, HTMLButtonElement>());
+
+  const rsvp = useRsvp({ workshopId: rsvpTarget });
+
+  // Point the one modal at this gathering, then open it. The target lands in
+  // state before any submit can run, so the hook always inserts against the
+  // gathering whose button was pressed.
+  const startRsvp = (gatheringId: string) => {
+    setRsvpTarget(gatheringId);
+    rsvp.openModal();
+  };
   // Parish whose "would you be the contact?" offer is open, if any.
   const [pocOffer, setPocOffer] = useState<string | null>(null);
 
@@ -358,6 +457,54 @@ export const ParishMap = () => {
   // Resolved against the VISIBLE set: filtering to "upcoming" should not
   // leave the sidebar describing a parish whose stamp is no longer on the
   // map. The key stays in state, so switching back to "all" restores it.
+  // The list reads biggest-first, then alphabetically so equal counts keep a
+  // stable order instead of shuffling with whatever Postgres returned.
+  const listedParishes = useMemo(
+    () =>
+      [...visibleParishes].sort(
+        (a, b) => b.memberCount - a.memberCount || a.parishName.localeCompare(b.parishName)
+      ),
+    [visibleParishes]
+  );
+
+  // Hover lighting is done by hand on the marker's own element rather than by
+  // rebuilding its icon through React: pointing at a row should not re-render
+  // every other marker on the map.
+  //
+  // A parish folded into a cluster has no element of its own, which would
+  // leave those rows with no answer at all. getVisibleParent gives back the
+  // cluster standing in for it, so the row still lights the thing on screen
+  // that contains it.
+  const highlightMarker = (key: string, on: boolean) => {
+    const marker = markerRefs.current.get(key);
+    if (!marker) return;
+    const onScreen = clusterRef.current?.getVisibleParent(marker) ?? marker;
+    onScreen?.getElement()?.classList.toggle('is-hovered', on);
+  };
+
+  // Row click → find the parish on the map. zoomToShowLayer is what makes
+  // this work on a marker currently folded into a cluster: it zooms until
+  // the marker stands alone, then runs the callback.
+  const focusParish = (key: string) => {
+    setSelectedParish(key);
+    const marker = markerRefs.current.get(key);
+    if (!marker) return;
+    const group = clusterRef.current;
+    if (group) {
+      group.zoomToShowLayer(marker, () => marker.openPopup());
+    } else {
+      mapRef.current?.flyTo(marker.getLatLng(), Math.max(mapRef.current.getZoom(), 12));
+      marker.openPopup();
+    }
+  };
+
+  // Marker click → bring its row into view, so the two halves never disagree
+  // about what is selected.
+  useEffect(() => {
+    if (!selectedParish) return;
+    rowRefs.current.get(selectedParish)?.scrollIntoView({ block: 'nearest' });
+  }, [selectedParish]);
+
   const selected = visibleParishes.find((c) => c.key === selectedParish) ?? null;
   // Only POCs are ever loaded, so every listed name is a point of contact.
   const selectedPocs = selected?.members ?? [];
@@ -366,6 +513,7 @@ export const ParishMap = () => {
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr,280px]">
       <div className="relative overflow-hidden rounded border border-mesquite/20" style={{ height: 460 }}>
         <MapContainer
+          ref={mapRef}
           center={[29.6, -98.5]}
           zoom={9}
           minZoom={7}
@@ -430,6 +578,7 @@ export const ParishMap = () => {
                hasUpcoming are fixed at construction. The set is a dozen
                markers, so rebuilding is free. */
             key={`${onlyUpcoming}:${visibleParishes.length}:${upcoming.size}`}
+            ref={clusterRef}
             iconCreateFunction={buildClusterIcon}
             disableClusteringAtZoom={13}
             showCoverageOnHover={false}
@@ -444,21 +593,18 @@ export const ParishMap = () => {
                 memberCount={c.memberCount}
                 hasUpcoming={upcoming.has(c.key)}
                 icon={buildParishStamp(c.memberCount, c.key === selectedParish, upcoming.has(c.key))}
+                ref={(m) => {
+                  if (m) markerRefs.current.set(c.key, m);
+                  else markerRefs.current.delete(c.key);
+                }}
                 eventHandlers={{ click: () => setSelectedParish(c.key) }}
               >
                 <Popup>
-                  <div className="font-heading text-mesquite">
-                    <div className="text-base">{c.parishName}</div>
-                    <div className="text-sm text-piedra">
-                      {c.memberCount}{' '}
-                      {c.memberCount === 1
-                        ? t(uiStrings.common.member)
-                        : t(uiStrings.common.members)}
-                    </div>
-                    {c.members[0] && (
-                      <div className="text-sm text-piedra">{c.members[0].name}</div>
-                    )}
-                  </div>
+                  <ParishCard
+                    parish={c}
+                    next={upcoming.get(c.key) ?? null}
+                    onRsvp={startRsvp}
+                  />
                 </Popup>
               </Marker>
             ))}
@@ -518,89 +664,148 @@ export const ParishMap = () => {
         </div>
       </div>
 
-      <aside className="rounded border border-mesquite/20 bg-cal/50 p-5">
-        {selected ? (
-          <>
-            <h3 className="font-heading text-lg text-mesquite">{selected.parishName}</h3>
-            <p className="mt-1 text-sm text-piedra">
-              {selected.memberCount} {selected.memberCount === 1 ? t(uiStrings.common.member) : t(uiStrings.common.members)}
+      {/* The parish list. It is also the map's accessible equivalent: every
+          parish, its count, whether something is coming up, and the same
+          details the popup carries, all reachable by keyboard. Anything the
+          stamps say, this says too. */}
+      <aside
+        aria-label={t(uiStrings.map.parishList)}
+        className="rounded border border-mesquite/20 bg-cal/50"
+      >
+        {/* Phone: the list collapses so the map keeps the screen. It stays in
+            the page flow rather than floating as a sheet — this map is one
+            section of the homepage, and an overlay would cover the article
+            around it. */}
+        <button
+          type="button"
+          onClick={() => setListOpen((v) => !v)}
+          aria-expanded={listOpen}
+          className="flex w-full items-center justify-between p-4 font-heading text-sm text-mesquite md:hidden"
+        >
+          <span>
+            {t(uiStrings.map.showList)}
+            <span className="ml-2 text-piedra/70">{listedParishes.length}</span>
+          </span>
+          <span aria-hidden="true" className="text-ocre">{listOpen ? '−' : '+'}</span>
+        </button>
+
+        <div className={`${listOpen ? 'block' : 'hidden'} md:block`}>
+          <div className="p-4 pb-2">
+            <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
+              {t(uiStrings.map.parishList)}
             </p>
-
-            {selectedPocs.length > 0 && (
-              <>
-                <div className="rule my-4" />
-                <p className="display-caps mb-3 text-[10px] tracking-[0.2em] text-ocre">
-                  {locale === 'es' ? 'CONTACTO' : 'POINT OF CONTACT'}
-                </p>
-                <ul className="space-y-3">
-                  {selectedPocs.map((m) => (
-                    <li key={m.id}>
-                      <Link
-                        to={buildPath('memberDetail', locale, { id: m.id })}
-                        className="font-heading text-mesquite no-underline hover:text-ocre"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        {m.name}
-                      </Link>
-                      {m.contactEmail && (
-                        <a
-                          href={`mailto:${m.contactEmail}`}
-                          className="mt-0.5 block font-serif text-xs italic text-ocre hover:underline"
-                        >
-                          {m.contactEmail}
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            {selectedPocs.length === 0 && (
-              <>
-                <div className="rule my-4" />
-                <p className="font-serif text-xs italic text-piedra/70">
-                  {locale === 'es'
-                    ? 'Aún no hay un contacto designado para esta parroquia.'
-                    : 'No point of contact listed yet for this parish.'}
-                </p>
-                {/* This used to be where the panel stopped. Someone who just
-                    clicked their own parish and found it unclaimed is the best
-                    candidate the chapter will ever get for the role the whole
-                    directory depends on, so ask them. */}
-                <button
-                  type="button"
-                  onClick={() => setPocOffer(selected.parishName)}
-                  className="mt-3 font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
-                >
-                  {locale === 'es'
-                    ? '¿Te gustaría serlo? →'
-                    : 'Would you be the one? →'}
-                </button>
-              </>
-            )}
-          </>
-        ) : (
-          <div>
-            <p className="font-heading italic text-piedra">
-              {onlyUpcoming && visibleParishes.length === 0
+            <p className="mt-1 font-serif text-xs italic text-piedra/70">
+              {listedParishes.length === 0
                 ? t(uiStrings.map.noneUpcoming)
-                : locale === 'es'
-                  ? 'Toca una parroquia para ver a sus miembros.'
-                  : 'Tap a parish to see its members.'}
+                : t(uiStrings.map.listHint)}
             </p>
+          </div>
+
+          <ul className="max-h-[22rem] overflow-y-auto px-2 pb-2">
+            {listedParishes.map((c) => {
+              const isSelected = c.key === selectedParish;
+              const hasUpcoming = upcoming.has(c.key);
+              return (
+                <li key={c.key}>
+                  <button
+                    type="button"
+                    ref={(el) => {
+                      if (el) rowRefs.current.set(c.key, el);
+                      else rowRefs.current.delete(c.key);
+                    }}
+                    onClick={() => focusParish(c.key)}
+                    onMouseEnter={() => highlightMarker(c.key, true)}
+                    onMouseLeave={() => highlightMarker(c.key, false)}
+                    /* Focus mirrors hover so a keyboard walk down the list
+                       lights the same stamps a mouse would. */
+                    onFocus={() => highlightMarker(c.key, true)}
+                    onBlur={() => highlightMarker(c.key, false)}
+                    aria-current={isSelected ? 'true' : undefined}
+                    aria-expanded={isSelected}
+                    className={`flex w-full items-baseline justify-between gap-2 rounded-sm px-2 py-1.5 text-left transition ${
+                      isSelected ? 'bg-ocre/15' : 'hover:bg-ocre/5'
+                    }`}
+                  >
+                    <span className="font-heading text-sm leading-tight text-mesquite">
+                      {c.parishName}
+                      {hasUpcoming && (
+                        <>
+                          {' '}
+                          <span aria-hidden="true" className="text-ocre">●</span>
+                          <span className="sr-only"> — {t(uiStrings.map.filterUpcoming)}</span>
+                        </>
+                      )}
+                    </span>
+                    <span className="shrink-0 font-caps text-xs text-piedra">{c.memberCount}</span>
+                  </button>
+
+                  {isSelected && (
+                    <div className="border-l-2 border-ocre/40 px-3 py-2 pl-4">
+                      <ParishCard
+                        parish={c}
+                        next={upcoming.get(c.key) ?? null}
+                        onRsvp={startRsvp}
+                      />
+
+                      {/* POC emails live here rather than in the popup: the
+                          popup is the glance, this is the panel you read. */}
+                      {selectedPocs.some((m) => m.contactEmail) && (
+                        <ul className="mt-2 space-y-0.5">
+                          {selectedPocs
+                            .filter((m) => m.contactEmail)
+                            .map((m) => (
+                              <li key={m.id}>
+                                <a
+                                  href={`mailto:${m.contactEmail}`}
+                                  className="font-serif text-xs italic text-ocre hover:underline"
+                                >
+                                  {m.contactEmail}
+                                </a>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+
+                      {selectedPocs.length === 0 && (
+                        <>
+                          <p className="mt-2 font-serif text-xs italic text-piedra/70">
+                            {locale === 'es'
+                              ? 'Aún no hay un contacto designado para esta parroquia.'
+                              : 'No point of contact listed yet for this parish.'}
+                          </p>
+                          {/* Someone who just opened their own parish and
+                              found it unclaimed is the best candidate the
+                              chapter will ever get for the role the whole
+                              directory depends on, so ask them. */}
+                          <button
+                            type="button"
+                            onClick={() => setPocOffer(c.parishName)}
+                            className="mt-1 font-heading text-xs text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
+                          >
+                            {locale === 'es' ? '¿Te gustaría serlo? →' : 'Would you be the one? →'}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="px-4 pb-4">
             {parishesWithUpcoming.length > 0 && (
-              <p className="mt-3 font-serif text-xs italic text-piedra/70">
+              <p className="font-serif text-xs italic text-piedra/70">
                 {t(uiStrings.map.upcomingRing)}
               </p>
             )}
             {!isApprovedMember && !user && (
-              <p className="mt-4 border-t border-mesquite/10 pt-4 font-serif text-xs italic text-piedra/70">
+              <p className="mt-3 border-t border-mesquite/10 pt-3 font-serif text-xs italic text-piedra/70">
                 {t(uiStrings.workshop.memberOnlyMap)}
               </p>
             )}
           </div>
-        )}
+        </div>
       </aside>
 
       {/* Offer to serve as a parish's point of contact. The form opens on the
@@ -618,6 +823,10 @@ export const ParishMap = () => {
             : undefined
         }
       />
+
+      {/* One modal for every popup's RSVP button; portal-rendered, so it sits
+          above the map rather than inside a Leaflet pane. */}
+      <RsvpModal open={rsvp.modalOpen} onClose={rsvp.closeModal} onSubmit={rsvp.submit} />
     </div>
   );
 };

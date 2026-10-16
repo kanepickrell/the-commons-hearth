@@ -191,7 +191,11 @@
   cursor: pointer;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
+/* .is-hovered is set from the sidebar, directly on the marker element, so
+   hovering a row lights its stamp without re-rendering every marker. It is
+   kept separate from .is-selected so clearing one never clears the other. */
 .clm-stamp:hover,
+.clm-stamp.is-hovered,
 .clm-stamp.is-selected {
   border-color: hsl(var(--mesquite));
   box-shadow: 0 0 0 3px hsl(var(--ocre) / 0.25),
