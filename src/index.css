@@ -1,10 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Marcellus+SC&display=swap');
 @import 'leaflet/dist/leaflet.css';
 @import 'leaflet-draw/dist/leaflet.draw.css';
-/* Cluster spiderfy/zoom transitions only. The package's companion
-   MarkerCluster.Default.css is deliberately NOT imported — it paints the
-   stock blue bubbles, and every cluster here is drawn by our own divIcon. */
-@import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 
 @tailwind base;
 @tailwind components;
@@ -165,176 +161,31 @@
   background: hsl(var(--cal));
 }
 
-/* Parish stamps — each parish is struck as a letterpress mark: a limestone
-   disc inside an ocre ring, carrying its approved-member count in the display
-   face. Three sizes step with the count so the map reads at a glance.
-
-   These replaced soft "breathing" circle markers. Every dot used to glow on a
-   loop, which left nothing for a real signal to say: the pulse is now spent
-   only on parishes with a gathering coming up (see .clm-stamp--upcoming).
-
-   The box size is written inline by Leaflet from the icon's iconSize, so the
-   tier classes below carry only the typography — STAMP_TIERS in ParishMap.tsx
-   is the single source of truth for the pixel size. */
-.clm-stamp {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border-radius: 9999px;
-  background: hsl(var(--cal));
-  border: 1.5px solid hsl(var(--ocre));
-  box-shadow: 0 1px 2px hsl(var(--mesquite) / 0.3);
-  color: hsl(var(--mesquite));
-  font-family: 'Marcellus SC', Georgia, serif;
-  line-height: 1;
+/* Parish dots — styled as soft "live" lights: a warm ocre glow that gently
+   breathes, lifting them off the open parchment. A crisper glow on hover
+   invites the click. Adapted from live-map treatments to the chapter palette. */
+.parish-dot {
+  filter: drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
+  animation: parish-breathe 4s ease-in-out infinite;
+  transition: filter 150ms ease;
   cursor: pointer;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
-/* .is-hovered is set from the sidebar, directly on the marker element, so
-   hovering a row lights its stamp without re-rendering every marker. It is
-   kept separate from .is-selected so clearing one never clears the other. */
-.clm-stamp:hover,
-.clm-stamp.is-hovered,
-.clm-stamp.is-selected {
-  border-color: hsl(var(--mesquite));
-  box-shadow: 0 0 0 3px hsl(var(--ocre) / 0.25),
-              0 2px 4px hsl(var(--mesquite) / 0.4);
+.parish-dot:hover {
+  animation: none;
+  filter: drop-shadow(0 0 6px hsl(var(--ocre) / 0.6))
+          drop-shadow(0 2px 4px hsl(var(--mesquite) / 0.45));
 }
-.clm-stamp--sm { font-size: 12px; }
-.clm-stamp--md { font-size: 14px; }
-.clm-stamp--lg { font-size: 16px; }
-
-/* A parish with a gathering inside the next 30 days sends out a slow ocre
-   ring. Leaflet positions marker icons absolutely, so ::after has a
-   containing block to sit in without any help. */
-.clm-stamp--upcoming::after {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border-radius: 9999px;
-  border: 2px solid hsl(var(--ocre));
-  pointer-events: none;
-  animation: clm-pulse 2s ease-out infinite;
-}
-@keyframes clm-pulse {
-  0%        { transform: scale(0.9);  opacity: 0.85; }
-  70%, 100% { transform: scale(1.28); opacity: 0; }
-}
-/* Reduced motion keeps the signal and drops the movement: the same ring,
-   held still. */
-@media (prefers-reduced-motion: reduce) {
-  .clm-stamp--upcoming::after {
-    animation: none;
-    transform: none;
-    opacity: 0.8;
+@keyframes parish-breathe {
+  0%, 100% {
+    filter: drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px hsl(var(--ocre) / 0.45))
+            drop-shadow(0 1px 2px hsl(var(--mesquite) / 0.35));
   }
 }
-
-/* Cluster stamps — the same mark struck heavier, carrying the summed member
-   count of every parish folded inside it. The outer ring is what tells a sum
-   apart from a single parish. */
-.clm-cluster {
-  box-shadow: 0 0 0 1.5px hsl(var(--cal)),
-              0 0 0 3px hsl(var(--ocre) / 0.45),
-              0 2px 4px hsl(var(--mesquite) / 0.3);
-}
-.clm-cluster:hover {
-  box-shadow: 0 0 0 1.5px hsl(var(--cal)),
-              0 0 0 3px hsl(var(--ocre) / 0.75),
-              0 2px 5px hsl(var(--mesquite) / 0.45);
-}
-.clm-cluster--sm { font-size: 15px; }
-.clm-cluster--md { font-size: 18px; }
-.clm-cluster--lg { font-size: 21px; }
-
-/* A cluster hiding at least one parish with a gathering coming up wears a
-   single ocre dot. A pulse here would be a lie about where the gathering
-   is — the dot just says "open me". */
-.clm-cluster--upcoming::before {
-  content: '';
-  position: absolute;
-  top: 1px;
-  right: 1px;
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background: hsl(var(--ocre));
-  box-shadow: 0 0 0 2px hsl(var(--cal));
-  pointer-events: none;
-}
-
-/* Legend keys in the layer control. Each is a miniature of the mark the
-   layer actually draws, so the switch doubles as the key. */
-.clm-key {
-  display: inline-block;
-  flex: none;
-  width: 12px;
-  height: 12px;
-}
-.clm-key--parishes {
-  border-radius: 9999px;
-  background: hsl(var(--cal));
-  border: 1.5px solid hsl(var(--ocre));
-}
-.clm-key--gatherings {
-  border-radius: 9999px;
-  border: 1.5px solid hsl(var(--ocre));
-  box-shadow: 0 0 0 2px hsl(var(--ocre) / 0.3);
-}
-.clm-key--annotations {
-  height: 0;
-  border-top: 2px dashed hsl(var(--ocre));
-  align-self: center;
-}
-
-/* Annotations a steward drew. A point annotation is a word set on the land:
-   the icon box is collapsed to nothing (Leaflet owns the element's own
-   transform for positioning) and the text centres itself inside it. */
-.clm-annotation-label {
-  width: 0 !important;
-  height: 0 !important;
-  overflow: visible;
-}
-.clm-annotation-label > span {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
-  font-family: 'Marcellus SC', Georgia, serif;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: hsl(var(--mesquite));
-  text-shadow: 0 1px 2px hsl(var(--cal) / 0.9), 0 0 3px hsl(var(--cal) / 0.9);
-  pointer-events: none;
-}
-.clm-annotation-mark {
-  border-radius: 9999px;
-  background: hsl(var(--ocre) / 0.8);
-  box-shadow: 0 0 0 2px hsl(var(--cal));
-}
-
-/* Gathering pins — the craft's own line drawing on a lighter disc, so a
-   gathering reads as a different kind of thing from a parish stamp. */
-.clm-workshop-pin {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border-radius: 9999px;
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--mesquite) / 0.4);
-  box-shadow: 0 1px 2px hsl(var(--mesquite) / 0.25);
-  color: hsl(var(--mesquite));
-  overflow: hidden;
-  cursor: pointer;
-}
-.clm-workshop-pin svg {
-  display: block;
-  width: 28px;
-  height: 28px;
+@media (prefers-reduced-motion: reduce) {
+  .parish-dot { animation: none; }
 }
 
 /* Framing vignette over the basemap: a faint inset shadow settles the empty

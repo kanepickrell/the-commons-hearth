@@ -25,7 +25,6 @@ const Bienvenido   = lazy(() => import("./pages/Bienvenido.tsx"));
 const MiPerfil     = lazy(() => import("./pages/MiPerfil.tsx"));
 const Mayordomo    = lazy(() => import("./pages/Mayordomo.tsx"));
 const NuevaReunion = lazy(() => import("./pages/NuevaReunion.tsx"));
-const Mapa         = lazy(() => import("./pages/Mapa.tsx"));
 const NotFound     = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
@@ -93,9 +92,6 @@ const App = () => (
 
                   <Route path={routes.mayordomo.es} element={<Mayordomo />} />
                   <Route path={routes.mayordomo.en} element={<Mayordomo />} />
-
-                  <Route path={routes.mapa.es} element={<Mapa />} />
-                  <Route path={routes.mapa.en} element={<Mapa />} />
 
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

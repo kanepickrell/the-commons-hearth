@@ -13,10 +13,10 @@ import { RsvpModal, type ContributionType } from '@/components/RsvpModal';
 import { SignInModal } from '@/components/SignInModal';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useRsvp } from '@/hooks/useRsvp';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
 import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 import type { IconSlug } from '@/lib/types';
 import { formatDate, formatTime, fromDateOnly, dateOnlyInZone, chapterTzLabel } from '@/lib/dates';
 
@@ -51,6 +51,7 @@ const TallerDetail = () => {
   const [w, setW] = useState<GatheringDetail | null>(null);
   const [rsvps, setRsvps] = useState<RsvpRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
 
   const isApprovedMember = !!profile && profile.status === 'approved';
@@ -96,11 +97,43 @@ const TallerDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isApprovedMember]);
 
-  const { modalOpen, openModal, closeModal, submit: handleRsvp } = useRsvp({
-    workshopId: id ?? null,
-    alreadyRsvpd: !!myRsvp,
-    onSuccess: loadRsvps,
-  });
+  const handleRsvp = async (values: { contributionType: ContributionType; note: string }) => {
+    if (!user || !id) throw new Error('not signed in');
+
+    const { error } = await supabase.from('rsvps').insert({
+      workshop_id: id,
+      profile_id: user.id,
+      contribution_type: values.contributionType,
+      contribution_note: values.note || null,
+    });
+
+    if (error) {
+      if (error.code === '23505') {
+        throw new Error(t(uiStrings.rsvp.alreadyRsvpd));
+      }
+      throw new Error(error.message);
+    }
+
+    setModalOpen(false);
+    toast({ title: t(uiStrings.rsvp.confirmed) });
+    await loadRsvps();
+  };
+
+  const openModal = () => {
+    if (!user) {
+      toast({ title: t(uiStrings.rsvp.signInFirst) });
+      return;
+    }
+    if (!isApprovedMember) {
+      toast({ title: t(uiStrings.rsvp.needsApproval) });
+      return;
+    }
+    if (myRsvp) {
+      toast({ title: t(uiStrings.rsvp.alreadyRsvpd) });
+      return;
+    }
+    setModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -268,7 +301,7 @@ const TallerDetail = () => {
         )}
       </article>
 
-      <RsvpModal open={modalOpen} onClose={closeModal} onSubmit={handleRsvp} />
+      <RsvpModal open={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleRsvp} />
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
     </Layout>
   );
