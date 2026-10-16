@@ -253,6 +253,32 @@ export const uiStrings = {
     members:        { en: 'members',         es: 'miembros' },
     member:         { en: 'member',          es: 'miembro' },
   },
+  map: {
+    filterAll:      { en: 'All parishes',        es: 'Todas las parroquias' },
+    filterUpcoming: { en: 'Upcoming gatherings', es: 'Próximas reuniones' },
+    upcomingRing: {
+      en: 'A ring marks a parish with a gathering in the next 30 days.',
+      es: 'Un anillo marca una parroquia con reunión en los próximos 30 días.',
+    },
+    noneUpcoming: {
+      en: 'No gatherings in the next 30 days.',
+      es: 'No hay reuniones en los próximos 30 días.',
+    },
+    copyLink:  { en: 'Copy link to this view', es: 'Copiar enlace a esta vista' },
+    exportPng: { en: 'Save as image',          es: 'Guardar como imagen' },
+    exporting: { en: 'Saving…',                es: 'Guardando…' },
+    layers:          { en: 'Layers',      es: 'Capas' },
+    layerParishes:   { en: 'Parishes',    es: 'Parroquias' },
+    layerGatherings: { en: 'Gatherings',  es: 'Reuniones' },
+    layerNotes:      { en: 'Annotations', es: 'Anotaciones' },
+    parishList:    { en: 'Parishes',       es: 'Parroquias' },
+    nextGathering: { en: 'Next gathering', es: 'Próxima reunión' },
+    showList:      { en: 'Parish list',    es: 'Lista de parroquias' },
+    listHint: {
+      en: 'Sorted by members. Choose one to find it on the map.',
+      es: 'Ordenadas por miembros. Elige una para encontrarla en el mapa.',
+    },
+  },
   auth: {
     signIn:         { en: 'Sign in',    es: 'Entrar' },
     signOut:        { en: 'Sign out',   es: 'Salir' },
