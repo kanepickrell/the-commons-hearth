@@ -111,3 +111,68 @@ the chapter, upcoming gatherings, distributism and Catholic Social Teaching.
 bunx supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 bunx supabase functions deploy chester --use-api
 ```
+
+## The parish map
+
+Lives in `src/components/ParishMap.tsx`, mounted twice: as a section of the
+homepage, and on its own page at `/map` / `/mapa` (`src/pages/Mapa.tsx`).
+
+Parishes are `divIcon` stamps, not `CircleMarker`s — Leaflet.markercluster
+only clusters `L.Marker`. Each stamp carries its parish's `memberCount` in
+its Leaflet options, and a cluster shows the **sum** of those, so the number
+always means people rather than pins. Clustering stops at z13.
+
+A parish with a gathering in the next 30 days wears an ocre ring; a cluster
+hiding one wears a dot. The ring is pinned to the *parish's* coordinates, not
+the gathering's, and that is deliberate: `gatherings_public` withholds
+`held_at`, `location_text`, `lat` and `lng` on upcoming gatherings from
+non-members, so this is the one way to tell a signed-out visitor that
+something is happening nearby without telling them where. Signed-in and
+signed-out run the same query.
+
+Colors reach Leaflet through `src/lib/tokens.ts`. Leaflet writes vector
+colors onto SVG presentation attributes, where `var()` is never resolved —
+passing `hsl(var(--ocre))` to a `pathOption` silently paints nothing.
+
+### Sharing a view
+
+`/map` keeps the view in the URL and `?present=1` strips the site away:
+
+```
+/map?c=29.42,-98.49&z=11&layers=parishes,gatherings&filter=upcoming
+/map?c=29.42,-98.49&z=11&layers=parishes&present=1
+```
+
+"Copy link to this view" is in the map's corner. "Save as image" is beside it
+for members and stewards; it needs `crossOrigin` on the tile layers, which is
+already set — without it the canvas is tainted and the PNG comes out empty.
+
+### Drawing annotations (stewards)
+
+Signed in as an admin, the map grows a Geoman toolbar (top left) and a panel
+underneath it. Draw an area, a line or a point; the panel then asks for the
+text in both languages, a palette token for the color, and **who sees it**:
+
+| Visibility | Who reads the row |
+|---|---|
+| `public`  | anyone, signed in or not |
+| `members` | approved members |
+| `admin`   | stewards only |
+
+That last column is enforced by RLS in
+`supabase/sql/2026-10-16_map_annotations.sql`, not by the layer toggle — a
+row marked `admin` is never sent to a member's browser. A new annotation
+defaults to `members`, so a slip of the hand publishes nothing.
+
+Geoman owns geometry only: drag a vertex or use the eraser and the change is
+saved against the row. Everything else is edited in the panel. This is
+separate from the community-area editor in Mayordomo → Areas, which keeps its
+own map and its own `leaflet-draw`; the two drawing libraries never share a
+map instance.
+
+### Partners
+
+Not built. There is no partners table — "partner" currently exists only as a
+contact-form category. The layer control in `ParishMap.tsx` (`LAYER_ORDER`)
+is shaped so a partners layer slots in beside the others when there is
+something to show, with `lat`/`lng`/`category` on whatever table holds them.
