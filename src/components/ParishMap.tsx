@@ -19,7 +19,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap } from
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { listSegments, type ChapterSegment } from '@/lib/segments';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { iconMap, hasIcon } from '@/lib/icons';
 import { useLocale } from '@/i18n/LocaleProvider';
@@ -30,7 +30,19 @@ import { useAuth } from '@/hooks/useAuth';
 import type { IconSlug } from '@/lib/types';
 import { ContactModal } from '@/components/ContactModal';
 import { RsvpModal } from '@/components/RsvpModal';
+import { AnnotationLayer } from '@/components/map/AnnotationLayer';
+import { AnnotationTools } from '@/components/map/AnnotationTools';
+import { AnnotationAdmin, type AnnotationDraft } from '@/components/map/AnnotationAdmin';
+import {
+  createAnnotation,
+  deleteAnnotation,
+  listAnnotations,
+  updateAnnotation,
+  type AnnotationGeometry,
+  type MapAnnotation,
+} from '@/lib/annotations';
 import { useRsvp } from '@/hooks/useRsvp';
+import { toast } from '@/hooks/use-toast';
 import { chapterToday, formatDate, fromDateOnly, todayLocalISO } from '@/lib/dates';
 
 type ProfileWithParish = {
@@ -258,9 +270,22 @@ const FitBounds = ({ points }: { points: [number, number][] }) => {
   return null;
 };
 
+// Which story layers are drawn. Partners are deliberately absent: the
+// chapter has no partners table yet, and the toggle is built so one can be
+// added here without touching anything else.
+type LayerKey = 'parishes' | 'gatherings' | 'annotations';
+
+const LAYER_ORDER: LayerKey[] = ['parishes', 'gatherings', 'annotations'];
+
+const LAYER_LABEL: Record<LayerKey, keyof typeof uiStrings.map> = {
+  parishes: 'layerParishes',
+  gatherings: 'layerGatherings',
+  annotations: 'layerNotes',
+};
+
 export const ParishMap = () => {
   const { t, locale } = useLocale();
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const isAuthenticated = !!user;
   const isApprovedMember = !!profile && profile.status === 'approved';
 
@@ -276,6 +301,14 @@ export const ParishMap = () => {
   // Mobile only — the parish list collapses so the map keeps the screen.
   const [listOpen, setListOpen] = useState(false);
 
+  const [annotations, setAnnotations] = useState<MapAnnotation[]>([]);
+  const [activeLayers, setActiveLayers] = useState<Set<LayerKey>>(
+    () => new Set<LayerKey>(LAYER_ORDER)
+  );
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [draft, setDraft] = useState<AnnotationDraft | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
+
   const mapRef = useRef<L.Map | null>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const markerRefs = useRef(new Map<string, L.Marker>());
@@ -290,6 +323,53 @@ export const ParishMap = () => {
     setRsvpTarget(gatheringId);
     rsvp.openModal();
   };
+
+  const toggleLayer = (key: LayerKey) =>
+    setActiveLayers((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
+  // --- steward's annotation edits ------------------------------------------
+  // A freshly drawn shape waits here, unsaved, until it has been given its
+  // words and its audience. Defaulting a new annotation to 'members' rather
+  // than 'public' means a slip of the hand publishes nothing.
+  const handleDraw = (geometry: AnnotationGeometry) =>
+    setDraft({ geometry, labelEn: '', labelEs: '', visibility: 'members', color: 'ocre' });
+
+  const saveDraft = async () => {
+    if (!draft) return;
+    setSavingDraft(true);
+    const { error } = await createAnnotation({
+      layer: 'annotations',
+      geometry: draft.geometry,
+      labelEn: draft.labelEn.trim() || null,
+      labelEs: draft.labelEs.trim() || null,
+      style: { color: draft.color },
+      visibility: draft.visibility,
+    });
+    setSavingDraft(false);
+    if (error) {
+      toast({ title: error });
+      return;
+    }
+    setDraft(null);
+    reloadAnnotations();
+  };
+
+  const editAnnotation = async (id: string, patch: Partial<MapAnnotation>) => {
+    const { error } = await updateAnnotation(id, patch);
+    if (error) toast({ title: error });
+    else reloadAnnotations();
+  };
+
+  const removeAnnotation = async (id: string) => {
+    const { error } = await deleteAnnotation(id);
+    if (error) toast({ title: error });
+    else reloadAnnotations();
+  };
   // Parish whose "would you be the contact?" offer is open, if any.
   const [pocOffer, setPocOffer] = useState<string | null>(null);
 
@@ -297,6 +377,17 @@ export const ParishMap = () => {
   useEffect(() => {
     listSegments().then(setSegments);
   }, []);
+
+  const reloadAnnotations = useCallback(() => {
+    listAnnotations().then(setAnnotations);
+  }, []);
+
+  // Re-fetched when the viewer changes, because RLS answers a different
+  // question for each one: signing in as a steward is what makes the
+  // members-only and steward-only rows exist at all.
+  useEffect(() => {
+    reloadAnnotations();
+  }, [reloadAnnotations, isAuthenticated, isApprovedMember, isAdmin]);
 
   useEffect(() => {
     (async () => {
@@ -565,9 +656,23 @@ export const ParishMap = () => {
             </Polygon>
           ))}
 
+          {/* Marginalia a steward has drawn. Rendered before the stamps so a
+              shape never sits on top of a parish. */}
+          {activeLayers.has('annotations') && <AnnotationLayer annotations={annotations} />}
+
+          {isAdmin && (
+            <AnnotationTools
+              locale={locale}
+              onDraw={handleDraw}
+              onReshape={(id, geometry) => editAnnotation(id, { geometry })}
+              onErase={removeAnnotation}
+            />
+          )}
+
           {/* Parish stamps, gathered into cluster stamps while the view is
               wide. Clustering switches off at z13, where parishes in the same
               town have separated enough to stand on their own. */}
+          {activeLayers.has('parishes') && (
           <MarkerClusterGroup
             /* Remount the group whenever the marker set or the upcoming set
                changes. Two things make this necessary rather than tidy:
@@ -609,8 +714,9 @@ export const ParishMap = () => {
               </Marker>
             ))}
           </MarkerClusterGroup>
+          )}
 
-          {workshops.map((w) =>
+          {activeLayers.has('gatherings') && workshops.map((w) =>
             hasIcon(w.craft) ? (
               <Marker
                 key={w.id}
@@ -640,27 +746,62 @@ export const ParishMap = () => {
             zoomed-out view reads as intentional rather than empty. */}
         <div className="map-vignette pointer-events-none absolute inset-0 z-[500] rounded" />
 
-        {/* Filter. Sits above the vignette but below Leaflet's popups (z700)
-            so a popup opening near this corner is never covered. */}
-        <div className="absolute right-3 top-3 z-[600] flex overflow-hidden rounded-sm border border-mesquite/20 bg-cal/95 shadow-sm">
-          {([false, true] as const).map((wantsUpcoming) => {
-            const active = onlyUpcoming === wantsUpcoming;
-            return (
-              <button
-                key={String(wantsUpcoming)}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setOnlyUpcoming(wantsUpcoming)}
-                className={`px-3 py-1.5 font-heading text-xs transition ${
-                  active
-                    ? 'bg-ocre/15 text-mesquite'
-                    : 'text-mesquite/60 hover:bg-ocre/5 hover:text-mesquite'
-                }`}
-              >
-                {t(wantsUpcoming ? uiStrings.map.filterUpcoming : uiStrings.map.filterAll)}
-              </button>
-            );
-          })}
+        {/* Map controls. Above the vignette but below Leaflet's popups
+            (z700), so a popup opening near this corner is never covered. */}
+        <div className="absolute right-3 top-3 z-[600] flex w-44 flex-col items-stretch gap-2">
+          <div className="flex overflow-hidden rounded-sm border border-mesquite/20 bg-cal/95 shadow-sm">
+            {([false, true] as const).map((wantsUpcoming) => {
+              const active = onlyUpcoming === wantsUpcoming;
+              return (
+                <button
+                  key={String(wantsUpcoming)}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setOnlyUpcoming(wantsUpcoming)}
+                  className={`flex-1 px-2 py-1.5 font-heading text-xs transition ${
+                    active
+                      ? 'bg-ocre/15 text-mesquite'
+                      : 'text-mesquite/60 hover:bg-ocre/5 hover:text-mesquite'
+                  }`}
+                >
+                  {t(wantsUpcoming ? uiStrings.map.filterUpcoming : uiStrings.map.filterAll)}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Layers, with the legend folded into the same list: each row is
+              both the switch and the key to what it draws. */}
+          <div className="overflow-hidden rounded-sm border border-mesquite/20 bg-cal/95 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setLayersOpen((v) => !v)}
+              aria-expanded={layersOpen}
+              className="flex w-full items-center justify-between px-2 py-1.5 font-heading text-xs text-mesquite"
+            >
+              {t(uiStrings.map.layers)}
+              <span aria-hidden="true" className="text-ocre">{layersOpen ? '−' : '+'}</span>
+            </button>
+
+            {layersOpen && (
+              <ul className="border-t border-mesquite/10 px-2 py-1.5">
+                {LAYER_ORDER.map((key) => (
+                  <li key={key}>
+                    <label className="flex cursor-pointer items-center gap-2 py-1 font-serif text-xs text-mesquite">
+                      <input
+                        type="checkbox"
+                        checked={activeLayers.has(key)}
+                        onChange={() => toggleLayer(key)}
+                        className="accent-ocre"
+                      />
+                      <span aria-hidden="true" className={`clm-key clm-key--${key}`} />
+                      {t(uiStrings.map[LAYER_LABEL[key]])}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
 
@@ -827,6 +968,20 @@ export const ParishMap = () => {
       {/* One modal for every popup's RSVP button; portal-rendered, so it sits
           above the map rather than inside a Leaflet pane. */}
       <RsvpModal open={rsvp.modalOpen} onClose={rsvp.closeModal} onSubmit={rsvp.submit} />
+
+      {isAdmin && (
+        <AnnotationAdmin
+          locale={locale}
+          annotations={annotations}
+          draft={draft}
+          onDraftChange={setDraft}
+          onDraftSave={saveDraft}
+          onDraftCancel={() => setDraft(null)}
+          onEdit={editAnnotation}
+          onDelete={removeAnnotation}
+          saving={savingDraft}
+        />
+      )}
     </div>
   );
 };

@@ -264,6 +264,58 @@
   pointer-events: none;
 }
 
+/* Legend keys in the layer control. Each is a miniature of the mark the
+   layer actually draws, so the switch doubles as the key. */
+.clm-key {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+.clm-key--parishes {
+  border-radius: 9999px;
+  background: hsl(var(--cal));
+  border: 1.5px solid hsl(var(--ocre));
+}
+.clm-key--gatherings {
+  border-radius: 9999px;
+  border: 1.5px solid hsl(var(--ocre));
+  box-shadow: 0 0 0 2px hsl(var(--ocre) / 0.3);
+}
+.clm-key--annotations {
+  height: 0;
+  border-top: 2px dashed hsl(var(--ocre));
+  align-self: center;
+}
+
+/* Annotations a steward drew. A point annotation is a word set on the land:
+   the icon box is collapsed to nothing (Leaflet owns the element's own
+   transform for positioning) and the text centres itself inside it. */
+.clm-annotation-label {
+  width: 0 !important;
+  height: 0 !important;
+  overflow: visible;
+}
+.clm-annotation-label > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-family: 'Marcellus SC', Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--mesquite));
+  text-shadow: 0 1px 2px hsl(var(--cal) / 0.9), 0 0 3px hsl(var(--cal) / 0.9);
+  pointer-events: none;
+}
+.clm-annotation-mark {
+  border-radius: 9999px;
+  background: hsl(var(--ocre) / 0.8);
+  box-shadow: 0 0 0 2px hsl(var(--cal));
+}
+
 /* Gathering pins — the craft's own line drawing on a lighter disc, so a
    gathering reads as a different kind of thing from a parish stamp. */
 .clm-workshop-pin {
