@@ -15,12 +15,21 @@
 // contact_email only when the viewer is authenticated; anon users get the
 // non-sensitive subset and simply never see POC emails.
 
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Tooltip, useMap } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polygon,
+  Tooltip,
+  useMap,
+  useMapEvents,
+} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { listSegments, type ChapterSegment } from '@/lib/segments';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { iconMap, hasIcon } from '@/lib/icons';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
@@ -44,6 +53,7 @@ import {
 import { useRsvp } from '@/hooks/useRsvp';
 import { toast } from '@/hooks/use-toast';
 import { chapterToday, formatDate, fromDateOnly, todayLocalISO } from '@/lib/dates';
+import { readViewState, writeViewState, type MapFilter, type MapView } from '@/lib/mapView';
 
 type ProfileWithParish = {
   id: string;
@@ -248,10 +258,21 @@ const ParishCard = ({
   );
 };
 
-const FitBounds = ({ points }: { points: [number, number][] }) => {
+/** Reports the view after every pan or zoom, so it can be written to the URL. */
+const ViewReporter = ({ onView }: { onView: (v: MapView) => void }) => {
+  const map = useMapEvents({
+    moveend: () => onView({ center: [map.getCenter().lat, map.getCenter().lng], zoom: map.getZoom() }),
+  });
+  return null;
+};
+
+const FitBounds = ({ points, enabled }: { points: [number, number][]; enabled: boolean }) => {
   const map = useMap();
   const lastSig = useRef<string>('');
   useEffect(() => {
+    // A view carried in from a link is somebody's deliberate choice of
+    // ground. Framing the data over the top of it would throw that away.
+    if (!enabled) return;
     if (!points.length) return;
     // Only frame the map when the *set of coordinates* actually changes (data
     // loads), not on every render. Selecting a parish re-renders this component
@@ -266,7 +287,7 @@ const FitBounds = ({ points }: { points: [number, number][] }) => {
     // Cap the zoom so a lone dot (or a tight cluster) doesn't slam all the way
     // in, and pad generously so the territory breathes inside the frame.
     map.fitBounds(bounds, { padding: [64, 64], maxZoom: 10 });
-  }, [map, points]);
+  }, [map, points, enabled]);
   return null;
 };
 
@@ -283,16 +304,40 @@ const LAYER_LABEL: Record<LayerKey, keyof typeof uiStrings.map> = {
   annotations: 'layerNotes',
 };
 
-export const ParishMap = () => {
+type ParishMapProps = {
+  /**
+   * Keep the view, the lit layers and the filter in the URL, and offer the
+   * share and export controls. Off for the homepage section — panning a map
+   * a visitor is scrolling past should not keep rewriting the homepage's
+   * address — and on for the dedicated map page, where a link to a view is
+   * the point.
+   */
+  syncUrl?: boolean;
+  /** Presentation mode: the map alone, with a title, a legend and the mark. */
+  presentation?: boolean;
+  /** Shown as the title in presentation mode. */
+  title?: string;
+};
+
+export const ParishMap = ({ syncUrl = false, presentation = false, title }: ParishMapProps) => {
   const { t, locale } = useLocale();
   const { user, profile, isAdmin } = useAuth();
   const isAuthenticated = !!user;
   const isApprovedMember = !!profile && profile.status === 'approved';
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Read once, on mount. After that the URL is something this component
+  // writes, not something it listens to — re-reading would fight the user's
+  // own panning.
+  const initial = useRef(readViewState(searchParams)).current;
+
   const [clusters, setClusters] = useState<ParishCluster[]>([]);
   const [workshops, setWorkshops] = useState<WorkshopMarker[]>([]);
   const [upcoming, setUpcoming] = useState<Map<string, UpcomingGathering>>(new Map());
-  const [onlyUpcoming, setOnlyUpcoming] = useState(false);
+  const [onlyUpcoming, setOnlyUpcoming] = useState(
+    syncUrl ? initial.filter === 'upcoming' : false
+  );
+  const [view, setView] = useState<MapView | null>(syncUrl ? initial.view : null);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
   const [segments, setSegments] = useState<ChapterSegment[]>([]);
   // Which gathering the RSVP modal is for. One modal serves every popup:
@@ -302,14 +347,18 @@ export const ParishMap = () => {
   const [listOpen, setListOpen] = useState(false);
 
   const [annotations, setAnnotations] = useState<MapAnnotation[]>([]);
-  const [activeLayers, setActiveLayers] = useState<Set<LayerKey>>(
-    () => new Set<LayerKey>(LAYER_ORDER)
-  );
+  const [activeLayers, setActiveLayers] = useState<Set<LayerKey>>(() => {
+    const fromUrl = syncUrl ? initial.layers : null;
+    if (!fromUrl) return new Set<LayerKey>(LAYER_ORDER);
+    // An unknown layer name in a link is dropped, not fatal.
+    return new Set<LayerKey>(LAYER_ORDER.filter((k) => fromUrl.includes(k)));
+  });
   const [layersOpen, setLayersOpen] = useState(false);
   const [draft, setDraft] = useState<AnnotationDraft | null>(null);
   const [savingDraft, setSavingDraft] = useState(false);
 
   const mapRef = useRef<L.Map | null>(null);
+  const mapFrameRef = useRef<HTMLDivElement | null>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const markerRefs = useRef(new Map<string, L.Marker>());
   const rowRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -322,6 +371,68 @@ export const ParishMap = () => {
   const startRsvp = (gatheringId: string) => {
     setRsvpTarget(gatheringId);
     rsvp.openModal();
+  };
+
+  // State → URL. `replace` so panning doesn't fill the back button with a
+  // hundred near-identical views, and only once a view exists, so the link
+  // never names a centre the map hasn't settled on.
+  useEffect(() => {
+    if (!syncUrl || !view) return;
+    const next = writeViewState(searchParams, {
+      view,
+      layers: LAYER_ORDER.filter((k) => activeLayers.has(k)),
+      filter: (onlyUpcoming ? 'upcoming' : 'all') as MapFilter,
+    });
+    if (next.toString() !== searchParams.toString()) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [syncUrl, view, activeLayers, onlyUpcoming, searchParams, setSearchParams]);
+
+  const copyViewLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({ title: locale === 'es' ? 'Enlace copiado.' : 'Link copied.' });
+    } catch {
+      // Clipboard access can be refused outright (insecure origin, denied
+      // permission). Showing the address is more use than an apology.
+      toast({ title: window.location.href });
+    }
+  };
+
+  // PNG of the map as it stands, for a packet or a slide. Members and
+  // stewards only. The controls and the vignette are left out of the frame:
+  // a filter toggle is useless in a still, and the exported file should look
+  // like a printed map rather than a screenshot of a website.
+  const [exporting, setExporting] = useState(false);
+  const exportPng = async () => {
+    const node = mapFrameRef.current;
+    if (!node) return;
+    setExporting(true);
+    try {
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(node, {
+        pixelRatio: 2,
+        cacheBust: true,
+        filter: (el) => {
+          if (!(el instanceof HTMLElement)) return true;
+          if (el.dataset.exportHide !== undefined) return false;
+          // Zoom buttons and the draw toolbar are controls, not map. The
+          // attribution deliberately stays: Esri's terms require it, and an
+          // exported map travels further than the page it came from.
+          if (el.classList.contains('leaflet-control-zoom')) return false;
+          if (el.classList.contains('leaflet-pm-toolbar')) return false;
+          return true;
+        },
+      });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `commons-map-${todayLocalISO(chapterToday())}.png`;
+      a.click();
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : String(e) });
+    } finally {
+      setExporting(false);
+    }
   };
 
   const toggleLayer = (key: LayerKey) =>
@@ -601,12 +712,24 @@ export const ParishMap = () => {
   const selectedPocs = selected?.members ?? [];
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr,280px]">
-      <div className="relative overflow-hidden rounded border border-mesquite/20" style={{ height: 460 }}>
+    <div
+      className={
+        presentation
+          ? // h-full matters: the frame below asks for height:100%, and a grid
+            // child with no height of its own resolves that to nothing.
+            'grid h-full grid-cols-1'
+          : 'grid grid-cols-1 gap-6 md:grid-cols-[1fr,280px]'
+      }
+    >
+      <div
+        ref={mapFrameRef}
+        className="relative overflow-hidden rounded border border-mesquite/20"
+        style={{ height: presentation ? '100%' : 460 }}
+      >
         <MapContainer
           ref={mapRef}
-          center={[29.6, -98.5]}
-          zoom={9}
+          center={view?.center ?? [29.6, -98.5]}
+          zoom={view?.zoom ?? 9}
           minZoom={7}
           maxZoom={17}
           zoomSnap={0.5}
@@ -618,21 +741,32 @@ export const ParishMap = () => {
               Positron-style look the palette was tuned for, without CARTO's
               "API KEY REQUIRED" watermark. Native tiles stop at z16; Leaflet
               upscales beyond that. */}
+          {/* crossOrigin is what lets the PNG export read these tiles back
+              out of the canvas. Esri answers with Access-Control-Allow-Origin:
+              *, so the images stay untainted and toPng produces a map rather
+              than an empty frame. */}
           <TileLayer
             attribution="Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors"
             url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
             maxNativeZoom={16}
             maxZoom={17}
+            crossOrigin="anonymous"
           />
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
             maxNativeZoom={16}
             maxZoom={17}
             zIndex={2}
+            crossOrigin="anonymous"
           />
           {/* Frame members + all chapter areas, so the territory shows even
-              before any members load. */}
-          <FitBounds points={[...allPoints, ...segments.flatMap((s) => s.ring)]} />
+              before any members load — unless a link already said where to
+              look. */}
+          <FitBounds
+            points={[...allPoints, ...segments.flatMap((s) => s.ring)]}
+            enabled={!(syncUrl && initial.view)}
+          />
+          {syncUrl && <ViewReporter onView={setView} />}
 
           {/* Chapter community areas — each its own soft colored region with a
               floating label. Rendered before the markers so they sit underneath,
@@ -660,7 +794,7 @@ export const ParishMap = () => {
               shape never sits on top of a parish. */}
           {activeLayers.has('annotations') && <AnnotationLayer annotations={annotations} />}
 
-          {isAdmin && (
+          {isAdmin && !presentation && (
             <AnnotationTools
               locale={locale}
               onDraw={handleDraw}
@@ -748,7 +882,10 @@ export const ParishMap = () => {
 
         {/* Map controls. Above the vignette but below Leaflet's popups
             (z700), so a popup opening near this corner is never covered. */}
-        <div className="absolute right-3 top-3 z-[600] flex w-44 flex-col items-stretch gap-2">
+        <div
+          data-export-hide
+          className="absolute right-3 top-3 z-[600] flex w-44 flex-col items-stretch gap-2"
+        >
           <div className="flex overflow-hidden rounded-sm border border-mesquite/20 bg-cal/95 shadow-sm">
             {([false, true] as const).map((wantsUpcoming) => {
               const active = onlyUpcoming === wantsUpcoming;
@@ -802,7 +939,62 @@ export const ParishMap = () => {
               </ul>
             )}
           </div>
+
+          {syncUrl && (
+            <div className="flex flex-col gap-1 rounded-sm border border-mesquite/20 bg-cal/95 p-1 shadow-sm">
+              <button
+                type="button"
+                onClick={copyViewLink}
+                className="px-2 py-1 text-left font-heading text-xs text-mesquite/80 transition hover:text-mesquite"
+              >
+                {t(uiStrings.map.copyLink)}
+              </button>
+              {/* Members and stewards only. The export carries member-only
+                  marks when a member made it, so it is not a visitor's to
+                  hand out. */}
+              {(isApprovedMember || isAdmin) && (
+                <button
+                  type="button"
+                  onClick={exportPng}
+                  disabled={exporting}
+                  className="px-2 py-1 text-left font-heading text-xs text-mesquite/80 transition hover:text-mesquite disabled:opacity-40"
+                >
+                  {exporting ? t(uiStrings.map.exporting) : t(uiStrings.map.exportPng)}
+                </button>
+              )}
+            </div>
+          )}
         </div>
+
+        {/* Presentation chrome. Only in presentation mode, and inside the map
+            frame so it lands in the PNG export too. */}
+        {presentation && (
+          <>
+            {title && (
+              // Indented clear of Leaflet's zoom control, which sits top-left
+              // at a higher z-index and would otherwise eat the first letter.
+              <div className="absolute left-20 top-4 z-[600] max-w-[55%]">
+                <h1 className="font-heading text-2xl leading-tight text-mesquite drop-shadow-[0_1px_2px_hsl(var(--cal))]">
+                  {title}
+                </h1>
+              </div>
+            )}
+            <p className="absolute bottom-6 left-4 z-[600] display-caps text-[10px] tracking-[0.2em] text-ocre drop-shadow-[0_1px_2px_hsl(var(--cal))]">
+              {t(uiStrings.eyebrow.chapter)}
+            </p>
+            <ul className="absolute bottom-6 right-4 z-[600] rounded-sm border border-mesquite/20 bg-cal/90 px-3 py-2">
+              {LAYER_ORDER.filter((k) => activeLayers.has(k)).map((key) => (
+                <li
+                  key={key}
+                  className="flex items-center gap-2 py-0.5 font-serif text-xs text-mesquite"
+                >
+                  <span aria-hidden="true" className={`clm-key clm-key--${key}`} />
+                  {t(uiStrings.map[LAYER_LABEL[key]])}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
 
       {/* The parish list. It is also the map's accessible equivalent: every
@@ -811,6 +1003,7 @@ export const ParishMap = () => {
           stamps say, this says too. */}
       <aside
         aria-label={t(uiStrings.map.parishList)}
+        hidden={presentation}
         className="rounded border border-mesquite/20 bg-cal/50"
       >
         {/* Phone: the list collapses so the map keeps the screen. It stays in
@@ -969,7 +1162,7 @@ export const ParishMap = () => {
           above the map rather than inside a Leaflet pane. */}
       <RsvpModal open={rsvp.modalOpen} onClose={rsvp.closeModal} onSubmit={rsvp.submit} />
 
-      {isAdmin && (
+      {isAdmin && !presentation && (
         <AnnotationAdmin
           locale={locale}
           annotations={annotations}
