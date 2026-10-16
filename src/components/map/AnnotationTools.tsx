@@ -1,7 +1,14 @@
 // src/components/map/AnnotationTools.tsx
 // The steward's drawing toolbar for map annotations. Mounted inside the
-// MapContainer and only for admins, so no one else downloads Geoman at all —
-// the library and its stylesheet are imported dynamically for that reason.
+// MapContainer and only for admins.
+//
+// This component does NOT import Geoman. ParishMap loads it before the map
+// is constructed and holds the map back until it has, because Geoman installs
+// itself through L.Map.addInitHook — which only ever runs for maps created
+// after the import. Importing it from in here, inside a child's effect, left
+// `map.pm` permanently undefined on an already-built map, and Geoman's own
+// layeradd handler then dereferenced it on the next marker added and took the
+// whole page down with it. By the time this mounts, `map.pm` exists.
 //
 // Separate from the community-area editor in Mayordomo → Areas, which keeps
 // its own map and its own leaflet-draw instance. The two never share a map,
@@ -45,13 +52,14 @@ export const AnnotationTools = ({ onDraw, onReshape, onErase, locale }: Props) =
   handlers.current = { onDraw, onReshape, onErase };
 
   useEffect(() => {
-    let cancelled = false;
+    // Should always be present (ParishMap gates on it), but a missing pm must
+    // never again be the thing that throws.
+    if (!map.pm) {
+      console.error('Geoman is not initialised on this map; draw tools skipped.');
+      return;
+    }
 
-    (async () => {
-      await import('@geoman-io/leaflet-geoman-free');
-      await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
-      if (cancelled || !map.pm) return;
-
+    {
       map.pm.setLang(locale === 'es' ? 'es' : 'en');
       map.pm.addControls({
         position: 'topleft',
@@ -91,10 +99,9 @@ export const AnnotationTools = ({ onDraw, onReshape, onErase, locale }: Props) =
       };
       map.on('pm:update', persist);
       map.on('pm:dragend', persist);
-    })();
+    }
 
     return () => {
-      cancelled = true;
       map.off('pm:create');
       map.off('pm:remove');
       map.off('pm:update');

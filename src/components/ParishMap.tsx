@@ -357,6 +357,35 @@ export const ParishMap = ({ syncUrl = false, presentation = false, title }: Pari
   const [draft, setDraft] = useState<AnnotationDraft | null>(null);
   const [savingDraft, setSavingDraft] = useState(false);
 
+  // Geoman installs itself with L.Map.addInitHook, which only runs for maps
+  // constructed AFTER the import. It therefore has to be loaded before this
+  // map exists — and, because `isAdmin` arrives late (the profile loads after
+  // the first render), the map that already exists has to go away while it
+  // loads. `mapReady` below is what tears it down: the moment we learn draw
+  // tools are wanted, the pm-less map unmounts, Geoman loads against no map
+  // at all, and a fresh one is built with `pm` on it.
+  //
+  // Getting this wrong is not a degraded toolbar. Geoman's own layeradd
+  // handler reads map.pm on every marker added, so a map without it throws
+  // on the next render and the page's error boundary eats the whole site.
+  const needsDrawTools = isAdmin && !presentation;
+  const [drawToolsReady, setDrawToolsReady] = useState(false);
+
+  useEffect(() => {
+    if (!needsDrawTools || drawToolsReady) return;
+    let cancelled = false;
+    (async () => {
+      await import('@geoman-io/leaflet-geoman-free');
+      await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
+      if (!cancelled) setDrawToolsReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [needsDrawTools, drawToolsReady]);
+
+  const mapReady = !needsDrawTools || drawToolsReady;
+
   const mapRef = useRef<L.Map | null>(null);
   const mapFrameRef = useRef<HTMLDivElement | null>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
@@ -726,6 +755,12 @@ export const ParishMap = ({ syncUrl = false, presentation = false, title }: Pari
         className="relative overflow-hidden rounded border border-mesquite/20"
         style={{ height: presentation ? '100%' : 460 }}
       >
+        {!mapReady && (
+          <div className="flex h-full items-center justify-center font-serif italic text-piedra/60">
+            …
+          </div>
+        )}
+        {mapReady && (
         <MapContainer
           ref={mapRef}
           center={view?.center ?? [29.6, -98.5]}
@@ -876,6 +911,7 @@ export const ParishMap = ({ syncUrl = false, presentation = false, title }: Pari
             ) : null
           )}
         </MapContainer>
+        )}
         {/* Soft inner vignette frames the open parchment so the wide,
             zoomed-out view reads as intentional rather than empty. */}
         <div className="map-vignette pointer-events-none absolute inset-0 z-[500] rounded" />
