@@ -102,14 +102,26 @@ export default function History() {
         </ol>
       </section>
 
-      <section className="container-narrow py-16 text-center">
-        <Link
-          to={buildPath('vision', locale)}
-          className="font-heading text-lg text-ocre no-underline hover:text-mesquite"
-          style={{ textDecoration: 'none' }}
-        >
-          {t({ en: 'What the chapter believes', es: 'Lo que cree el capítulo' })} →
-        </Link>
+      {/* Two ways on from here. A reader who came for the documents is the
+          likeliest person on the site to want the reading list, so Resources
+          sits beside the hand-off to what the chapter believes. */}
+      <section className="container-narrow py-16">
+        <div className="mx-auto flex max-w-xs flex-col items-center gap-5 text-center sm:max-w-none sm:flex-row sm:justify-center sm:gap-10">
+          <Link
+            to={buildPath('vision', locale)}
+            className="font-heading text-lg text-ocre no-underline hover:text-mesquite"
+            style={{ textDecoration: 'none' }}
+          >
+            {t({ en: 'What the chapter believes', es: 'Lo que cree el capítulo' })} →
+          </Link>
+          <Link
+            to={buildPath('resources', locale)}
+            className="font-heading text-lg text-ocre no-underline hover:text-mesquite"
+            style={{ textDecoration: 'none' }}
+          >
+            {t({ en: 'Learn more', es: 'Aprende más' })} →
+          </Link>
+        </div>
       </section>
     </Layout>
   );
