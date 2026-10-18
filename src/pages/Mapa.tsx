@@ -42,7 +42,7 @@ const Mapa = () => {
         <p className="display-caps text-xs tracking-[0.2em] text-ocre">
           {t(uiStrings.eyebrow.chapter)}
         </p>
-        <h1 className="mt-3 font-heading text-4xl leading-tight text-mesquite">{title}</h1>
+        <h1 className="mt-3 font-heading text-3xl leading-tight text-mesquite md:text-4xl">{title}</h1>
         <p className="mt-3 max-w-prose font-serif italic text-piedra">
           {locale === 'es'
             ? 'Cada sello es una parroquia, y el número son sus miembros. Mueve el mapa y el enlace de arriba se queda con la vista — compártelo y se abre justo aquí.'

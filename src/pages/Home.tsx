@@ -70,17 +70,20 @@ const Home = () => {
         <p className="prose-body mx-auto mt-8 max-w-xl text-left text-lg leading-relaxed text-mesquite">
           {t(homeCopy.lede)}
         </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        {/* Phones get two full-width buttons, stacked and equal: left to wrap
+            they came out ragged, at different widths, and small to thumb.
+            From sm up they sit side by side as before. */}
+        <div className="mx-auto mt-10 flex max-w-xs flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
           <Link
             to={buildPath('talleres', locale)}
-            className="rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal no-underline transition hover:bg-mesquite"
+            className="rounded-sm bg-ocre px-8 py-3 text-center font-heading text-base text-cal no-underline transition hover:bg-mesquite"
             style={{ textDecoration: 'none' }}
           >
             {t(homeCopy.ctaGathering)}
           </Link>
           <Link
             to={buildPath('participate', locale)}
-            className="rounded-sm border border-mesquite/30 px-8 py-3 font-heading text-base text-mesquite no-underline transition hover:border-ocre hover:text-ocre"
+            className="rounded-sm border border-mesquite/30 px-8 py-3 text-center font-heading text-base text-mesquite no-underline transition hover:border-ocre hover:text-ocre"
             style={{ textDecoration: 'none' }}
           >
             {t(homeCopy.ctaJoin)}
@@ -179,6 +182,15 @@ const Home = () => {
         >
           <ParishMap />
         </Suspense>
+        <p className="mt-6 text-center">
+          <Link
+            to={buildPath('mapa', locale)}
+            className="display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
+            style={{ textDecoration: 'none' }}
+          >
+            {t(homeCopy.openMap)} →
+          </Link>
+        </p>
       </section>
 
       <div className="rule container-wide" />
