@@ -179,6 +179,10 @@ describe('app renders', () => {
     // A link that only goes to something ABOUT a source has to say so, or
     // the page implies a primary document it can't hand over.
     expect(screen.getAllByText(/about the source, not the source itself/).length).toBe(2);
+
+    // Somewhere to go on to: the reading list, and what the chapter believes.
+    expect(document.querySelector('a[href="/resources"]')).not.toBeNull();
+    expect(document.querySelector('a[href="/vision"]')).not.toBeNull();
   });
 
   it('workshops list, including a non-illustrated craft', async () => {
