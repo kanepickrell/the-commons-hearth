@@ -33,6 +33,7 @@ bun run build
 ```
 src/
   App.tsx              routes (bilingual slugs from i18n/routes.ts), providers, lazy pages
+  content/home.ts      the homepage's copy — shared with the prerender, see below
   auth/AuthProvider    one auth subscription + profile for the whole app (useAuth reads it)
   i18n/                LocaleProvider (EN/ES) and the route slug table
   lib/
@@ -65,6 +66,37 @@ supabase/
   `admin_update_gathering`, `set_poc_status`, …) and the `admin-add-member`
   Edge Function. Browser-facing functions set `verify_jwt = false` so CORS
   preflight works, and check `profiles.is_admin` themselves.
+
+## The prerendered homepage
+
+`index.html` used to ship an empty `<div id="root">`, so a search engine that
+doesn't run JavaScript, a link unfurler, and any agent fetching the URL all saw
+a blank document — the `og:` tags carried the only prose on the site.
+
+`vite/prerender-home.ts` now writes the homepage's opening (hero, "Why it
+matters", "Grown, Not Built", the four pillars) into `index.html` at build
+time, replacing the `<!--prerender-home-->` marker inside `#root`. React 18's
+`createRoot()` clears its container before the first render, so the shell is
+the pre-hydration paint and then it's gone — no hydration contract, no
+mismatch warning, and the homepage paints its own heading instead of a blank
+cream page.
+
+The words come from `src/content/home.ts`, the same module `Home.tsx` renders,
+so **edit homepage copy there and both stay in step.** Remove the marker and
+the build fails loudly rather than quietly shipping the empty document again.
+
+Two known limits, both deliberate:
+
+- The shell is English. The document is `lang="en"` and the locale toggle is
+  client-side, so a Spanish reader gets the shell for an instant and then the
+  real page in Spanish.
+- `vercel.json` serves `index.html` for every route, so a non-JS crawler
+  reading `/vision` sees the homepage's words. That is the cost of a
+  single-document SPA, and strictly more than the nothing it got before. Fixing
+  it properly means either real SSR (the app renders Leaflet, Supabase and
+  `localStorage` on mount) or emitting a second, shell-free HTML entry and
+  pointing the `/(.*)` rewrite at it.
+
 
 ## Regenerating types
 

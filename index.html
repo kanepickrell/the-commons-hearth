@@ -29,7 +29,10 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <!-- The homepage's opening is written in here at build time by
+         vite/prerender-home.ts, so the document says something before any
+         JavaScript runs. React's createRoot() clears it on mount. -->
+    <div id="root"><!--prerender-home--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
