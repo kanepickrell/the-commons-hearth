@@ -135,8 +135,21 @@ describe('app renders', () => {
 
     const img = screen.getByRole('img', { name: /Apostolic Blessing/ });
     expect(img).toHaveAttribute('src', '/vatican-support-letter.png');
-    expect(screen.getByText(/Secretariat of State/)).toBeInTheDocument();
-    expect(screen.getByText(/18 November 2025/)).toBeInTheDocument();
+
+    // The whole point is the continuity, so the timeline must read in order
+    // and must still carry 1946 as teaching rather than as a blessing.
+    const years = screen.getAllByText(/^(1933|1936|1946|2025)$/).map((n) => n.textContent);
+    expect(years).toEqual(['1933', '1936', '1946', '2025']);
+    expect(screen.getByText(/Not a blessing on the Land Movement/)).toBeInTheDocument();
+
+    // Every citation points somewhere a reader can check it.
+    for (const href of [
+      'https://collected.jcu.edu/the_cross_and_the_plough/1/',
+      'https://www.cambridge.org/core/journals/blackfriars/article/editorial/0138EA20F62FE2A774DE6132472C1021',
+      'https://www.ewtn.com/catholicism/library/pope-speaks-on-rural-life-9050',
+    ]) {
+      expect(document.querySelector(`a[href="${href}"]`)).not.toBeNull();
+    }
   });
 
   it('workshops list, including a non-illustrated craft', async () => {
