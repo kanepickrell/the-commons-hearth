@@ -23,17 +23,25 @@ export const homeCopy = {
   } satisfies Bilingual,
 
   tagline: {
-    en: 'Rooted in the soil, rooted in Christ.',
-    es: 'Arraigados en la tierra, arraigados en Cristo.',
+    // No article and no full stop: "in soil" and "in Christ" become the same
+    // shape, which is what makes the line land. Spanish keeps its article —
+    // "arraigados en tierra" reads as broken Spanish, not as a tighter echo.
+    en: 'Rooted in soil, rooted in Christ',
+    es: 'Arraigados en la tierra, arraigados en Cristo',
   } satisfies Bilingual,
 
-  // What the movement is for, and how wide the door is. "Wherever you are"
-  // is left unexplained on purpose: the rural-resettlement/first-loaf pairing
-  // that used to finish this sentence now closes `approach` below, and the
-  // page shouldn't make the same move twice.
+  // What the movement is for, and what this chapter actually offers toward
+  // it. The second sentence names the three things a visitor gets — network,
+  // vision, support — rather than restating that the door is wide; the
+  // rural-resettlement/first-loaf pairing in `approach` below already does
+  // that job, and the page shouldn't make the same move twice.
+  //
+  // "Here in Central Texas" came out with it. The geography isn't lost: the
+  // approach paragraph still ends "across every parish from Austin to San
+  // Antonio", which places the chapter more concretely than the region name.
   lede: {
-    en: 'The Catholic Land Movement exists to help Catholics resettle onto productive land they own. Here in Central Texas, that work starts wherever you are.',
-    es: 'El Movimiento Católico de la Tierra existe para ayudar a los católicos a reasentarse en tierra productiva que sea suya. Aquí en el centro de Tejas, ese trabajo empieza donde estés.',
+    en: 'The Catholic Land Movement exists to help Catholics resettle onto productive land they own. We offer the network, vision, and support to help make it a reality.',
+    es: 'El Movimiento Católico de la Tierra existe para ayudar a los católicos a reasentarse en tierra productiva que sea suya. Ofrecemos la red, la visión, y el apoyo para hacerlo realidad.',
   } satisfies Bilingual,
 
   ctaGathering: {
@@ -47,7 +55,7 @@ export const homeCopy = {
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
-  // 2. Why it matters — the ache, named before anything is asked
+  // 2. Why this matters — the ache, named before anything is asked
   // ---------------------------------------------------------------------
   whyEyebrow: {
     en: 'WHY THIS MATTERS',
@@ -63,37 +71,35 @@ export const homeCopy = {
   // It used to carry its own heading ("Grown, Not Built"); folded in here
   // it reads as the turn from the ache to the response, and the page
   // carries one section where it carried two.
-  // The closing sentence is the chapter's older one, restored: it names both
-  // ends of the range (a rural resettlement, a first loaf) and the ground the
-  // chapter actually covers. "Central Texas" in the lede is the shorthand;
-  // Austin to San Antonio is the thing a visitor can place themselves inside.
+  // The closing sentence names both ends of the range — a rural resettlement,
+  // a first loaf — and the ground the chapter actually covers. Since the lede
+  // stopped saying "Central Texas", this is now the only place the page tells
+  // a visitor where we are, and Austin to San Antonio is the more concrete
+  // way to say it anyway.
   approach: {
     en: 'We believe family, faith, and place are gifts we receive, not things we build from a plan. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
     es: 'Creemos que la familia, la fe, y el lugar son dones que recibimos, no cosas que construimos según un plan. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado — en cada parroquia desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
-  // 4. Our Roots
+  // Our Roots — folded away under "Why this matters", see RootsNote
   //
-  // Answers "where did this come from?" and nothing more. The organisation
-  // we descend from, named — not the intellectual prehistory. Rerum Novarum
-  // gets a passing mention because the associations were answering it; the
-  // rest of the line (McNabb, Pius XII, Mater et Magistra, Laudato Si') is
-  // on /history, which the link at the end of the section goes to.
+  // Answers "where did this come from?" and nothing more: the Church's
+  // response to industrialization, the association we descend from, and the
+  // blessing. The rest of the line (McNabb, Pius XII, Mater et Magistra,
+  // Laudato Si') is on /history, which the link at the end goes to.
   // ---------------------------------------------------------------------
   rootsEyebrow: {
     en: 'OUR ROOTS',
     es: 'NUESTRAS RAÍCES',
   } satisfies Bilingual,
 
-  // Written against how the movement's own writers tell this — the
-  // Distributist Review, Our Lady's Ranch, the national chapter — rather
-  // than as a summary. What that meant in practice: lead with the problem
-  // (Catholics packed into industrial cities) before the remedy, keep the
-  // concrete verbs the sources use (buy land, train townsmen, settle
-  // families), vary the sentence lengths instead of marching date-first
-  // through four parallel clauses, and take the 2025 line almost as the
-  // national chapter words it themselves.
+  // Framed as one arc rather than a list of dates: the Industrial Revolution
+  // pulls families off the land, Leo XIII answers, Glasgow acts, Pius XI
+  // blesses — and we are in another technological revolution now, which is
+  // what makes the 2025 blessing more than a formality. The four dated lines
+  // that used to sit under this were dropped because the paragraph already
+  // names 1891, 1929, 1933 and today.
   roots: {
     en: 'Our movement has a rich and significant role in the Church’s long response to industrialization, carrying forward Pope Leo XIII’s vision of families who own the land they work. When the Industrial Revolution drew families off the land and into factories, Leo answered in Rerum Novarum (1891), urging widespread ownership of productive property. In 1929, Catholics in Glasgow took up that call and formed the first Catholic Land Association. Associations soon spread across Scotland and England, with bishops as their presidents and patrons, and in 1933 Pope Pius XI sent his Apostolic Blessing to their work. Today, as a new technological revolution reshapes work and home once again, Pope Leo XIV has extended that same blessing to the Catholic Land Movement, recognizing us as carrying this work forward.',
     es: 'Nuestro movimiento tiene un papel rico y significativo en la larga respuesta de la Iglesia a la industrialización, y lleva adelante la visión del Papa León XIII de familias que poseen la tierra que trabajan. Cuando la Revolución Industrial sacó a las familias del campo y las llevó a las fábricas, León respondió en Rerum Novarum (1891), instando a una propiedad generalizada de los bienes productivos. En 1929, unos católicos en Glasgow tomaron ese llamado y formaron la primera Asociación Católica de la Tierra. Pronto surgieron asociaciones por toda Escocia e Inglaterra, con obispos como sus presidentes y patronos, y en 1933 el Papa Pío XI envió su Bendición Apostólica a su labor. Hoy, mientras una nueva revolución tecnológica vuelve a transformar el trabajo y el hogar, el Papa León XIV ha extendido esa misma bendición al Movimiento Católico de la Tierra, reconociéndonos como quienes llevan adelante esta obra.',
