@@ -4,6 +4,7 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { ContactModal } from '@/components/ContactModal';
 import { buildPath } from '@/i18n/routes';
+import { RECOGNITION_ANCHOR } from '@/components/RecognitionNote';
 
 export const Footer = () => {
   const { t, locale } = useLocale();
@@ -41,11 +42,11 @@ export const Footer = () => {
             introduce it, which is why neither is up in the page. */}
         {nationalLink}
 
-        {/* Points at the letters rather than at one image file, so the
-            sentence keeps working as more arrive. */}
+        {/* Points at the disclosure on /vision, which opens on this hash —
+            the letters live with the page that makes the claim. */}
         <p className="-mt-3">
           <Link
-            to={buildPath('recognition', locale)}
+            to={`${buildPath('vision', locale)}#${RECOGNITION_ANCHOR}`}
             title={t(uiStrings.common.recognitionDoc)}
             className="font-serif text-sm italic text-piedra"
           >
