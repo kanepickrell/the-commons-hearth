@@ -3,12 +3,12 @@
 //
 // Structure:
 //   1. Hero — who we are, what the movement is for, and the two next steps
-//   2. Why it matters — the longing, named before anything is asked
-//   3. Approach — "Grown, Not Built"
-//   4. Our Mission — Resettlement, Education, Fellowship, Glorification
-//   5. Meet your neighbors — the chapter map and parish list
-//   6. Next Gathering — the one dated thing, read from the /workshops data
-//   7. The patron — the closing note
+//   2. Why this matters — the ache, then the answer; with our roots folded
+//      away underneath for anyone who asks where this came from
+//   3. Our Mission — Resettlement, Education, Fellowship, Glorification
+//   4. Meet your neighbors — the chapter map and parish list
+//   5. Next Gathering — the one dated thing, read from the /workshops data
+//   6. The patron — the closing note
 //
 // Notes:
 //   - The words live in src/content/home.ts, not inline here, because
@@ -112,20 +112,18 @@ const Home = () => {
           <p className="prose-body text-lg leading-relaxed text-mesquite/90">
             {t(homeCopy.approach)}
           </p>
+
+          {/* Our Roots, folded away under the prose it belongs to rather
+              than ruled off as a section of its own — where it read as a
+              third heading competing with the two either side of it. */}
+          <RootsNote />
         </div>
       </section>
 
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 3. Our Roots — collapsed until asked for                         */}
-      {/* ---------------------------------------------------------------- */}
-      <RootsNote />
-
-      <div className="rule container-prose" />
-
-      {/* ---------------------------------------------------------------- */}
-      {/* 4. Our Mission                                                   */}
+      {/* 3. Our Mission                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-14 text-center">
@@ -156,7 +154,7 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 5. Meet your neighbors                                           */}
+      {/* 4. Meet your neighbors                                           */}
       {/*                                                                  */}
       {/* The chapter's ecclesiastical recognition used to sit under this   */}
       {/* header. It reads as provenance rather than as an introduction to  */}
@@ -194,14 +192,14 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 6. Next gathering                                                */}
+      {/* 5. Next gathering                                                */}
       {/* ---------------------------------------------------------------- */}
       <NextGathering />
 
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 7. The patron — the closing note                                 */}
+      {/* 6. The patron — the closing note                                 */}
       {/*                                                                   */}
       {/* Nothing else on the site says "this is a CATHOLIC land movement"  */}
       {/* as immediately as Isidore does, and the page that carries him —   */}

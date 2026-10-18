@@ -7,11 +7,14 @@
 // unasked. Collapsed, the section costs one line; opened, it reads in full
 // and hands off to /history.
 //
+// Subtle on purpose, and attached to the paragraph above rather than set off
+// as its own section: with rules above and below it read as a third heading
+// competing with "Why this matters" and "Our Mission", which is more weight
+// than an optional aside should carry. It now sits under the prose as one
+// quiet line in the site's standard small-caps link treatment.
+//
 // The panel animates the same way RecognitionNote's does (0fr → 1fr, so it
 // eases to the content's real height rather than to a guessed max-height).
-// The two are kept separate rather than sharing a primitive: their triggers
-// are different animals — a seal line there, a section eyebrow here — and
-// the shared part is about eight lines of class names.
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -24,21 +27,17 @@ export const RootsNote = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="container-prose py-20 text-center">
-      {/* The section's eyebrow IS the control, so the collapsed state is a
-          single quiet line rather than a heading plus a button. */}
+    <div>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="our-roots"
-        className="group inline-flex items-center gap-2.5 text-ocre transition-colors hover:text-mesquite"
+        className="inline-flex items-center gap-2 display-caps text-xs tracking-[0.2em] text-ocre transition-colors hover:text-mesquite"
       >
-        <span className="display-caps text-sm font-semibold tracking-[0.3em] md:text-base">
-          {t(homeCopy.rootsEyebrow)}
-        </span>
+        {t(homeCopy.rootsEyebrow)}
         <svg
-          width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"
+          width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"
           fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
           strokeLinejoin="round"
           className={`flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
@@ -54,7 +53,7 @@ export const RootsNote = () => {
         }`}
       >
         <div className="overflow-hidden">
-          <p className="prose-body mx-auto mt-9 max-w-xl text-left text-lg leading-relaxed text-mesquite/90">
+          <p className="prose-body mt-5 text-base leading-relaxed text-mesquite/80">
             {t(homeCopy.roots)}
           </p>
 
@@ -62,13 +61,13 @@ export const RootsNote = () => {
             to={buildPath('history', locale)}
             tabIndex={open ? 0 : -1}
             aria-hidden={!open}
-            className="mt-8 inline-block display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
+            className="mt-5 inline-block display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
             style={{ textDecoration: 'none' }}
           >
             {t(homeCopy.rootsMore)} →
           </Link>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
