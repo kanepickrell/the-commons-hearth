@@ -81,12 +81,27 @@ describe('app renders', () => {
     expect(screen.getByText('join the chapter')).toBeInTheDocument();
   });
 
-  it('home carries the mission and the blessing', async () => {
+  it('home carries the mission', async () => {
     visit('/');
     await waitFor(() => expect(screen.getByText(/We Are the Catholic Land Movement/)).toBeInTheDocument());
-    expect(screen.getByText(/Recognized and blessed by Pope Leo XIV/)).toBeInTheDocument();
     expect(screen.getByText('Resettlement')).toBeInTheDocument();
     expect(screen.getByText('Glorification')).toBeInTheDocument();
+  });
+
+  // The recognition is provenance, not a section heading — it belongs to the
+  // footer, which is also what puts it on every page instead of just this one.
+  it('the papal recognition rides in the footer, on every page', async () => {
+    visit('/');
+    const onHome = await waitFor(() => screen.getByText(/Recognized and blessed by Pope Leo XIV/));
+    expect(onHome.closest('footer')).not.toBeNull();
+    // ...and it is not left behind in the map section it used to sit in.
+    expect(screen.getByText('MEET YOUR NEIGHBORS').parentElement?.textContent)
+      .not.toMatch(/Pope Leo XIV/);
+
+    visit('/vision');
+    await waitFor(() =>
+      expect(screen.getAllByText(/Recognized and blessed by Pope Leo XIV/).length).toBeGreaterThan(0)
+    );
   });
 
   it('workshops list, including a non-illustrated craft', async () => {

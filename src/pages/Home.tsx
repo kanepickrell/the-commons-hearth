@@ -158,17 +158,15 @@ const Home = () => {
       {/* ---------------------------------------------------------------- */}
       {/* 5. Meet your neighbors                                           */}
       {/*                                                                  */}
-      {/* The blessing sits here rather than in the hero on purpose: it's   */}
-      {/* the sentence that tells a visitor the thing they're looking at    */}
-      {/* on this map is recognised by the Church, not a private project.   */}
+      {/* The chapter's ecclesiastical recognition used to sit under this   */}
+      {/* header. It reads as provenance rather than as an introduction to  */}
+      {/* a map, so it now lives in the footer beside the national          */}
+      {/* affiliation — and on every page rather than this one.             */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-10 text-center">
           <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
             {t(homeCopy.mapEyebrow)}
-          </p>
-          <p className="prose-body mx-auto mt-4 max-w-md text-sm italic leading-relaxed text-piedra">
-            {t(homeCopy.blessing)}
           </p>
         </header>
         <Suspense
