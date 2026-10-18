@@ -80,7 +80,64 @@ export const homeCopy = {
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
-  // 4. Our Mission
+  // 4. Our Roots
+  //
+  // Answers "where did this come from?" and nothing more. The organisation
+  // we descend from, named — not the intellectual prehistory. Rerum Novarum
+  // gets a passing mention because the associations were answering it; the
+  // rest of the line (McNabb, Pius XII, Mater et Magistra, Laudato Si') is
+  // on /history, which the link at the end of the section goes to.
+  // ---------------------------------------------------------------------
+  rootsEyebrow: {
+    en: 'OUR ROOTS',
+    es: 'NUESTRAS RAÍCES',
+  } satisfies Bilingual,
+
+  roots: {
+    en: 'We didn’t start something new. In 1929, Catholics in Glasgow formed the first Catholic Land Association, answering Pope Leo XIII’s call in Rerum Novarum for families to own productive property. Associations soon spread across Scotland and England, with bishops serving as their presidents and patrons. In 1933, Pope Pius XI sent his Apostolic Blessing to their work. In 2025, Pope Leo XIV extended that same blessing to the Catholic Land Movement, recognizing us as carrying the same work forward today.',
+    es: 'No empezamos algo nuevo. En 1929, unos católicos en Glasgow formaron la primera Asociación Católica de la Tierra, respondiendo al llamado del Papa León XIII en Rerum Novarum a que las familias posean propiedad productiva. Pronto surgieron asociaciones por toda Escocia e Inglaterra, con obispos como sus presidentes y patronos. En 1933, el Papa Pío XI envió su Bendición Apostólica a esa labor. En 2025, el Papa León XIV extendió esa misma bendición al Movimiento Católico de la Tierra, reconociéndonos como quienes llevan adelante la misma obra hoy.',
+  } satisfies Bilingual,
+
+  // Four lines, not a timeline. The 1933 and 2025 entries link straight to
+  // the documents — seeing the letters does more than any summary.
+  rootsLines: [
+    {
+      year: '1891',
+      text: {
+        en: 'Rerum Novarum calls for the law to help as many people as possible become owners',
+        es: 'Rerum Novarum pide que la ley ayude a que el mayor número posible de personas lleguen a ser propietarias',
+      } satisfies Bilingual,
+    },
+    {
+      year: '1929',
+      text: {
+        en: 'First Catholic Land Association founded in Glasgow',
+        es: 'Se funda en Glasgow la primera Asociación Católica de la Tierra',
+      } satisfies Bilingual,
+    },
+    {
+      year: '1933',
+      text: {
+        en: 'Pius XI blesses the Catholic Land Associations',
+        es: 'Pío XI bendice a las Asociaciones Católicas de la Tierra',
+      } satisfies Bilingual,
+    },
+    {
+      year: '2025',
+      text: {
+        en: 'Leo XIV extends that blessing to the Catholic Land Movement',
+        es: 'León XIV extiende esa bendición al Movimiento Católico de la Tierra',
+      } satisfies Bilingual,
+    },
+  ],
+
+  rootsMore: {
+    en: 'Read the history and source documents',
+    es: 'Lee la historia y los documentos',
+  } satisfies Bilingual,
+
+  // ---------------------------------------------------------------------
+  // 5. Our Mission
   // ---------------------------------------------------------------------
   pillarsEyebrow: {
     en: 'OUR MISSION',

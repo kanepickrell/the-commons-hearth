@@ -136,20 +136,49 @@ describe('app renders', () => {
     const img = screen.getByRole('img', { name: /Apostolic Blessing/ });
     expect(img).toHaveAttribute('src', '/vatican-support-letter.png');
 
-    // The whole point is the continuity, so the timeline must read in order
-    // and must still carry 1946 as teaching rather than as a blessing.
-    const years = screen.getAllByText(/^(1933|1936|1946|2025)$/).map((n) => n.textContent);
-    expect(years).toEqual(['1933', '1936', '1946', '2025']);
+    // One document, not the backstory: /vision stays mission-focused and
+    // hands the long line off to /history.
+    expect(screen.queryByText(/Rerum Novarum/)).toBeNull();
+    expect(document.querySelector('a[href="/history"]')).not.toBeNull();
+  });
+
+  it('home names the organization the chapter descends from', async () => {
+    visit('/');
+    await waitFor(() =>
+      expect(screen.getByText(/first Catholic Land Association/)).toBeInTheDocument()
+    );
+    const years = screen.getAllByText(/^(1891|1929|1933|2025)$/).map((n) => n.textContent);
+    expect(years).toEqual(['1891', '1929', '1933', '2025']);
+    expect(document.querySelector('a[href="/history"]')).not.toBeNull();
+  });
+
+  it('history carries the whole line, with its sources', async () => {
+    visit('/history');
+    await waitFor(() => expect(screen.getByText('History & Sources')).toBeInTheDocument());
+
+    const years = screen
+      .getAllByText(/^(1891|1925|1929|1933|1936|1946|1961|2015|2025)$/)
+      .map((n) => n.textContent);
+    expect(years).toEqual(['1891', '1925', '1929', '1933', '1936', '1946', '1961', '2015', '2025']);
+
+    // 1946 stays teaching, not a blessing on the movement.
     expect(screen.getByText(/Not a blessing on the Land Movement/)).toBeInTheDocument();
 
-    // Every citation points somewhere a reader can check it.
+    // Every primary document is reachable.
     for (const href of [
+      'https://www.vatican.va/content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_15051891_rerum-novarum.html',
       'https://collected.jcu.edu/the_cross_and_the_plough/1/',
       'https://www.cambridge.org/core/journals/blackfriars/article/editorial/0138EA20F62FE2A774DE6132472C1021',
       'https://www.ewtn.com/catholicism/library/pope-speaks-on-rural-life-9050',
+      'https://www.vatican.va/content/john-xxiii/en/encyclicals/documents/hf_j-xxiii_enc_15051961_mater.html',
+      'https://www.vatican.va/content/francesco/en/encyclicals/documents/papa-francesco_20150524_enciclica-laudato-si.html',
     ]) {
       expect(document.querySelector(`a[href="${href}"]`)).not.toBeNull();
     }
+
+    // A link that only goes to something ABOUT a source has to say so, or
+    // the page implies a primary document it can't hand over.
+    expect(screen.getAllByText(/about the source, not the source itself/).length).toBe(2);
   });
 
   it('workshops list, including a non-illustrated craft', async () => {

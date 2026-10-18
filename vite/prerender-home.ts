@@ -51,6 +51,10 @@ const shell = () => {
     .map((p) => `<li style="margin:0 0 .75rem"><strong>${esc(p.name.en)}</strong> — ${esc(p.body.en)}</li>`)
     .join('');
 
+  const roots = homeCopy.rootsLines
+    .map((l) => `<li style="margin:0 0 .5rem"><strong>${esc(l.year)}</strong> — ${esc(l.text.en)}</li>`)
+    .join('');
+
   return `<div style="${PAGE}">
 <h1 style="${H1}">${esc(homeCopy.heading.en)}</h1>
 <p style="${TAGLINE}">${esc(homeCopy.tagline.en)}</p>
@@ -60,6 +64,9 @@ const shell = () => {
 <p style="${BODY}">${esc(homeCopy.why.en)}</p>
 <h2 style="${H2}">${esc(homeCopy.approachHeading.en)}</h2>
 <p style="${BODY}">${esc(homeCopy.approach.en)}</p>
+<h2 style="${H2}">Our Roots</h2>
+<p style="${BODY}">${esc(homeCopy.roots.en)}</p>
+<ul style="${BODY}list-style:none;padding:0">${roots}</ul>
 <h2 style="${H2}">Our Mission</h2>
 <ul style="${BODY}list-style:none;padding:0">${mission}</ul>
 </div>`;
