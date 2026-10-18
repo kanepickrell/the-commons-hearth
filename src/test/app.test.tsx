@@ -113,20 +113,29 @@ describe('app renders', () => {
     // One standing behind the pillars the page lays out, one in the footer.
     expect(all.filter((el) => el.closest('footer') === null)).toHaveLength(1);
     expect(all.filter((el) => el.closest('footer') !== null)).toHaveLength(1);
-    // Both are links to the letters, not to one image file — so the sentence
-    // keeps working as more letters are added.
-    for (const el of all) {
-      expect(el.closest('a')).toHaveAttribute('href', '/recognition');
-    }
+    // In the page it's the disclosure's trigger; in the footer it's a link
+    // to that same disclosure. Neither points at a bare image file, so both
+    // keep working as more letters are added.
+    const inPage = all.find((el) => el.closest('footer') === null)!;
+    expect(inPage.closest('button')).toHaveAttribute('aria-expanded', 'false');
+    const inFooter = all.find((el) => el.closest('footer') !== null)!;
+    expect(inFooter.closest('a')).toHaveAttribute('href', '/vision#recognition');
   });
 
-  it('the recognition page shows the Vatican letter', async () => {
-    visit('/recognition');
-    await waitFor(() =>
-      expect(screen.getByText(/Secretariat of State/)).toBeInTheDocument()
-    );
+  it('the recognition opens to the Vatican letter in place', async () => {
+    visit('/vision');
+    const trigger = await waitFor(() => {
+      const el = screen.getAllByText(/Recognized and blessed by Pope Leo XIV/)
+        .find((n) => n.closest('footer') === null)!;
+      return el.closest('button')!;
+    });
+
+    trigger.click();
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
+
     const img = screen.getByRole('img', { name: /Apostolic Blessing/ });
     expect(img).toHaveAttribute('src', '/vatican-support-letter.png');
+    expect(screen.getByText(/Secretariat of State/)).toBeInTheDocument();
     expect(screen.getByText(/18 November 2025/)).toBeInTheDocument();
   });
 

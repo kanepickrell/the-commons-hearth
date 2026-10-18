@@ -14,14 +14,15 @@
 //   - Dropped the "Begin where you are" closing CTA; the Participate
 //     page is the natural next click and is now linked from this page.
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
 import { buildPath } from '@/i18n/routes';
-import { uiStrings } from '@/lib/fixtures/uiStrings';
+import { RecognitionNote, RECOGNITION_ANCHOR } from '@/components/RecognitionNote';
 
 export default function Vision() {
   const { t, locale } = useLocale();
+  const { hash } = useLocation();
 
   const pillars = [
     {
@@ -100,23 +101,11 @@ export default function Vision() {
           })}
         </p>
 
-        {/* The chapter's ecclesiastical recognition. It reads here, under the
-            opening and above the pillars, because this is the page that says
-            what the movement believes — and the recognition stands behind
-            exactly that. Flanked by hairlines rather than set in a box: the
-            site's own vocabulary for a seal, and quieter than a banner.
-            The footer carries the same line on every page. */}
-        <p className="mt-12 flex max-w-xl items-center justify-center gap-4 text-sm leading-relaxed">
-          <span aria-hidden="true" className="hidden h-px w-10 flex-shrink-0 bg-ocre/40 sm:block" />
-          <Link
-            to={buildPath('recognition', locale)}
-            title={t(uiStrings.common.recognitionDoc)}
-            className="font-serif italic text-piedra"
-          >
-            {t(uiStrings.common.recognition)}
-          </Link>
-          <span aria-hidden="true" className="hidden h-px w-10 flex-shrink-0 bg-ocre/40 sm:block" />
-        </p>
+        {/* The chapter's ecclesiastical recognition, and the letter behind
+            it. It reads here, under the opening and above the pillars,
+            because this is the page that says what the movement believes —
+            and the recognition stands behind exactly that. */}
+        <RecognitionNote defaultOpen={hash === `#${RECOGNITION_ANCHOR}`} />
       </section>
 
       {/* ---------------------------------------------------------------- */}
