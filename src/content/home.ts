@@ -93,9 +93,17 @@ export const homeCopy = {
     es: 'NUESTRAS RAÍCES',
   } satisfies Bilingual,
 
+  // Written against how the movement's own writers tell this — the
+  // Distributist Review, Our Lady's Ranch, the national chapter — rather
+  // than as a summary. What that meant in practice: lead with the problem
+  // (Catholics packed into industrial cities) before the remedy, keep the
+  // concrete verbs the sources use (buy land, train townsmen, settle
+  // families), vary the sentence lengths instead of marching date-first
+  // through four parallel clauses, and take the 2025 line almost as the
+  // national chapter words it themselves.
   roots: {
-    en: 'We didn’t start something new. In 1929, Catholics in Glasgow formed the first Catholic Land Association, answering Pope Leo XIII’s call in Rerum Novarum for families to own productive property. Associations soon spread across Scotland and England, with bishops serving as their presidents and patrons. In 1933, Pope Pius XI sent his Apostolic Blessing to their work. In 2025, Pope Leo XIV extended that same blessing to the Catholic Land Movement, recognizing us as carrying the same work forward today.',
-    es: 'No empezamos algo nuevo. En 1929, unos católicos en Glasgow formaron la primera Asociación Católica de la Tierra, respondiendo al llamado del Papa León XIII en Rerum Novarum a que las familias posean propiedad productiva. Pronto surgieron asociaciones por toda Escocia e Inglaterra, con obispos como sus presidentes y patronos. En 1933, el Papa Pío XI envió su Bendición Apostólica a esa labor. En 2025, el Papa León XIV extendió esa misma bendición al Movimiento Católico de la Tierra, reconociéndonos como quienes llevan adelante la misma obra hoy.',
+    en: 'We didn’t start this. A hundred years ago most of Britain’s Catholics were packed into industrial cities, and in 1929 a handful of them in Glasgow set out to get families back onto land of their own. They founded the first Catholic Land Association — to buy land, train townsmen to farm it, and settle families on it — and they had the hierarchy behind them from the start. Associations followed in the North, the Midlands and the South of England, with bishops standing as their presidents and patrons. They were answering Leo XIII, who had written in Rerum Novarum that the law should help as many people as possible become owners. Pius XI sent them his Apostolic Blessing in 1933. In November of 2025, Pope Leo XIV recognized the Catholic Land Movement and extended that same blessing to our work.',
+    es: 'Esto no lo empezamos nosotros. Hace cien años la mayoría de los católicos de Gran Bretaña vivía apiñada en ciudades industriales, y en 1929 unos cuantos en Glasgow se propusieron devolver a las familias a una tierra propia. Fundaron la primera Asociación Católica de la Tierra — para comprar tierra, enseñar a la gente de ciudad a trabajarla, y asentar en ella a las familias — y desde el principio tuvieron detrás a la jerarquía. Siguieron asociaciones en el norte, el centro y el sur de Inglaterra, con obispos como sus presidentes y patronos. Respondían a León XIII, que había escrito en Rerum Novarum que la ley debía ayudar a que el mayor número posible de personas llegara a ser propietaria. Pío XI les envió su Bendición Apostólica en 1933. En noviembre de 2025, el Papa León XIV reconoció al Movimiento Católico de la Tierra y extendió esa misma bendición a nuestra labor.',
   } satisfies Bilingual,
 
   // Four lines, not a timeline. The 1933 and 2025 entries link straight to
