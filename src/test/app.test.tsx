@@ -98,10 +98,21 @@ describe('app renders', () => {
     expect(screen.getByText('MEET YOUR NEIGHBORS').parentElement?.textContent)
       .not.toMatch(/Pope Leo XIV/);
 
+  });
+
+  // Its own test, not a second visit() in the one above: visit() renders a
+  // fresh app without unmounting the previous one, so counting matches across
+  // two visits counts both copies of the site.
+  it('vision carries the recognition in the page as well as the footer', async () => {
     visit('/vision');
-    await waitFor(() =>
-      expect(screen.getAllByText(/Recognized and blessed by Pope Leo XIV/).length).toBeGreaterThan(0)
-    );
+    const all = await waitFor(() => {
+      const found = screen.getAllByText(/Recognized and blessed by Pope Leo XIV/);
+      expect(found).toHaveLength(2);
+      return found;
+    });
+    // One standing behind the pillars the page lays out, one in the footer.
+    expect(all.filter((el) => el.closest('footer') === null)).toHaveLength(1);
+    expect(all.filter((el) => el.closest('footer') !== null)).toHaveLength(1);
   });
 
   it('workshops list, including a non-illustrated craft', async () => {

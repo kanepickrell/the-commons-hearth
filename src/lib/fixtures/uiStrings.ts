@@ -181,12 +181,6 @@ export const uiStrings = {
       en: 'We operate under the national Catholic Land Movement organization',
       es: 'Parte del Movimiento Católico de la Tierra',
     },
-    // Provenance, not a banner. It sits with the national affiliation
-    // because that is what it qualifies, and it reads on every page.
-    blessed: {
-      en: 'Recognized and blessed by Pope Leo XIV, November 2025.',
-      es: 'Reconocido y bendecido por el Papa León XIV, noviembre de 2025.',
-    },
     sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · AD 2026', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · AD 2026' },
     reachUs: { en: 'Still Have Questions?', es: 'Escríbenos' },
   },
@@ -258,6 +252,13 @@ export const uiStrings = {
     theWitness:      { en: 'OUR WITNESS',           es: 'EL TESTIMONIO' },
   },
   common: {
+    // Read in two places: quietly in the footer, where it qualifies the
+    // chapter on every page, and once more on /vision, where it stands
+    // behind the four pillars the page goes on to lay out.
+    recognition: {
+      en: 'Recognized and blessed by Pope Leo XIV, November 2025.',
+      es: 'Reconocido y bendecido por el Papa León XIV, noviembre de 2025.',
+    },
     backToTalleres: { en: '← All workshops', es: '← Todos los talleres' },
     backToVision:   { en: '← Vision',        es: '← Visión' },
     members:        { en: 'members',         es: 'miembros' },

@@ -40,7 +40,7 @@ export const Footer = () => {
         {nationalLink}
 
         <p className="-mt-3 font-serif text-sm italic text-piedra">
-          {t(s.blessed)}
+          {t(uiStrings.common.recognition)}
         </p>
 
         {/* Inbound channel for non-members — opens the contact form. */}

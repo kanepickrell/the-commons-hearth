@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
 import { buildPath } from '@/i18n/routes';
+import { uiStrings } from '@/lib/fixtures/uiStrings';
 
 export default function Vision() {
   const { t, locale } = useLocale();
@@ -97,6 +98,18 @@ export default function Vision() {
             en: 'We are families in Central Texas taking up the first vocation given to man — to till the earth and keep it. Not to flee the world, but to sanctify a small corner of it for Christ.',
             es: 'Somos familias del Centro de Texas que asumimos la primera vocación dada al hombre — labrar la tierra y guardarla. No para huir del mundo, sino para santificar un pequeño rincón de él para Cristo.',
           })}
+        </p>
+
+        {/* The chapter's ecclesiastical recognition. It reads here, under the
+            opening and above the pillars, because this is the page that says
+            what the movement believes — and the recognition stands behind
+            exactly that. Flanked by hairlines rather than set in a box: the
+            site's own vocabulary for a seal, and quieter than a banner.
+            The footer carries the same line on every page. */}
+        <p className="mt-12 flex max-w-xl items-center justify-center gap-4 font-serif text-sm italic leading-relaxed text-piedra">
+          <span aria-hidden="true" className="hidden h-px w-10 flex-shrink-0 bg-ocre/40 sm:block" />
+          {t(uiStrings.common.recognition)}
+          <span aria-hidden="true" className="hidden h-px w-10 flex-shrink-0 bg-ocre/40 sm:block" />
         </p>
       </section>
 
