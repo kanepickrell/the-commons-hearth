@@ -172,6 +172,48 @@ describe('app renders', () => {
     expect(document.documentElement.lang).toBe('es');
   });
 
+  // The phone nav is a media-query layout, and jsdom has no layout — so this
+  // tests the part that is actually logic: the panel's existence, the button's
+  // state, and that following a link puts it away again.
+  it('phone nav opens and closes behind the menu button', async () => {
+    visit('/');
+    const button = await waitFor(() => screen.getByLabelText('Menu'));
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(document.getElementById('site-menu')).toBeNull();
+
+    button.click();
+    await waitFor(() => expect(document.getElementById('site-menu')).not.toBeNull());
+    expect(screen.getByLabelText('Close menu')).toHaveAttribute('aria-expanded', 'true');
+
+    // Every nav destination is reachable from inside the panel.
+    const panel = document.getElementById('site-menu')!;
+    const hrefs = [...panel.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(['/vision', '/participate', '/workshops', '/witness', '/patron', '/resources']);
+
+    // Following one navigates and puts the panel away.
+    (panel.querySelector('a[href="/vision"]') as HTMLAnchorElement).click();
+    await waitFor(() => expect(window.location.pathname).toBe('/vision'));
+    await waitFor(() => expect(document.getElementById('site-menu')).toBeNull());
+  });
+
+  it('the phone nav carries the language toggle', async () => {
+    visit('/workshops');
+    (await waitFor(() => screen.getByLabelText('Menu'))).click();
+    // waitFor only retries when its callback THROWS, so assert inside it —
+    // returning a bare null resolves on the first tick.
+    const panel = await waitFor(() => {
+      const el = document.getElementById('site-menu');
+      expect(el).not.toBeNull();
+      return el!;
+    });
+
+    const es = [...panel.querySelectorAll('button')].find((b) => b.textContent === 'ES')!;
+    expect(es).toHaveAttribute('aria-pressed', 'false');
+    es.click();
+    await waitFor(() => expect(window.location.pathname).toBe('/talleres'));
+    expect(document.documentElement.lang).toBe('es');
+  });
+
   it('unknown route shows not-found', async () => {
     visit('/nope');
     await waitFor(() => expect(screen.getByText(/404/)).toBeInTheDocument());
