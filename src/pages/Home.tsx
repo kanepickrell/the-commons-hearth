@@ -1,35 +1,38 @@
 // src/pages/Home.tsx
 // Landing page — the trailhead, not the whole trail.
 //
-// Structure (per the chapter's approved copy):
-//   1. Opening — the longing, who we are, what we believe
-//   2. Pillars — Resettlement, Education, Fellowship, Glorification
-//   3. A single recent witness, large, as evidence
-//   4. The chapter map
-//   5. The patron — the one line that names whose care this work is under
-//   6. Closing CTA — members → profile, visitors → onboarding
+// Structure:
+//   1. Hero — who we are, what the movement is for, and the two next steps
+//   2. Why it matters — the longing, named before anything is asked
+//   3. Approach — "Grown, Not Built"
+//   4. Our Mission — Resettlement, Education, Fellowship, Glorification
+//   5. Meet your neighbors — the chapter map and parish list
+//   6. Next Gathering — the one dated thing, read from the /workshops data
+//   7. The patron — the closing note
 //
 // Notes:
-//   - Vision owns the deeper exposition of the four pillars; Home
-//     introduces them. The "how to live this out" three-movement content
-//     that used to sit at the bottom of Home now lives on Participate.
-//   - The four pillar icons are bespoke line-art (homestead, sprouting
-//     book, shared table, monstrance), kept separate from the craft
-//     iconMap. They're inlined via ?raw so they inherit currentColor.
+//   - The words live in src/content/home.ts, not inline here, because
+//     vite/prerender-home.ts reads the same module to write a static copy of
+//     the page's opening into index.html at build time. Editing copy in one
+//     place keeps the prerender from drifting out of date.
+//   - Vision owns the deeper exposition of the four pillars; Home introduces
+//     them. The "how to live this out" content lives on Participate, which
+//     is where the hero's "Join the chapter" points.
+//   - The witness quote that used to sit between the pillars and the map now
+//     lives only on /witness — the Year Wheel is the better home for it, and
+//     the section rendered as nothing whenever no post was approved.
+//   - The four pillar icons are bespoke line-art (homestead, sprouting book,
+//     shared table, monstrance), kept separate from the craft iconMap.
+//     They're inlined via ?raw so they inherit currentColor.
 
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { SignInModal } from '@/components/SignInModal';
-import { Icon } from '@/components/Icon';
-import { LanguageNote } from '@/components/LanguageNote';
+import { NextGathering } from '@/components/NextGathering';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
-import { useAuth } from '@/hooks/useAuth';
 import { buildPath } from '@/i18n/routes';
-import { supabase } from '@/lib/supabase';
-import type { IconSlug, Bilingual } from '@/lib/types';
-import { formatDate } from '@/lib/dates';
+import { homeCopy, pillars } from '@/content/home';
 
 import resettlement from '@/assets/icons/resettlement.svg?raw';
 import education from '@/assets/icons/education.svg?raw';
@@ -46,177 +49,85 @@ const PILLAR_ICONS = {
   resettlement, education, fellowship, glorification,
 } as const;
 
-// Prose is authored inline here rather than in uiStrings.ts because it's
-// landing-page copy — long, editorial, and likely to be revised often.
-const copy = {
-  // ---------------------------------------------------------------------
-  // 1. Opening
-  // ---------------------------------------------------------------------
-  eyebrow: {
-    en: 'We Are the Catholic Land Movement',
-    es: 'Somos el Movimiento Católico de la Tierra',
-  } satisfies Bilingual,
-
-  // The ache. Names the longing the visitor already feels.
-  ache: {
-    en: 'Many of us yearn for a life rooted in the land — work centered in the home, food raised by neighbors, parishes where real fellowship happens. We miss the simple traditions that make the family what God created it to be: the heart of society.',
-    es: 'Muchos de nosotros anhelamos una vida arraigada en la tierra — el trabajo centrado en el hogar, la comida cultivada por los vecinos, parroquias donde haya verdadera hermandad. Extrañamos las tradiciones sencillas que hacen de la familia lo que Dios creó que fuera: el corazón de la sociedad.',
-  } satisfies Bilingual,
-
-  // Who we are + what we believe. One paragraph on purpose.
-  whoWeAre: {
-    en: 'We exist to help restore the household to what it once was: a place that makes, grows, and gives, rather than one that only consumes. Whether you\u2019re planning a rural resettlement or simply learning to bake sourdough, we\u2019re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
-    es: 'Existimos para ayudar a restaurar el hogar a lo que alguna vez fue: un lugar que hace, cultiva y da, en vez de uno que solo consume. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre o a construir una cama de cultivo. Nuestra misión es servir a cada parroquia del centro de Tejas, desde Austin hasta San Antonio.',
-  } satisfies Bilingual,
-
-  // ---------------------------------------------------------------------
-  // 2. Pillars
-  // ---------------------------------------------------------------------
-  pillarsEyebrow: {
-    en: 'OUR MISSION',
-    es: 'NUESTRA MISION',
-  } satisfies Bilingual,
-
-  // ---------------------------------------------------------------------
-  // 3. Recent witness
-  // ---------------------------------------------------------------------
-  witnessEyebrow: {
-    en: 'FROM THE CHAPTER',
-    es: 'DEL CAPÍTULO',
-  } satisfies Bilingual,
-  witnessReadMore: {
-    en: 'Read the year',
-    es: 'Lee el año',
-  } satisfies Bilingual,
-
-  // ---------------------------------------------------------------------
-  // 4. The map
-  // ---------------------------------------------------------------------
-  mapEyebrow: {
-    en: 'MEET YOUR NEIGHBORS',
-    es: 'TUS VECINOS',
-  } satisfies Bilingual,
-  mapHeading: {
-    en: 'The chapter, on the land',
-    es: 'El capítulo, en la tierra',
-  } satisfies Bilingual,
-
-  // ---------------------------------------------------------------------
-  // 5. The patron
-  // ---------------------------------------------------------------------
-  patronLine: {
-    en: 'A hired hand outside Madrid who went to Mass before the fields and prayed behind the plough. The chapter has placed its work under his care.',
-    es: 'Un jornalero de las afueras de Madrid que iba a Misa antes de los campos y rezaba tras el arado. El capítulo ha puesto su labor bajo su cuidado.',
-  } satisfies Bilingual,
-  patronMore: {
-    en: 'His life, and the prayer',
-    es: 'Su vida, y la oración',
-  } satisfies Bilingual,
-};
-
-// The four pillars. Each gets an icon, a name, and one paragraph. The
-// deeper exposition lives on /vision; this is the introduction.
-const pillars: {
-  key: keyof typeof PILLAR_ICONS;
-  name: Bilingual;
-  body: Bilingual;
-}[] = [
-  {
-    key: 'resettlement',
-    name: { en: 'Resettlement', es: 'Reasentamiento' },
-    body: {
-      en: 'To assist in putting working land back in the hands of families through rural resettlement or domestically productive property.',
-      es: 'Poner tierra fértil de nuevo en manos de las familias, para que puedan arraigarse otra vez en la tierra, el trabajo, y la parroquia.',
-    },
-  },
-  {
-    key: 'education',
-    name: { en: 'Education', es: 'Educación' },
-    body: {
-      en: 'To educate and train in the domestic order, agricultural skills and craft traditions necessary to successfully cultivate Catholic homesteads.',
-      es: 'Vecinos que enseñan a vecinos los oficios de la tierra y de la mano — el conocimiento práctico que antes pasaba de casa en casa.',
-    },
-  },
-  {
-    key: 'fellowship',
-    name: { en: 'Fellowship', es: 'Compañerismo' },
-    body: {
-      en: 'To cultivate a network of practical, spiritual and intellectual support between those established Catholic homesteads and those seeking lasting relationships through skill sharing.',
-      es: 'Hogares que están ahí unos para otros — con una mano, una conversación, una oración.',
-    },
-  },
-  {
-    key: 'glorification',
-    name: { en: 'Glorification', es: 'Glorificación' },
-    body: {
-      en: 'To renew prayer, the Mass, and the seasons of the Church back in agrarian life. Recognizing the fruits of our labor as gift from God.',
-      es: 'La oración, la Misa, y las estaciones del año litúrgico dan forma a todo lo que hacemos. Todo se le ofrece a Dios en adoración.',
-    },
-  },
-];
-
-type RecentPost = {
-  id: string;
-  body: string;
-  language: 'en' | 'es' | null;
-  craft: IconSlug | null;
-  occurred_at: string;
-  author_display_name: string | null;
-};
-
 const Home = () => {
   const { t, locale } = useLocale();
-  const { user } = useAuth();
-
-  const [latest, setLatest] = useState<RecentPost | null>(null);
-  const [joinOpen, setJoinOpen] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      // One post — the most recent approved. A single piece of evidence
-      // at reading size does more work than three stacked cards.
-      const { data, error } = await supabase
-        .from('witness_public')
-        .select('id, body, language, craft, occurred_at, author_display_name')
-        .order('occurred_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        console.error('Failed to load recent witness:', error);
-      } else if (data && data.length > 0) {
-        setLatest(data[0] as unknown as RecentPost);
-      }
-    })();
-  }, []);
 
   return (
     <Layout>
       {/* ---------------------------------------------------------------- */}
-      {/* 1. Opening                                                       */}
+      {/* 1. Hero                                                          */}
+      {/*                                                                  */}
+      {/* Two buttons, two destinations, in the order a visitor should      */}
+      {/* consider them: see it for yourself, then throw in with us.       */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16 pt-24 text-center">
         <h1 className="font-heading text-ocre text-3xl md:text-4xl">
-          {t(copy.eyebrow)}
+          {t(homeCopy.heading)}
         </h1>
-        <div className="mx-auto mt-10 max-w-xl space-y-6 text-left">
-          <p className="prose-body text-lg leading-relaxed text-mesquite/80">
-            {t(copy.ache)}
-          </p>
-          <p className="prose-body text-lg leading-relaxed text-mesquite">
-            {t(copy.whoWeAre)}
-          </p>
+        <p className="prose-body mx-auto mt-5 max-w-xl text-lg italic leading-relaxed text-piedra">
+          {t(homeCopy.tagline)}
+        </p>
+        <p className="prose-body mx-auto mt-8 max-w-xl text-left text-lg leading-relaxed text-mesquite">
+          {t(homeCopy.lede)}
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to={buildPath('talleres', locale)}
+            className="rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal no-underline transition hover:bg-mesquite"
+            style={{ textDecoration: 'none' }}
+          >
+            {t(homeCopy.ctaGathering)}
+          </Link>
+          <Link
+            to={buildPath('participate', locale)}
+            className="rounded-sm border border-mesquite/30 px-8 py-3 font-heading text-base text-mesquite no-underline transition hover:border-ocre hover:text-ocre"
+            style={{ textDecoration: 'none' }}
+          >
+            {t(homeCopy.ctaJoin)}
+          </Link>
         </div>
       </section>
 
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 2. Pillars                                                       */}
+      {/* 2. Why it matters                                                */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-prose py-20 text-center">
+        <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
+          {t(homeCopy.whyEyebrow)}
+        </p>
+        <p className="prose-body mx-auto mt-9 max-w-xl text-left text-lg leading-relaxed text-mesquite/90">
+          {t(homeCopy.why)}
+        </p>
+      </section>
+
+      <div className="rule container-prose" />
+
+      {/* ---------------------------------------------------------------- */}
+      {/* 3. Approach                                                      */}
+      {/*                                                                  */}
+      {/* The movable one. If the page ever runs long, this section is the  */}
+      {/* one to lift onto /vision — it's exposition, not an invitation.   */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-prose py-20 text-center">
+        <h2 className="font-heading text-3xl text-mesquite">
+          {t(homeCopy.approachHeading)}
+        </h2>
+        <p className="prose-body mx-auto mt-6 max-w-xl text-left text-lg leading-relaxed text-mesquite/90">
+          {t(homeCopy.approach)}
+        </p>
+      </section>
+
+      <div className="rule container-prose" />
+
+      {/* ---------------------------------------------------------------- */}
+      {/* 4. Our Mission                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-14 text-center">
           <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
-            {t(copy.pillarsEyebrow)}
+            {t(homeCopy.pillarsEyebrow)}
           </p>
         </header>
         <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-2">
@@ -242,51 +153,20 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 3. One witness, large                                            */}
-      {/* ---------------------------------------------------------------- */}
-      {latest && (
-        <>
-          <section className="container-prose py-20 text-center">
-            <p className="display-caps text-xs tracking-[0.3em] text-ocre">
-              {t(copy.witnessEyebrow)}
-            </p>
-            <div className="mt-10 flex flex-col items-center">
-              <Icon slug={latest.craft} size={72} locale={locale} />
-              <blockquote className="mt-8 max-w-xl">
-                <p className="prose-body text-2xl leading-relaxed text-mesquite">
-                  &ldquo;{latest.body}&rdquo;
-                  <LanguageNote contentLanguage={latest.language} className="ml-2" />
-                </p>
-                <footer className="mt-6 text-sm italic text-piedra">
-                  {latest.author_display_name ?? '—'} ·{' '}
-                  {formatDate(latest.occurred_at, locale)}
-                </footer>
-              </blockquote>
-              <Link
-                to={buildPath('testimonio', locale)}
-                className="mt-10 display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
-                style={{ textDecoration: 'none' }}
-              >
-                {t(copy.witnessReadMore)} →
-              </Link>
-            </div>
-          </section>
-
-          <div className="rule container-prose" />
-        </>
-      )}
-
-      {/* ---------------------------------------------------------------- */}
-      {/* 4. The map                                                       */}
+      {/* 5. Meet your neighbors                                           */}
+      {/*                                                                  */}
+      {/* The blessing sits here rather than in the hero on purpose: it's   */}
+      {/* the sentence that tells a visitor the thing they're looking at    */}
+      {/* on this map is recognised by the Church, not a private project.   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-10 text-center">
           <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
-            {t(copy.mapEyebrow)}
+            {t(homeCopy.mapEyebrow)}
           </p>
-          {/* <h2 className="mt-4 font-heading text-3xl text-mesquite">
-            {t(copy.mapHeading)}
-          </h2> */}
+          <p className="prose-body mx-auto mt-4 max-w-md text-sm italic leading-relaxed text-piedra">
+            {t(homeCopy.blessing)}
+          </p>
         </header>
         <Suspense
           fallback={
@@ -304,7 +184,14 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 5. The patron                                                     */}
+      {/* 6. Next gathering                                                */}
+      {/* ---------------------------------------------------------------- */}
+      <NextGathering />
+
+      <div className="rule container-prose" />
+
+      {/* ---------------------------------------------------------------- */}
+      {/* 7. The patron — the closing note                                 */}
       {/*                                                                   */}
       {/* Nothing else on the site says "this is a CATHOLIC land movement"  */}
       {/* as immediately as Isidore does, and the page that carries him —   */}
@@ -312,7 +199,7 @@ const Home = () => {
       {/* pointing at it. One line here; the dateline already counts down   */}
       {/* to his feast.                                                     */}
       {/* ---------------------------------------------------------------- */}
-      <section className="container-prose py-16 text-center">
+      <section className="container-prose py-20 text-center">
         <p className="display-caps text-xs tracking-[0.3em] text-ocre">
           {t(uiStrings.patron.feastDay).toUpperCase()}
         </p>
@@ -320,50 +207,16 @@ const Home = () => {
           {t(uiStrings.patron.heading)}
         </h2>
         <p className="prose-body mx-auto mt-4 max-w-md text-base italic leading-relaxed text-piedra">
-          {t(copy.patronLine)}
+          {t(homeCopy.patronLine)}
         </p>
         <Link
           to={buildPath('santo', locale)}
           className="mt-6 inline-block display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
           style={{ textDecoration: 'none' }}
         >
-          {t(copy.patronMore)} →
+          {t(homeCopy.patronMore)} →
         </Link>
       </section>
-
-      <div className="rule container-prose" />
-
-      {/* ---------------------------------------------------------------- */}
-      {/* 6. Closing CTA                                                   */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="container-prose py-24 text-center">
-        {user ? (
-          <Link
-            to={buildPath('miPerfil', locale)}
-            className="inline-flex items-center gap-2 rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal no-underline transition hover:bg-mesquite"
-            style={{ textDecoration: 'none' }}
-          >
-            {t({ en: 'My profile', es: 'Mi perfil' })}
-          </Link>
-        ) : (
-          <button
-            onClick={() => setJoinOpen(true)}
-            className="inline-flex items-center gap-2 rounded-sm bg-ocre px-8 py-3 font-heading text-base text-cal transition hover:bg-mesquite"
-          >
-            {t({ en: 'Join the chapter →', es: 'Únete al capítulo →' })}
-          </button>
-        )}
-      </section>
-
-      <SignInModal
-        open={joinOpen}
-        onClose={() => setJoinOpen(false)}
-        title={{ en: 'Join the chapter', es: 'Únete al capítulo' }}
-        subtitle={{
-          en: 'Sign in to create your profile and get started — the link sets up an account if you’re new.',
-          es: 'Inicia sesión para crear tu perfil y empezar — el enlace crea una cuenta si eres nuevo.',
-        }}
-      />
     </Layout>
   );
 };

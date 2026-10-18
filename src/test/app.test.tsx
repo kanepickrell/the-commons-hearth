@@ -59,14 +59,34 @@ beforeEach(() => {
 });
 
 describe('app renders', () => {
-  it('home with a witness post whose craft has no artwork', async () => {
-    rows.witness_public = [{
-      id: '1', body: 'We split a hive.', language: 'en', craft: 'el-huerto',
-      occurred_at: '2026-04-12T00:00:00Z', author_display_name: 'M. Cruz',
+  it('home shows the next gathering, including a craft with no artwork', async () => {
+    rows.gatherings_public = [{
+      id: 'w1', title: 'Grafting rootstock', description: 'Bring a knife.',
+      language: 'en', craft: 'el-huerto', event_date: '2099-03-04', held_at: null,
+      location_text: null, parish_city: 'Lockhart', details_visible: false,
     }];
     visit('/');
-    await waitFor(() => expect(screen.getByText(/We split a hive/)).toBeInTheDocument());
-    expect(screen.getByText(/M\. Cruz/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Grafting rootstock')).toBeInTheDocument());
+    // The town, not the address: gatherings_public withholds location_text on
+    // an upcoming gathering from anyone who isn't an approved member.
+    expect(screen.getByText(/near Lockhart/)).toBeInTheDocument();
+    expect(screen.getByText(/Log In To RSVP/)).toBeInTheDocument();
+  });
+
+  it('home says so plainly when nothing is scheduled', async () => {
+    visit('/');
+    await waitFor(() =>
+      expect(screen.getByText(/No gathering scheduled yet/)).toBeInTheDocument()
+    );
+    expect(screen.getByText('join the chapter')).toBeInTheDocument();
+  });
+
+  it('home carries the mission and the blessing', async () => {
+    visit('/');
+    await waitFor(() => expect(screen.getByText(/We Are the Catholic Land Movement/)).toBeInTheDocument());
+    expect(screen.getByText(/Recognized and blessed by Pope Leo XIV/)).toBeInTheDocument();
+    expect(screen.getByText('Resettlement')).toBeInTheDocument();
+    expect(screen.getByText('Glorification')).toBeInTheDocument();
   });
 
   it('workshops list, including a non-illustrated craft', async () => {
