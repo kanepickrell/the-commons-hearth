@@ -9,6 +9,7 @@ export type RouteKey =
   | 'vision'
   | 'participate'
   | 'resources'
+  | 'recognition'
   | 'memberDetail'
   | 'talleres'
   | 'tallerDetail'
@@ -25,6 +26,7 @@ export const routes: Record<RouteKey, { en: string; es: string }> = {
   vision:        { en: '/vision',          es: '/vision' },
   participate:   { en: '/participate',     es: '/participar' },
   resources:     { en: '/resources',       es: '/recursos' },
+  recognition:   { en: '/recognition',     es: '/reconocimiento' },
   memberDetail:  { en: '/members/:id',     es: '/miembros/:id' },
   nuevaReunion:  { en: '/workshops/new',   es: '/talleres/nueva' },
   talleres:      { en: '/workshops',       es: '/talleres' },

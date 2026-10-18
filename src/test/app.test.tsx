@@ -113,6 +113,21 @@ describe('app renders', () => {
     // One standing behind the pillars the page lays out, one in the footer.
     expect(all.filter((el) => el.closest('footer') === null)).toHaveLength(1);
     expect(all.filter((el) => el.closest('footer') !== null)).toHaveLength(1);
+    // Both are links to the letters, not to one image file — so the sentence
+    // keeps working as more letters are added.
+    for (const el of all) {
+      expect(el.closest('a')).toHaveAttribute('href', '/recognition');
+    }
+  });
+
+  it('the recognition page shows the Vatican letter', async () => {
+    visit('/recognition');
+    await waitFor(() =>
+      expect(screen.getByText(/Secretariat of State/)).toBeInTheDocument()
+    );
+    const img = screen.getByRole('img', { name: /Apostolic Blessing/ });
+    expect(img).toHaveAttribute('src', '/vatican-support-letter.png');
+    expect(screen.getByText(/18 November 2025/)).toBeInTheDocument();
   });
 
   it('workshops list, including a non-illustrated craft', async () => {
