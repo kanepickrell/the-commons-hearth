@@ -14,13 +14,15 @@
 //   - Dropped the "Begin where you are" closing CTA; the Participate
 //     page is the natural next click and is now linked from this page.
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
 import { buildPath } from '@/i18n/routes';
+import { RecognitionNote, RECOGNITION_ANCHOR } from '@/components/RecognitionNote';
 
 export default function Vision() {
   const { t, locale } = useLocale();
+  const { hash } = useLocation();
 
   const pillars = [
     {
@@ -98,6 +100,12 @@ export default function Vision() {
             es: 'Somos familias del Centro de Texas que asumimos la primera vocación dada al hombre — labrar la tierra y guardarla. No para huir del mundo, sino para santificar un pequeño rincón de él para Cristo.',
           })}
         </p>
+
+        {/* The chapter's ecclesiastical recognition, and the letter behind
+            it. It reads here, under the opening and above the pillars,
+            because this is the page that says what the movement believes —
+            and the recognition stands behind exactly that. */}
+        <RecognitionNote defaultOpen={hash === `#${RECOGNITION_ANCHOR}`} />
       </section>
 
       {/* ---------------------------------------------------------------- */}

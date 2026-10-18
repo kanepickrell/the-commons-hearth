@@ -4,6 +4,7 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { ContactModal } from '@/components/ContactModal';
+import { RECOGNITION_ANCHOR } from '@/components/RecognitionNote';
 
 export const Footer = () => {
   const { t, locale } = useLocale();
@@ -36,7 +37,22 @@ export const Footer = () => {
 
         {/* <p className="font-heading italic text-mesquite/80">{t(s.underPatronage)}</p> */}
 
+        {/* Provenance, in one quiet block: who we answer to, and who
+            recognised the work. Both qualify the chapter rather than
+            introduce it, which is why neither is up in the page. */}
         {nationalLink}
+
+{/* Points at the disclosure on /vision, which opens on this hash —
+            the letters live with the page that makes the claim. */}
+        <p className="-mt-3">
+          <Link
+            to={`${buildPath('vision', locale)}#${RECOGNITION_ANCHOR}`}
+            title={t(uiStrings.common.recognitionDoc)}
+            className="font-serif text-sm italic text-piedra"
+          >
+            {t(uiStrings.common.recognition)}
+          </Link>
+        </p>
 
         {/* Giving. Footer rather than the main nav on purpose: putting
             "Donate" beside Vision and Patron changes what the site is for at a

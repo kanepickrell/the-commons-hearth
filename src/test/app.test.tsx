@@ -59,14 +59,134 @@ beforeEach(() => {
 });
 
 describe('app renders', () => {
-  it('home with a witness post whose craft has no artwork', async () => {
-    rows.witness_public = [{
-      id: '1', body: 'We split a hive.', language: 'en', craft: 'el-huerto',
-      occurred_at: '2026-04-12T00:00:00Z', author_display_name: 'M. Cruz',
+  it('home shows the next gathering, including a craft with no artwork', async () => {
+    rows.gatherings_public = [{
+      id: 'w1', title: 'Grafting rootstock', description: 'Bring a knife.',
+      language: 'en', craft: 'el-huerto', event_date: '2099-03-04', held_at: null,
+      location_text: null, parish_city: 'Lockhart', details_visible: false,
     }];
     visit('/');
-    await waitFor(() => expect(screen.getByText(/We split a hive/)).toBeInTheDocument());
-    expect(screen.getByText(/M\. Cruz/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Grafting rootstock')).toBeInTheDocument());
+    // The town, not the address: gatherings_public withholds location_text on
+    // an upcoming gathering from anyone who isn't an approved member.
+    expect(screen.getByText(/near Lockhart/)).toBeInTheDocument();
+    expect(screen.getByText(/Log In To RSVP/)).toBeInTheDocument();
+  });
+
+  it('home says so plainly when nothing is scheduled', async () => {
+    visit('/');
+    await waitFor(() =>
+      expect(screen.getByText(/No gathering scheduled yet/)).toBeInTheDocument()
+    );
+    expect(screen.getByText('join the chapter')).toBeInTheDocument();
+  });
+
+  it('home carries the mission', async () => {
+    visit('/');
+    await waitFor(() => expect(screen.getByText(/We Are the Catholic Land Movement/)).toBeInTheDocument());
+    expect(screen.getByText('Resettlement')).toBeInTheDocument();
+    expect(screen.getByText('Glorification')).toBeInTheDocument();
+  });
+
+  // The recognition is provenance, not a section heading — it belongs to the
+  // footer, which is also what puts it on every page instead of just this one.
+  it('the papal recognition rides in the footer, on every page', async () => {
+    visit('/');
+    const onHome = await waitFor(() => screen.getByText(/Recognized and blessed by Pope Leo XIV/));
+    expect(onHome.closest('footer')).not.toBeNull();
+    // ...and it is not left behind in the map section it used to sit in.
+    expect(screen.getByText('MEET YOUR NEIGHBORS').parentElement?.textContent)
+      .not.toMatch(/Pope Leo XIV/);
+
+  });
+
+  // Its own test, not a second visit() in the one above: visit() renders a
+  // fresh app without unmounting the previous one, so counting matches across
+  // two visits counts both copies of the site.
+  it('vision carries the recognition in the page as well as the footer', async () => {
+    visit('/vision');
+    const all = await waitFor(() => {
+      const found = screen.getAllByText(/Recognized and blessed by Pope Leo XIV/);
+      expect(found).toHaveLength(2);
+      return found;
+    });
+    // One standing behind the pillars the page lays out, one in the footer.
+    expect(all.filter((el) => el.closest('footer') === null)).toHaveLength(1);
+    expect(all.filter((el) => el.closest('footer') !== null)).toHaveLength(1);
+    // In the page it's the disclosure's trigger; in the footer it's a link
+    // to that same disclosure. Neither points at a bare image file, so both
+    // keep working as more letters are added.
+    const inPage = all.find((el) => el.closest('footer') === null)!;
+    expect(inPage.closest('button')).toHaveAttribute('aria-expanded', 'false');
+    const inFooter = all.find((el) => el.closest('footer') !== null)!;
+    expect(inFooter.closest('a')).toHaveAttribute('href', '/vision#recognition');
+  });
+
+  it('the recognition opens to the Vatican letter in place', async () => {
+    visit('/vision');
+    const trigger = await waitFor(() => {
+      const el = screen.getAllByText(/Recognized and blessed by Pope Leo XIV/)
+        .find((n) => n.closest('footer') === null)!;
+      return el.closest('button')!;
+    });
+
+    trigger.click();
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
+
+    const img = screen.getByRole('img', { name: /Apostolic Blessing/ });
+    expect(img).toHaveAttribute('src', '/vatican-support-letter.png');
+
+    // One document, not the backstory: /vision stays mission-focused and
+    // hands the long line off to /history.
+    expect(screen.queryByText(/Rerum Novarum/)).toBeNull();
+    expect(document.querySelector('a[href="/history"]')).not.toBeNull();
+  });
+
+  it('home names the organization the chapter descends from, behind a toggle', async () => {
+    visit('/');
+    const trigger = await waitFor(() => screen.getByRole('button', { name: /OUR ROOTS/i }));
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    // Collapsed visually, but in the DOM — a crawler and the prerendered
+    // shell both still get the answer to "where did this come from?".
+    expect(screen.getByText(/first Catholic Land Association/)).toBeInTheDocument();
+
+    trigger.click();
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
+    expect(document.querySelector('a[href="/history"]')).not.toBeNull();
+  });
+
+  it('history carries the whole line, with its sources', async () => {
+    visit('/history');
+    await waitFor(() => expect(screen.getByText('History & Sources')).toBeInTheDocument());
+
+    const years = screen
+      .getAllByText(/^(1891|1925|1929|1933|1936|1946|1961|2015|2025)$/)
+      .map((n) => n.textContent);
+    expect(years).toEqual(['1891', '1925', '1929', '1933', '1936', '1946', '1961', '2015', '2025']);
+
+    // 1946 stays teaching, not a blessing on the movement.
+    expect(screen.getByText(/Not a blessing on the Land Movement/)).toBeInTheDocument();
+
+    // Every primary document is reachable.
+    for (const href of [
+      'https://www.vatican.va/content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_15051891_rerum-novarum.html',
+      'https://collected.jcu.edu/the_cross_and_the_plough/1/',
+      'https://www.cambridge.org/core/journals/blackfriars/article/editorial/0138EA20F62FE2A774DE6132472C1021',
+      'https://www.ewtn.com/catholicism/library/pope-speaks-on-rural-life-9050',
+      'https://www.vatican.va/content/john-xxiii/en/encyclicals/documents/hf_j-xxiii_enc_15051961_mater.html',
+      'https://www.vatican.va/content/francesco/en/encyclicals/documents/papa-francesco_20150524_enciclica-laudato-si.html',
+    ]) {
+      expect(document.querySelector(`a[href="${href}"]`)).not.toBeNull();
+    }
+
+    // A link that only goes to something ABOUT a source has to say so, or
+    // the page implies a primary document it can't hand over.
+    expect(screen.getAllByText(/about the source, not the source itself/).length).toBe(2);
+
+    // Somewhere to go on to: the reading list, and what the chapter believes.
+    expect(document.querySelector('a[href="/resources"]')).not.toBeNull();
+    expect(document.querySelector('a[href="/vision"]')).not.toBeNull();
   });
 
   it('workshops list, including a non-illustrated craft', async () => {
@@ -148,6 +268,48 @@ describe('app renders', () => {
     visit('/workshops');
     await waitFor(() => screen.getByLabelText('Español'));
     screen.getByLabelText('Español').click();
+    await waitFor(() => expect(window.location.pathname).toBe('/talleres'));
+    expect(document.documentElement.lang).toBe('es');
+  });
+
+  // The phone nav is a media-query layout, and jsdom has no layout — so this
+  // tests the part that is actually logic: the panel's existence, the button's
+  // state, and that following a link puts it away again.
+  it('phone nav opens and closes behind the menu button', async () => {
+    visit('/');
+    const button = await waitFor(() => screen.getByLabelText('Menu'));
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(document.getElementById('site-menu')).toBeNull();
+
+    button.click();
+    await waitFor(() => expect(document.getElementById('site-menu')).not.toBeNull());
+    expect(screen.getByLabelText('Close menu')).toHaveAttribute('aria-expanded', 'true');
+
+    // Every nav destination is reachable from inside the panel.
+    const panel = document.getElementById('site-menu')!;
+    const hrefs = [...panel.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(['/vision', '/participate', '/workshops', '/witness', '/patron', '/resources']);
+
+    // Following one navigates and puts the panel away.
+    (panel.querySelector('a[href="/vision"]') as HTMLAnchorElement).click();
+    await waitFor(() => expect(window.location.pathname).toBe('/vision'));
+    await waitFor(() => expect(document.getElementById('site-menu')).toBeNull());
+  });
+
+  it('the phone nav carries the language toggle', async () => {
+    visit('/workshops');
+    (await waitFor(() => screen.getByLabelText('Menu'))).click();
+    // waitFor only retries when its callback THROWS, so assert inside it —
+    // returning a bare null resolves on the first tick.
+    const panel = await waitFor(() => {
+      const el = document.getElementById('site-menu');
+      expect(el).not.toBeNull();
+      return el!;
+    });
+
+    const es = [...panel.querySelectorAll('button')].find((b) => b.textContent === 'ES')!;
+    expect(es).toHaveAttribute('aria-pressed', 'false');
+    es.click();
     await waitFor(() => expect(window.location.pathname).toBe('/talleres'));
     expect(document.documentElement.lang).toBe('es');
   });

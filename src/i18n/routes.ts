@@ -9,6 +9,7 @@ export type RouteKey =
   | 'vision'
   | 'participate'
   | 'resources'
+  | 'history'
   | 'memberDetail'
   | 'talleres'
   | 'tallerDetail'
@@ -18,6 +19,7 @@ export type RouteKey =
   | 'miPerfil'
   | 'mayordomo'
   | 'dar'
+  | 'mapa'
   | 'nuevaReunion';
 
 export const routes: Record<RouteKey, { en: string; es: string }> = {
@@ -25,6 +27,7 @@ export const routes: Record<RouteKey, { en: string; es: string }> = {
   vision:        { en: '/vision',          es: '/vision' },
   participate:   { en: '/participate',     es: '/participar' },
   resources:     { en: '/resources',       es: '/recursos' },
+  history:       { en: '/history',         es: '/historia' },
   memberDetail:  { en: '/members/:id',     es: '/miembros/:id' },
   nuevaReunion:  { en: '/workshops/new',   es: '/talleres/nueva' },
   talleres:      { en: '/workshops',       es: '/talleres' },
@@ -35,6 +38,7 @@ export const routes: Record<RouteKey, { en: string; es: string }> = {
   bienvenido:    { en: '/welcome',         es: '/bienvenido' },
   miPerfil:      { en: '/my-profile',      es: '/mi-perfil' },
   mayordomo:     { en: '/stewardship',     es: '/mayordomo' },
+  mapa:          { en: '/map',             es: '/mapa' },
 };
 
 export const buildPath = (key: RouteKey, locale: Locale, params: Record<string, string> = {}) => {

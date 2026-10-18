@@ -13,12 +13,12 @@ export const uiStrings = {
     patron:       { en: 'Patron',       es: 'Santo Patrón' },
     resources:    { en: 'Resources',    es: 'Recursos' },
     welcome:      { en: 'Welcome',      es: 'Bienvenido' },
+    // Phone header: the nav collapses behind a button.
+    menu:         { en: 'Menu',         es: 'Menú' },
+    closeMenu:    { en: 'Close menu',   es: 'Cerrar menú' },
+    language:     { en: 'Language',     es: 'Idioma' },
   },
   home: {
-    tagline: {
-      en: 'Ordinary Catholic households, becoming producers — together, in Central Texas.',
-      es: 'Familias católicas comunes, haciéndose productoras — juntas, en el centro de Tejas.',
-    },
     sowerCharism:     { en: 'The Sower — Education',         es: 'El Sembrador — La Educación' },
     communityCharism: { en: 'The Community — Fellowship',    es: 'La Comunidad — La Hermandad' },
     stewardCharism:   { en: 'The Steward — Resettlement',    es: 'El Mayordomo — El Asentamiento' },
@@ -248,10 +248,50 @@ export const uiStrings = {
     theWitness:      { en: 'OUR WITNESS',           es: 'EL TESTIMONIO' },
   },
   common: {
+    // Read in two places: quietly in the footer, where it qualifies the
+    // chapter on every page, and once more on /vision, where it stands
+    // behind the four pillars the page goes on to lay out.
+    recognition: {
+      en: 'Recognized and blessed by Pope Leo XIV, November 2025.',
+      es: 'Reconocido y bendecido por el Papa León XIV, noviembre de 2025.',
+    },
+    // Hover/title text for the link above. The letter itself is the
+    // Secretariat of State's, dated 18 November 2025 — the sentence says
+    // "November 2025", so the exact date belongs here rather than in it.
+    recognitionDoc: {
+      en: 'Read the letter from the Secretariat of State, 18 November 2025',
+      es: 'Lee la carta de la Secretaría de Estado, 18 de noviembre de 2025',
+    },
     backToTalleres: { en: '← All workshops', es: '← Todos los talleres' },
     backToVision:   { en: '← Vision',        es: '← Visión' },
     members:        { en: 'members',         es: 'miembros' },
     member:         { en: 'member',          es: 'miembro' },
+  },
+  map: {
+    filterAll:      { en: 'All parishes',        es: 'Todas las parroquias' },
+    filterUpcoming: { en: 'Upcoming gatherings', es: 'Próximas reuniones' },
+    upcomingRing: {
+      en: 'A ring marks a parish with a gathering in the next 30 days.',
+      es: 'Un anillo marca una parroquia con reunión en los próximos 30 días.',
+    },
+    noneUpcoming: {
+      en: 'No gatherings in the next 30 days.',
+      es: 'No hay reuniones en los próximos 30 días.',
+    },
+    copyLink:  { en: 'Copy link to this view', es: 'Copiar enlace a esta vista' },
+    exportPng: { en: 'Save as image',          es: 'Guardar como imagen' },
+    exporting: { en: 'Saving…',                es: 'Guardando…' },
+    layers:          { en: 'Layers',      es: 'Capas' },
+    layerParishes:   { en: 'Parishes',    es: 'Parroquias' },
+    layerGatherings: { en: 'Gatherings',  es: 'Reuniones' },
+    layerNotes:      { en: 'Annotations', es: 'Anotaciones' },
+    parishList:    { en: 'Parishes',       es: 'Parroquias' },
+    nextGathering: { en: 'Next gathering', es: 'Próxima reunión' },
+    showList:      { en: 'Parish list',    es: 'Lista de parroquias' },
+    listHint: {
+      en: 'Sorted by members. Choose one to find it on the map.',
+      es: 'Ordenadas por miembros. Elige una para encontrarla en el mapa.',
+    },
   },
   auth: {
     signIn:         { en: 'Sign in',    es: 'Entrar' },

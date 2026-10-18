@@ -35,7 +35,7 @@ const Santo = () => {
               SAN ISIDRO<br />LABRADOR
             </span>
           </div>
-          <h1 className="mt-10 font-heading text-4xl leading-tight text-mesquite">
+          <h1 className="mt-10 font-heading text-3xl leading-tight text-mesquite md:text-4xl">
             {t(s.heading)}
           </h1>
           <p className="mt-3 display-caps text-xs tracking-[0.2em] text-ocre">

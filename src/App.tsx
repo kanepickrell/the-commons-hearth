@@ -16,6 +16,7 @@ import Home from "./pages/Home.tsx";
 const Vision       = lazy(() => import("./pages/Vision.tsx"));
 const Participate  = lazy(() => import("./pages/Participate.tsx"));
 const Resources    = lazy(() => import("./pages/Resources.tsx"));
+const History      = lazy(() => import("./pages/History.tsx"));
 const MemberDetail = lazy(() => import("./pages/MemberDetail.tsx"));
 const Talleres     = lazy(() => import("./pages/Talleres.tsx"));
 const TallerDetail = lazy(() => import("./pages/TallerDetail.tsx"));
@@ -26,6 +27,7 @@ const Bienvenido   = lazy(() => import("./pages/Bienvenido.tsx"));
 const MiPerfil     = lazy(() => import("./pages/MiPerfil.tsx"));
 const Mayordomo    = lazy(() => import("./pages/Mayordomo.tsx"));
 const NuevaReunion = lazy(() => import("./pages/NuevaReunion.tsx"));
+const Mapa         = lazy(() => import("./pages/Mapa.tsx"));
 const NotFound     = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
@@ -59,6 +61,10 @@ const App = () => (
                   {/* Resources — separate EN and ES slugs */}
                   <Route path={routes.resources.en} element={<Resources />} />
                   <Route path={routes.resources.es} element={<Resources />} />
+
+                  {/* Where the movement came from, in documents */}
+                  <Route path={routes.history.en} element={<History />} />
+                  <Route path={routes.history.es} element={<History />} />
 
                   {/* Legacy /ofrendas URLs redirect to /vision */}
                   <Route path="/ofrendas"      element={<Navigate to="/vision" replace />} />
@@ -97,6 +103,9 @@ const App = () => (
 
                   <Route path={routes.mayordomo.es} element={<Mayordomo />} />
                   <Route path={routes.mayordomo.en} element={<Mayordomo />} />
+
+                  <Route path={routes.mapa.es} element={<Mapa />} />
+                  <Route path={routes.mapa.en} element={<Mapa />} />
 
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
