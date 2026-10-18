@@ -19,10 +19,6 @@ export const uiStrings = {
     language:     { en: 'Language',     es: 'Idioma' },
   },
   home: {
-    tagline: {
-      en: 'Ordinary Catholic households, becoming producers — together, in Central Texas.',
-      es: 'Familias católicas comunes, haciéndose productoras — juntas, en el centro de Tejas.',
-    },
     sowerCharism:     { en: 'The Sower — Education',         es: 'El Sembrador — La Educación' },
     communityCharism: { en: 'The Community — Fellowship',    es: 'La Comunidad — La Hermandad' },
     stewardCharism:   { en: 'The Steward — Resettlement',    es: 'El Mayordomo — El Asentamiento' },

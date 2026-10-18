@@ -23,8 +23,8 @@ export const homeCopy = {
   } satisfies Bilingual,
 
   tagline: {
-    en: 'Ordinary Catholic households, becoming producers — together.',
-    es: 'Familias católicas comunes, haciéndose productoras — juntas.',
+    en: 'Rooted in the soil, rooted in Christ.',
+    es: 'Arraigados en la tierra, arraigados en Cristo.',
   } satisfies Bilingual,
 
   // What the movement is for, and how wide the door is. "Wherever you are"
@@ -50,33 +50,26 @@ export const homeCopy = {
   // 2. Why it matters — the ache, named before anything is asked
   // ---------------------------------------------------------------------
   whyEyebrow: {
-    en: 'WHY IT MATTERS',
-    es: 'POR QUÉ IMPORTA',
+    en: 'WHY THIS MATTERS',
+    es: 'POR QUÉ IMPORTA ESTO',
   } satisfies Bilingual,
 
   why: {
-    en: 'Many of us long for work centered in the home, food raised by neighbors, and parishes where people actually need each other. We miss the simple traditions that make the family what God created it to be: the heart of society.',
-    es: 'Muchos de nosotros anhelamos el trabajo centrado en el hogar, la comida cultivada por los vecinos, y parroquias donde la gente de veras se necesita. Extrañamos las tradiciones sencillas que hacen de la familia lo que Dios creó que fuera: el corazón de la sociedad.',
+    en: 'Many of us long for work centered in the home, food raised by our community, and parish life where members depend on each other. We miss the simple traditions that make the family what God created it to be: the soul of society.',
+    es: 'Muchos de nosotros anhelamos el trabajo centrado en el hogar, la comida cultivada por nuestra comunidad, y una vida parroquial donde los miembros dependan unos de otros. Extrañamos las tradiciones sencillas que hacen de la familia lo que Dios creó que fuera: el alma de la sociedad.',
   } satisfies Bilingual,
 
-  // ---------------------------------------------------------------------
-  // 3. Approach
-  //
-  // The one section that can leave: if the page ever runs long, this moves
-  // to /vision, which already carries the deeper exposition of the pillars.
-  // ---------------------------------------------------------------------
-  approachHeading: {
-    en: 'Grown, Not Built',
-    es: 'Crecido, no construido',
-  } satisfies Bilingual,
-
+  // The second half of "Why this matters": what we take the answer to be.
+  // It used to carry its own heading ("Grown, Not Built"); folded in here
+  // it reads as the turn from the ache to the response, and the page
+  // carries one section where it carried two.
   // The closing sentence is the chapter's older one, restored: it names both
   // ends of the range (a rural resettlement, a first loaf) and the ground the
   // chapter actually covers. "Central Texas" in the lede is the shorthand;
   // Austin to San Antonio is the thing a visitor can place themselves inside.
   approach: {
-    en: 'Family, faith, and place are gifts we receive, not things we build from a plan. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
-    es: 'La familia, la fe, y el lugar son dones que recibimos, no cosas que construimos según un plan. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado — en cada parroquia desde Austin hasta San Antonio.',
+    en: 'We believe family, faith, and place are gifts we receive, not things we build from a plan. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
+    es: 'Creemos que la familia, la fe, y el lugar son dones que recibimos, no cosas que construimos según un plan. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado — en cada parroquia desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
@@ -102,42 +95,9 @@ export const homeCopy = {
   // through four parallel clauses, and take the 2025 line almost as the
   // national chapter words it themselves.
   roots: {
-    en: 'We didn’t start this. A hundred years ago most of Britain’s Catholics were packed into industrial cities, and in 1929 a handful of them in Glasgow set out to get families back onto land of their own. They founded the first Catholic Land Association — to buy land, train townsmen to farm it, and settle families on it — and they had the hierarchy behind them from the start. Associations followed in the North, the Midlands and the South of England, with bishops standing as their presidents and patrons. They were answering Leo XIII, who had written in Rerum Novarum that the law should help as many people as possible become owners. Pius XI sent them his Apostolic Blessing in 1933. In November of 2025, Pope Leo XIV recognized the Catholic Land Movement and extended that same blessing to our work.',
-    es: 'Esto no lo empezamos nosotros. Hace cien años la mayoría de los católicos de Gran Bretaña vivía apiñada en ciudades industriales, y en 1929 unos cuantos en Glasgow se propusieron devolver a las familias a una tierra propia. Fundaron la primera Asociación Católica de la Tierra — para comprar tierra, enseñar a la gente de ciudad a trabajarla, y asentar en ella a las familias — y desde el principio tuvieron detrás a la jerarquía. Siguieron asociaciones en el norte, el centro y el sur de Inglaterra, con obispos como sus presidentes y patronos. Respondían a León XIII, que había escrito en Rerum Novarum que la ley debía ayudar a que el mayor número posible de personas llegara a ser propietaria. Pío XI les envió su Bendición Apostólica en 1933. En noviembre de 2025, el Papa León XIV reconoció al Movimiento Católico de la Tierra y extendió esa misma bendición a nuestra labor.',
+    en: 'Our movement has a rich and significant role in the Church’s long response to industrialization, carrying forward Pope Leo XIII’s vision of families who own the land they work. When the Industrial Revolution drew families off the land and into factories, Leo answered in Rerum Novarum (1891), urging widespread ownership of productive property. In 1929, Catholics in Glasgow took up that call and formed the first Catholic Land Association. Associations soon spread across Scotland and England, with bishops as their presidents and patrons, and in 1933 Pope Pius XI sent his Apostolic Blessing to their work. Today, as a new technological revolution reshapes work and home once again, Pope Leo XIV has extended that same blessing to the Catholic Land Movement, recognizing us as carrying this work forward.',
+    es: 'Nuestro movimiento tiene un papel rico y significativo en la larga respuesta de la Iglesia a la industrialización, y lleva adelante la visión del Papa León XIII de familias que poseen la tierra que trabajan. Cuando la Revolución Industrial sacó a las familias del campo y las llevó a las fábricas, León respondió en Rerum Novarum (1891), instando a una propiedad generalizada de los bienes productivos. En 1929, unos católicos en Glasgow tomaron ese llamado y formaron la primera Asociación Católica de la Tierra. Pronto surgieron asociaciones por toda Escocia e Inglaterra, con obispos como sus presidentes y patronos, y en 1933 el Papa Pío XI envió su Bendición Apostólica a su labor. Hoy, mientras una nueva revolución tecnológica vuelve a transformar el trabajo y el hogar, el Papa León XIV ha extendido esa misma bendición al Movimiento Católico de la Tierra, reconociéndonos como quienes llevan adelante esta obra.',
   } satisfies Bilingual,
-
-  // Four lines, not a timeline. The 1933 and 2025 entries link straight to
-  // the documents — seeing the letters does more than any summary.
-  rootsLines: [
-    {
-      year: '1891',
-      text: {
-        en: 'Rerum Novarum calls for the law to help as many people as possible become owners',
-        es: 'Rerum Novarum pide que la ley ayude a que el mayor número posible de personas lleguen a ser propietarias',
-      } satisfies Bilingual,
-    },
-    {
-      year: '1929',
-      text: {
-        en: 'First Catholic Land Association founded in Glasgow',
-        es: 'Se funda en Glasgow la primera Asociación Católica de la Tierra',
-      } satisfies Bilingual,
-    },
-    {
-      year: '1933',
-      text: {
-        en: 'Pius XI blesses the Catholic Land Associations',
-        es: 'Pío XI bendice a las Asociaciones Católicas de la Tierra',
-      } satisfies Bilingual,
-    },
-    {
-      year: '2025',
-      text: {
-        en: 'Leo XIV extends that blessing to the Catholic Land Movement',
-        es: 'León XIV extiende esa bendición al Movimiento Católico de la Tierra',
-      } satisfies Bilingual,
-    },
-  ],
 
   rootsMore: {
     en: 'Read the history and source documents',

@@ -29,6 +29,7 @@ import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { NextGathering } from '@/components/NextGathering';
+import { RootsNote } from '@/components/RootsNote';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
@@ -94,82 +95,37 @@ const Home = () => {
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 2. Why it matters                                                */}
+      {/* 2. Why this matters                                              */}
+      {/*                                                                  */}
+      {/* Two paragraphs, one section: the ache, then what we take the     */}
+      {/* answer to be. The second used to stand alone under "Grown, Not   */}
+      {/* Built"; read together they turn, which two headings broke.       */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose py-20 text-center">
         <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
           {t(homeCopy.whyEyebrow)}
         </p>
-        <p className="prose-body mx-auto mt-9 max-w-xl text-left text-lg leading-relaxed text-mesquite/90">
-          {t(homeCopy.why)}
-        </p>
+        <div className="mx-auto mt-9 max-w-xl space-y-6 text-left">
+          <p className="prose-body text-lg leading-relaxed text-mesquite/90">
+            {t(homeCopy.why)}
+          </p>
+          <p className="prose-body text-lg leading-relaxed text-mesquite/90">
+            {t(homeCopy.approach)}
+          </p>
+        </div>
       </section>
 
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 3. Approach                                                      */}
-      {/*                                                                  */}
-      {/* The movable one. If the page ever runs long, this section is the  */}
-      {/* one to lift onto /vision — it's exposition, not an invitation.   */}
+      {/* 3. Our Roots — collapsed until asked for                         */}
       {/* ---------------------------------------------------------------- */}
-      <section className="container-prose py-20 text-center">
-        <h2 className="font-heading text-3xl text-mesquite">
-          {t(homeCopy.approachHeading)}
-        </h2>
-        <p className="prose-body mx-auto mt-6 max-w-xl text-left text-lg leading-relaxed text-mesquite/90">
-          {t(homeCopy.approach)}
-        </p>
-      </section>
+      <RootsNote />
 
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 4. Our Roots                                                     */}
-      {/*                                                                  */}
-      {/* Between the approach and the mission on purpose, so the page     */}
-      {/* reads: who we are, why it matters, where we come from, what we   */}
-      {/* do. One paragraph and four dated lines — the organisation we     */}
-      {/* descend from, named, not the whole backstory. /history carries   */}
-      {/* the rest, which is what the link at the end goes to.             */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="container-prose py-20 text-center">
-        <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
-          {t(homeCopy.rootsEyebrow)}
-        </p>
-        <p className="prose-body mx-auto mt-9 max-w-xl text-left text-lg leading-relaxed text-mesquite/90">
-          {t(homeCopy.roots)}
-        </p>
-
-        <ul className="mx-auto mt-10 max-w-xl space-y-3 text-left">
-          {homeCopy.rootsLines.map((l) => (
-            <li
-              key={l.year}
-              className="flex gap-4 border-b border-mesquite/10 pb-3 last:border-b-0"
-            >
-              <span className="display-caps flex-shrink-0 text-xs tracking-[0.2em] text-ocre">
-                {l.year}
-              </span>
-              <span className="prose-body text-base leading-snug text-mesquite/80">
-                {t(l.text)}
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        <Link
-          to={buildPath('history', locale)}
-          className="mt-9 inline-block display-caps text-xs tracking-[0.2em] text-ocre no-underline hover:text-mesquite"
-          style={{ textDecoration: 'none' }}
-        >
-          {t(homeCopy.rootsMore)} →
-        </Link>
-      </section>
-
-      <div className="rule container-prose" />
-
-      {/* ---------------------------------------------------------------- */}
-      {/* 5. Our Mission                                                   */}
+      {/* 4. Our Mission                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-14 text-center">

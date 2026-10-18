@@ -142,13 +142,17 @@ describe('app renders', () => {
     expect(document.querySelector('a[href="/history"]')).not.toBeNull();
   });
 
-  it('home names the organization the chapter descends from', async () => {
+  it('home names the organization the chapter descends from, behind a toggle', async () => {
     visit('/');
-    await waitFor(() =>
-      expect(screen.getByText(/first Catholic Land Association/)).toBeInTheDocument()
-    );
-    const years = screen.getAllByText(/^(1891|1929|1933|2025)$/).map((n) => n.textContent);
-    expect(years).toEqual(['1891', '1929', '1933', '2025']);
+    const trigger = await waitFor(() => screen.getByRole('button', { name: /OUR ROOTS/i }));
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    // Collapsed visually, but in the DOM — a crawler and the prerendered
+    // shell both still get the answer to "where did this come from?".
+    expect(screen.getByText(/first Catholic Land Association/)).toBeInTheDocument();
+
+    trigger.click();
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
     expect(document.querySelector('a[href="/history"]')).not.toBeNull();
   });
 
