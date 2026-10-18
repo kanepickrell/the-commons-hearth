@@ -13,6 +13,10 @@ export const uiStrings = {
     patron:       { en: 'Patron',       es: 'Santo Patrón' },
     resources:    { en: 'Resources',    es: 'Recursos' },
     welcome:      { en: 'Welcome',      es: 'Bienvenido' },
+    // Phone header: the nav collapses behind a button.
+    menu:         { en: 'Menu',         es: 'Menú' },
+    closeMenu:    { en: 'Close menu',   es: 'Cerrar menú' },
+    language:     { en: 'Language',     es: 'Idioma' },
   },
   home: {
     tagline: {
