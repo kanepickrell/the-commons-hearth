@@ -1,10 +1,12 @@
 import { createElement, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { ContactModal } from '@/components/ContactModal';
+import { buildPath } from '@/i18n/routes';
 
 export const Footer = () => {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const s = uiStrings.footer;
   const [contactOpen, setContactOpen] = useState(false);
 
@@ -39,8 +41,16 @@ export const Footer = () => {
             introduce it, which is why neither is up in the page. */}
         {nationalLink}
 
-        <p className="-mt-3 font-serif text-sm italic text-piedra">
-          {t(uiStrings.common.recognition)}
+        {/* Points at the letters rather than at one image file, so the
+            sentence keeps working as more arrive. */}
+        <p className="-mt-3">
+          <Link
+            to={buildPath('recognition', locale)}
+            title={t(uiStrings.common.recognitionDoc)}
+            className="font-serif text-sm italic text-piedra"
+          >
+            {t(uiStrings.common.recognition)}
+          </Link>
         </p>
 
         {/* Inbound channel for non-members — opens the contact form. */}

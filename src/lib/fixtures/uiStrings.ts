@@ -259,6 +259,13 @@ export const uiStrings = {
       en: 'Recognized and blessed by Pope Leo XIV, November 2025.',
       es: 'Reconocido y bendecido por el Papa León XIV, noviembre de 2025.',
     },
+    // Hover/title text for the link above. The letter itself is the
+    // Secretariat of State's, dated 18 November 2025 — the sentence says
+    // "November 2025", so the exact date belongs here rather than in it.
+    recognitionDoc: {
+      en: 'Read the letter from the Secretariat of State, 18 November 2025',
+      es: 'Lee la carta de la Secretaría de Estado, 18 de noviembre de 2025',
+    },
     backToTalleres: { en: '← All workshops', es: '← Todos los talleres' },
     backToVision:   { en: '← Vision',        es: '← Visión' },
     members:        { en: 'members',         es: 'miembros' },

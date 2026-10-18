@@ -106,9 +106,15 @@ export default function Vision() {
             exactly that. Flanked by hairlines rather than set in a box: the
             site's own vocabulary for a seal, and quieter than a banner.
             The footer carries the same line on every page. */}
-        <p className="mt-12 flex max-w-xl items-center justify-center gap-4 font-serif text-sm italic leading-relaxed text-piedra">
+        <p className="mt-12 flex max-w-xl items-center justify-center gap-4 text-sm leading-relaxed">
           <span aria-hidden="true" className="hidden h-px w-10 flex-shrink-0 bg-ocre/40 sm:block" />
-          {t(uiStrings.common.recognition)}
+          <Link
+            to={buildPath('recognition', locale)}
+            title={t(uiStrings.common.recognitionDoc)}
+            className="font-serif italic text-piedra"
+          >
+            {t(uiStrings.common.recognition)}
+          </Link>
           <span aria-hidden="true" className="hidden h-px w-10 flex-shrink-0 bg-ocre/40 sm:block" />
         </p>
       </section>

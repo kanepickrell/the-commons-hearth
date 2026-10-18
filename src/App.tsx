@@ -16,6 +16,7 @@ import Home from "./pages/Home.tsx";
 const Vision       = lazy(() => import("./pages/Vision.tsx"));
 const Participate  = lazy(() => import("./pages/Participate.tsx"));
 const Resources    = lazy(() => import("./pages/Resources.tsx"));
+const Recognition  = lazy(() => import("./pages/Recognition.tsx"));
 const MemberDetail = lazy(() => import("./pages/MemberDetail.tsx"));
 const Talleres     = lazy(() => import("./pages/Talleres.tsx"));
 const TallerDetail = lazy(() => import("./pages/TallerDetail.tsx"));
@@ -59,6 +60,10 @@ const App = () => (
                   {/* Resources — separate EN and ES slugs */}
                   <Route path={routes.resources.en} element={<Resources />} />
                   <Route path={routes.resources.es} element={<Resources />} />
+
+                  {/* The chapter's letters of ecclesiastical support */}
+                  <Route path={routes.recognition.en} element={<Recognition />} />
+                  <Route path={routes.recognition.es} element={<Recognition />} />
 
                   {/* Legacy /ofrendas URLs redirect to /vision */}
                   <Route path="/ofrendas"      element={<Navigate to="/vision" replace />} />
