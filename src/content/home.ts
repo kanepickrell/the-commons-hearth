@@ -95,11 +95,6 @@ export const homeCopy = {
     es: 'TUS VECINOS',
   } satisfies Bilingual,
 
-  blessing: {
-    en: 'Recognized and blessed by Pope Leo XIV, November 2025.',
-    es: 'Reconocido y bendecido por el Papa León XIV, noviembre de 2025.',
-  } satisfies Bilingual,
-
   // The way out to /map. It earns its place on phones especially: the
   // homepage map doesn't drag on touch (see ParishMap), so this is how a
   // reader on a phone gets to a map they can actually move around.

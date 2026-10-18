@@ -34,7 +34,14 @@ export const Footer = () => {
 
         {/* <p className="font-heading italic text-mesquite/80">{t(s.underPatronage)}</p> */}
 
+        {/* Provenance, in one quiet block: who we answer to, and who
+            recognised the work. Both qualify the chapter rather than
+            introduce it, which is why neither is up in the page. */}
         {nationalLink}
+
+        <p className="-mt-3 font-serif text-sm italic text-piedra">
+          {t(s.blessed)}
+        </p>
 
         {/* Inbound channel for non-members — opens the contact form. */}
         <button

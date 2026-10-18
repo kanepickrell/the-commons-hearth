@@ -181,6 +181,12 @@ export const uiStrings = {
       en: 'We operate under the national Catholic Land Movement organization',
       es: 'Parte del Movimiento Católico de la Tierra',
     },
+    // Provenance, not a banner. It sits with the national affiliation
+    // because that is what it qualifies, and it reads on every page.
+    blessed: {
+      en: 'Recognized and blessed by Pope Leo XIV, November 2025.',
+      es: 'Reconocido y bendecido por el Papa León XIV, noviembre de 2025.',
+    },
     sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · AD 2026', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · AD 2026' },
     reachUs: { en: 'Still Have Questions?', es: 'Escríbenos' },
   },
