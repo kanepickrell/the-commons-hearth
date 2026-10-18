@@ -152,7 +152,7 @@ const TallerDetail = () => {
             {dateLine}
             {timeLine ? `, ${timeLine}` : ''}
           </p>
-          <h1 className="mt-4 font-heading text-4xl leading-tight text-mesquite">{w.title}</h1>
+          <h1 className="mt-4 font-heading text-3xl leading-tight text-mesquite md:text-4xl">{w.title}</h1>
         </header>
 
         <div className="rule mt-12" />

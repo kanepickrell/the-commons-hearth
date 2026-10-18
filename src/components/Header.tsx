@@ -38,12 +38,19 @@ export const Header = () => {
 
   return (
     <header className="relative z-50 border-b border-mesquite/15 bg-cal/80 backdrop-blur-sm">
-      <div className="container-wide flex flex-col gap-4 py-5 md:flex-row md:items-center md:justify-between">
-        <Link to={buildPath('home', locale)} className="display-caps text-mesquite no-underline" style={{ textDecoration: 'none' }}>
+      {/* Three items, two layouts, one source order.
+          Phone: the wordmark and the account/language controls share the first
+          row (the nav is `w-full`, so it wraps to its own centered row beneath
+          them). Stacking all three instead cost ~200px of a phone screen
+          before any of the page showed.
+          md and up: the nav un-wraps and `order` restores the reading order
+          the links were chosen in — wordmark, nav, controls. */}
+      <div className="container-wide flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4 md:py-5">
+        <Link to={buildPath('home', locale)} className="order-1 display-caps text-mesquite no-underline" style={{ textDecoration: 'none' }}>
           <span className="text-base md:text-lg">CENTRAL TEXAS CLM</span>
         </Link>
 
-        <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 font-heading text-[1.05rem]">
+        <nav className="order-3 flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-2 font-heading text-base md:order-2 md:w-auto md:justify-start md:gap-x-6 md:text-[1.05rem]">
           {links.map((l) => {
             const active = pathname === l.to || pathname.startsWith(l.to + '/');
             return (
@@ -59,7 +66,7 @@ export const Header = () => {
           })}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="order-2 flex items-center gap-4 md:order-3">
           <AuthButton />
 
           <div className="font-caps text-sm tracking-wider">

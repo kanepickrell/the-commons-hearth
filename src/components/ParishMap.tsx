@@ -334,6 +334,21 @@ export const ParishMap = ({
   title,
 }: ParishMapProps) => {
   const { t, locale } = useLocale();
+
+  // One-finger drag inside a map that is only ONE SECTION of a page steals the
+  // page's scroll: a reader swiping past the homepage map pans the map instead
+  // of moving down the article, and with the map full-bleed there's no margin
+  // left to swipe on instead. So on touch devices the embedded map doesn't
+  // drag — pinch-zoom still works (two fingers never read as a scroll), the
+  // +/− control still works, and tapping a parish or using the parish list is
+  // untouched. On /map the map IS the page, with nothing to scroll past, so it
+  // keeps dragging on every device.
+  const embedded = !syncUrl && !presentation;
+  const coarsePointer =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(pointer: coarse)').matches;
+  const allowDrag = !(embedded && coarsePointer);
   const { user, profile, isAdmin } = useAuth();
   const isAuthenticated = !!user;
   const isApprovedMember = !!profile && profile.status === 'approved';
@@ -783,6 +798,7 @@ export const ParishMap = ({
           zoomSnap={0.5}
           zoomDelta={0.5}
           scrollWheelZoom={true}
+          dragging={allowDrag}
           style={{ height: '100%', width: '100%' }}
         >
           {/* Esri's light-gray canvas + a separate labels layer. Same quiet
