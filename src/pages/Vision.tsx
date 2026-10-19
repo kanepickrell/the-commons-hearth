@@ -5,8 +5,12 @@
 //   - Pillar prose rewritten to track the CLM Field Manual phrasing, then
 //     put back into the first person: the manual writes "The Catholic Land
 //     Movement exists to...", which on our own Vision page reads like a
-//     third party describing us. Two pillars named the organisation; both
-//     now say "we". The page has already said whose vision it is.
+//     third party describing us. The page has already said whose vision it
+//     is, so the organisation is not named again here.
+//   - All four verses now open the same way, with a bare verb: Restore,
+//     Grow, Cultivate, Align. They had been four different shapes — an
+//     infinitive, a first-person clause, a gerund and a declarative — which
+//     read as four separate thoughts rather than one list of aims.
 //   - Resettlement re-framed: it's not about owning land per se, it's
 //     about productive property as the substrate that re-roots families
 //     as integrated social units (in land, work, parish, community).
@@ -36,8 +40,8 @@ export default function Vision() {
       // abstract — it's productive property as the substrate that lets
       // the family function as a real social unit again.
       verse: {
-        en: 'To restore productive property into the hands of households, which roots families as real social units fully integrated in land, work, parish, and community.',
-        es: 'La restauración de la propiedad productiva en manos de los hogares, lo cual arraiga de nuevo a las familias como unidades sociales reales, plenamente integradas en la tierra, el trabajo, la parroquia, y la comunidad.',
+        en: 'Restore productive property into the hands of households, which roots families as real social units fully integrated in land, work, parish, and community.',
+        es: 'Restaurar la propiedad productiva en manos de los hogares, lo cual arraiga de nuevo a las familias como unidades sociales reales, plenamente integradas en la tierra, el trabajo, la parroquia, y la comunidad.',
       },
       practice: {
         en: 'You do not need many acres to begin. A backyard garden, a parish plot, a flock of hens in the side yard will do. A productive property is whatever land you can put to fruitful use. We start where we are and with what we already have.',
@@ -48,8 +52,8 @@ export default function Vision() {
       roman: 'II',
       name: { en: 'Education', es: 'Educación' },
       verse: {
-        en: 'We exist to grow peer-to-peer networks of education in production land and hand crafts.',
-        es: 'Existimos para cultivar redes de educación entre vecinos en los oficios de la tierra y de la mano.',
+        en: 'Grow peer-to-peer networks of education in production land and hand crafts.',
+        es: 'Hacer crecer redes de educación entre vecinos en los oficios de la tierra y de la mano.',
       },
       practice: {
         en: 'These skills used to pass between neighbors: canning, carpentry, animal husbandry, the care of soil. We learn them back from one another, in workshops and in kitchens, and we pass them on before they are lost.',
@@ -64,7 +68,7 @@ export default function Vision() {
       // of the other three pillars. Verify against the field manual before
       // publishing.
       verse: {
-        en: 'Cultivating a network of practical, intellectual, and spiritual support within the chapter.',
+        en: 'Cultivate a network of practical, intellectual, and spiritual support within the chapter.',
         es: 'Cultivar una red de apoyo práctico, intelectual, y espiritual dentro del capítulo.',
       },
       practice: {
@@ -76,8 +80,8 @@ export default function Vision() {
       roman: 'IV',
       name: { en: 'Glorification', es: 'Glorificación' },
       verse: {
-        en: 'All our activity aligns with Gospel teaching: true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
-        es: 'Toda nuestra actividad se alinea con la enseñanza del Evangelio: la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
+        en: 'Align our events with Gospel teaching: true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
+        es: 'Alinear nuestros encuentros con la enseñanza del Evangelio: la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
       },
       practice: {
         en: 'Christ placed a meal at the center of His Church. The seed, the soil, the harvest, the table: all of it is ordered toward worship. Our labor is an offering.',
