@@ -174,7 +174,7 @@ export function SegmentPanel() {
           <p className="mt-1 max-w-prose font-serif text-sm italic text-piedra">
             {es
               ? 'Dibuja un área para cada agrupación de parroquias. Ponle nombre y guárdala; aparecerá en el mapa parroquial.'
-              : 'Draw an area for each parish cluster. Name it and save — it appears on the parish map.'}
+              : 'Draw an area for each parish cluster. Name it and save. It appears on the parish map.'}
           </p>
         </div>
         <button

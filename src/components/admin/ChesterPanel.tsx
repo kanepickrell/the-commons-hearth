@@ -55,8 +55,8 @@ export const ChesterPanel = () => {
         <h2 className="font-heading text-3xl text-mesquite md:text-4xl">Chester</h2>
         <p className="mt-2 font-serif text-lg italic text-mesquite/70">
           {t({
-            en: 'The notes Chester answers from, and what visitors have been asking him. Keep the notes factual and current — he will not invent what they leave out.',
-            es: 'Las notas con las que responde Chester, y lo que los visitantes le han preguntado. Mantén las notas precisas y al día — no inventará lo que falte.',
+            en: 'The notes Chester answers from, and what visitors have been asking him. Keep the notes factual and current. He will not invent what they leave out.',
+            es: 'Las notas con las que responde Chester, y lo que los visitantes le han preguntado. Mantén las notas precisas y al día. No inventará lo que falte.',
           })}
         </p>
       </div>
@@ -173,7 +173,7 @@ function NoteEditor({ note, nextSort, onDone }: { note: Note | null; nextSort: n
       toast({ title: t({ en: 'Could not save', es: 'No pudimos guardar' }), description: res.error.message, variant: 'destructive' });
       return;
     }
-    toast({ title: t({ en: 'Note saved — Chester will use it on his next answer', es: 'Nota guardada — Chester la usará en su próxima respuesta' }) });
+    toast({ title: t({ en: 'Note saved. Chester will use it on his next answer', es: 'Nota guardada. Chester la usará en su próxima respuesta' }) });
     await onDone();
   };
 
