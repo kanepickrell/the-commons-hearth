@@ -77,8 +77,8 @@ export const uiStrings = {
   },
   onboarding: {
     heading: {
-      en: 'Welcome — a few questions',
-      es: 'Bienvenido — unas preguntas',
+      en: 'Welcome. A few questions',
+      es: 'Bienvenido. Unas preguntas',
     },
     q1:     { en: 'What has God put in your hands?', es: '¿Qué ha puesto Dios en tus manos?' },
     q1Help: { en: 'Tell us a little about yourself. One paragraph is plenty.', es: 'Cuéntanos un poco de ti. Un párrafo es suficiente.' },
@@ -89,8 +89,8 @@ export const uiStrings = {
     },
     qLearning:     { en: 'What do you want to learn?', es: '¿Qué quieres aprender?' },
     qLearningHelp: {
-      en: 'One thing you want a teacher for — today, not someday.',
-      es: 'Una cosa para la que quieres un maestro — hoy, no algún día.',
+      en: 'One thing you want a teacher for. Today, not someday.',
+      es: 'Una cosa para la que quieres un maestro. Hoy, no algún día.',
     },
     markLabel: { en: 'YOUR MARK', es: 'TU SEÑAL' },
     markHelp: {
@@ -98,10 +98,10 @@ export const uiStrings = {
       es: 'El dibujo que te representa en tu página y en el mapa del capítulo.',
     },
     q3:     { en: 'Where do you worship?', es: '¿Dónde adoras?' },
-    q3Help: { en: 'Your parish — this is how we find your neighbors.', es: 'Tu parroquia — así es como encontramos a tus vecinos.' },
+    q3Help: { en: 'Your parish. This is how we find your neighbors.', es: 'Tu parroquia. Así es como encontramos a tus vecinos.' },
     qCraftsHeading: { en: 'Your crafts', es: 'Tus oficios' },
     qCraftsHelp: {
-      en: 'Tap any skill you can teach. Leave them all unlit — you can add them later.',
+      en: 'Tap any skill you can teach. Leave them all unlit. You can add them later.',
       es: 'Toca cualquier oficio que puedas enseñar. Puedes dejarlos todos apagados y agregarlos después.',
     },
     continue: { en: 'Continue', es: 'Continuar' },
@@ -125,8 +125,8 @@ export const uiStrings = {
       es: '¿Qué vas a traer?',
     },
     modalIntro: {
-      en: 'Every gathering is a chance to share. Most bring their time — that\u2019s enough. If you can bring more, tell the host.',
-      es: 'Cada reunión es una oportunidad para compartir. La mayoría trae su tiempo — eso basta. Si puedes traer más, dile al anfitrión.',
+      en: 'Every gathering is a chance to share. Most bring their time. That\u2019s enough. If you can bring more, tell the host.',
+      es: 'Cada reunión es una oportunidad para compartir. La mayoría trae su tiempo. Eso basta. Si puedes traer más, dile al anfitrión.',
     },
     noteLabel: {
       en: 'A note for the host (optional)',
@@ -183,8 +183,8 @@ export const uiStrings = {
   contact: {
     modalTitle: { en: 'Reach the chapter', es: 'Escríbele al capítulo' },
     modalIntro: {
-      en: 'A question, a parish that wants to partner, or a corner of Texas hoping to start its own chapter — write to us and a steward will reply.',
-      es: 'Una pregunta, una parroquia que quiere colaborar, o un rincón de Tejas que quiere abrir su propio capítulo — escríbenos y un mayordomo te responderá.',
+      en: 'A question, a parish that wants to partner, or a corner of Texas hoping to start its own chapter. Write to us and a steward will reply.',
+      es: 'Una pregunta, una parroquia que quiere colaborar, o un rincón de Tejas que quiere abrir su propio capítulo. Escríbenos y un mayordomo te responderá.',
     },
     nameLabel:        { en: 'Your name', es: 'Tu nombre' },
     namePlaceholder:  { en: 'Maria Treviño', es: 'María Treviño' },
@@ -208,8 +208,8 @@ export const uiStrings = {
     closeBtn:   { en: 'Close',    es: 'Cerrar' },
     sentTitle: { en: 'Message sent', es: 'Mensaje enviado' },
     sentBody: {
-      en: 'Thank you — your note is on its way to the chapter. A steward will reply to the email you gave.',
-      es: 'Gracias — tu mensaje va camino al capítulo. Un mayordomo responderá al correo que diste.',
+      en: 'Thank you. Your note is on its way to the chapter. A steward will reply to the email you gave.',
+      es: 'Gracias. Tu mensaje va camino al capítulo. Un mayordomo responderá al correo que diste.',
     },
     errName:    { en: 'Please add your name.',          es: 'Por favor, añade tu nombre.' },
     errEmail:   { en: 'Please enter a valid email.',    es: 'Por favor, ingresa un correo válido.' },
@@ -320,8 +320,8 @@ export const uiStrings = {
     // Hedged on purpose: the host total is entered by a steward while the names
     // come from witness posts, so the list is illustrative, not exhaustive.
     including: { en: 'including', es: 'entre ellos' },
-    pickMonth: { en: 'Choose a month — the wheel fills in as the year is lived.',
-                 es: 'Elige un mes — la rueda se llena conforme se vive el año.' },
+    pickMonth: { en: 'Choose a month. The wheel fills in as the year is lived.',
+                 es: 'Elige un mes. La rueda se llena conforme se vive el año.' },
     statGatherings:  { en: 'gatherings',  es: 'reuniones' },
     statHosts:       { en: 'hosts',       es: 'anfitriones' },
     statNeighbors:   { en: 'neighbors',   es: 'vecinos' },

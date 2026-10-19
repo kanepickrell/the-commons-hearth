@@ -34,8 +34,8 @@ export default function History() {
         </h1>
         <p className="mx-auto max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80">
           {t({
-            en: 'We did not start something new. What follows is the line we stand in, with the documents themselves — so none of it has to be taken on our word.',
-            es: 'No empezamos algo nuevo. Lo que sigue es la línea en la que estamos, con los documentos mismos — para que nada de esto tenga que creerse sólo por nuestra palabra.',
+            en: 'We did not start something new. What follows is the line we stand in, with the documents themselves, so none of it has to be taken on our word.',
+            es: 'No empezamos algo nuevo. Lo que sigue es la línea en la que estamos, con los documentos mismos, para que nada de esto tenga que creerse sólo por nuestra palabra.',
           })}
         </p>
       </section>

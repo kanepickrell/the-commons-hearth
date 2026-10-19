@@ -45,8 +45,8 @@ const Mapa = () => {
         <h1 className="mt-3 font-heading text-3xl leading-tight text-mesquite md:text-4xl">{title}</h1>
         <p className="mt-3 max-w-prose font-serif italic text-piedra">
           {locale === 'es'
-            ? 'Cada sello es una parroquia, y el número son sus miembros. Mueve el mapa y el enlace de arriba se queda con la vista — compártelo y se abre justo aquí.'
-            : 'Each stamp is a parish, and the number is its members. Move the map and the address above keeps the view — share it and it opens right here.'}
+            ? 'Cada sello es una parroquia, y el número son sus miembros. Mueve el mapa y el enlace de arriba se queda con la vista. Compártelo y se abre justo aquí.'
+            : 'Each stamp is a parish, and the number is its members. Move the map and the address above keeps the view. Share it and it opens right here.'}
         </p>
 
         {/* drawTools lives here and nowhere else: annotations are read on

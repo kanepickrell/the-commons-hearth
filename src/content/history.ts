@@ -51,7 +51,7 @@ export const history: HistoryMoment[] = [
     quote:
       'The law, therefore, should favor ownership, and its policy should be to induce as many as possible of the people to become owners.',
     why: {
-      en: 'The sentence the whole movement grew out of. Not charity for the poor but property in their hands — the conviction that a family with something of its own to work is the ground of a just society.',
+      en: 'The sentence the whole movement grew out of. Not charity for the poor but property in their hands. The conviction that a family with something of its own to work is the ground of a just society.',
       es: 'La frase de la que creció todo el movimiento. No caridad para los pobres, sino propiedad en sus manos: la convicción de que una familia con algo propio que trabajar es el cimiento de una sociedad justa.',
     },
     href: 'https://www.vatican.va/content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_15051891_rerum-novarum.html',
@@ -119,7 +119,7 @@ export const history: HistoryMoment[] = [
     },
     quote: 'the Holy Father’s approval of the work of the Land Movement',
     why: {
-      en: 'A Dominican journal records that approval independently. It also notes the Archbishop of Westminster’s clarification that the bishops’ decision that year implied no disapproval of the movement — only that an appeal for money was inexpedient.',
+      en: 'A Dominican journal records that approval independently. It also notes the Archbishop of Westminster’s clarification that the bishops’ decision that year implied no disapproval of the movement, only that an appeal for money was inexpedient.',
       es: 'Una revista dominica registra esa aprobación de forma independiente. También recoge la aclaración del arzobispo de Westminster: la decisión de los obispos aquel año no implicaba desaprobación del movimiento, sino sólo que una colecta de fondos era inoportuna.',
     },
     href: 'https://www.cambridge.org/core/journals/blackfriars/article/editorial/0138EA20F62FE2A774DE6132472C1021',
@@ -136,8 +136,8 @@ export const history: HistoryMoment[] = [
     },
     quote: 'a class of farmers socially sound and religiously firm',
     why: {
-      en: 'Not a blessing on the Land Movement — this was addressed to an Italian farmers’ confederation — but the teaching the movement rests on: that the moral recovery of a whole people depends on a farming class sound in society and firm in faith.',
-      es: 'No es una bendición al Movimiento de la Tierra — fue dirigida a una confederación de agricultores italianos — sino la enseñanza en que el movimiento se apoya: que la recuperación moral de todo un pueblo depende de una clase campesina sana en lo social y firme en la fe.',
+      en: 'Not a blessing on the Land Movement. It was addressed to an Italian farmers’ confederation. But it is the teaching the movement rests on: that the moral recovery of a whole people depends on a farming class sound in society and firm in faith.',
+      es: 'No es una bendición al Movimiento de la Tierra. Fue dirigida a una confederación de agricultores italianos. Pero es la enseñanza en que el movimiento se apoya: que la recuperación moral de todo un pueblo depende de una clase campesina sana en lo social y firme en la fe.',
     },
     href: 'https://www.ewtn.com/catholicism/library/pope-speaks-on-rural-life-9050',
     linkLabel: { en: 'The Pope Speaks on Rural Life', es: 'El Papa habla de la vida rural' },
@@ -150,8 +150,8 @@ export const history: HistoryMoment[] = [
     source: { en: 'John XXIII, Mater et Magistra, §142', es: 'Juan XXIII, Mater et Magistra, §142' },
     quote: 'We are bound above all to consider as an ideal the kind of farm which is owned and managed by the family.',
     why: {
-      en: 'Seventy years after Rerum Novarum, the Church names the thing itself: not merely property, but the family farm, held and worked by the household that lives on it. Addressed to the whole Church rather than to the movement — and all the stronger for it.',
-      es: 'Setenta años después de Rerum Novarum, la Iglesia nombra la cosa misma: no sólo la propiedad, sino la granja familiar, poseída y trabajada por el hogar que vive en ella. Dirigida a toda la Iglesia y no al movimiento — y por eso más fuerte aún.',
+      en: 'Seventy years after Rerum Novarum, the Church names the thing itself: not merely property, but the family farm, held and worked by the household that lives on it. Addressed to the whole Church rather than to the movement, and all the stronger for it.',
+      es: 'Setenta años después de Rerum Novarum, la Iglesia nombra la cosa misma: no sólo la propiedad, sino la granja familiar, poseída y trabajada por el hogar que vive en ella. Dirigida a toda la Iglesia y no al movimiento, y por eso más fuerte aún.',
     },
     href: 'https://www.vatican.va/content/john-xxiii/en/encyclicals/documents/hf_j-xxiii_enc_15051961_mater.html',
     linkLabel: { en: 'Mater et Magistra', es: 'Mater et Magistra' },
