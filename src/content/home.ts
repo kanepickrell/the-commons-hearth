@@ -40,8 +40,8 @@ export const homeCopy = {
   // approach paragraph still ends "across every parish from Austin to San
   // Antonio", which places the chapter more concretely than the region name.
   lede: {
-    en: 'The Catholic Land Movement exists to help Catholics resettle onto productive land they own. We offer the network, vision, and support to help make it a reality.',
-    es: 'El Movimiento Católico de la Tierra existe para ayudar a los católicos a reasentarse en tierra productiva que sea suya. Ofrecemos la red, la visión, y el apoyo para hacerlo realidad.',
+    en: 'The Catholic Land Movement exists to help families resettle onto productive land they own. We offer the network, vision, and support to help make it a reality.',
+    es: 'El Movimiento Católico de la Tierra existe para ayudar a las familias a reasentarse en tierra productiva que sea suya. Ofrecemos la red, la visión, y el apoyo para hacerlo realidad.',
   } satisfies Bilingual,
 
   ctaGathering: {
@@ -77,8 +77,8 @@ export const homeCopy = {
   // a visitor where we are, and Austin to San Antonio is the more concrete
   // way to say it anyway.
   approach: {
-    en: 'We believe family, faith, and place are gifts we receive, not things we build from a plan. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
-    es: 'Creemos que la familia, la fe, y el lugar son dones que recibimos, no cosas que construimos según un plan. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado — en cada parroquia desde Austin hasta San Antonio.',
+    en: 'We believe family, faith, and place are gifts we receive, not things we build from nothing. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
+    es: 'Creemos que la familia, la fe, y el lugar son dones que recibimos, no cosas que hacemos de la nada. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado — en cada parroquia desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
