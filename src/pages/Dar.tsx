@@ -32,16 +32,19 @@
 //   · Exactly one optional question. Not five.
 // ---------------------------------------------------------------------------
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { ContactModal } from '@/components/ContactModal';
-import { WheatMeter, FurrowMeter } from '@/components/giving/WheatMeter';
-import { WoodcutFill } from '@/components/giving/WoodcutFill';
+import { WheatMeter } from '@/components/giving/WheatMeter';
+import { GlassWindow } from '@/components/giving/GlassWindow';
+
+import laAzuela from '@/assets/icons/la-azuela.svg?raw';
+import laGallina from '@/assets/icons/la-gallina.svg?raw';
+import elPan from '@/assets/icons/el-pan.svg?raw';
+import laConserva from '@/assets/icons/la-conserva.svg?raw';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { chapterToday, formatDate } from '@/lib/dates';
-import { nextFeast } from '@/lib/liturgical';
 import { supabase } from '@/lib/supabase';
 import type { Bilingual } from '@/lib/types';
 
@@ -51,14 +54,31 @@ const PHOTO_BUCKET = 'month-photos';
 // PLACEHOLDER DATA — none of these numbers are real. Cost the tools, set the
 // goals, and wire `raised` to wherever giving is actually tracked before this
 // page faces a donor.
+//
+// PHOTOGRAPHS: two of the four have one. The walk-behind tractor and the
+// grain mill do NOT, on purpose — the stock photographs available for them
+// misrepresented the fund. Every "walk-behind tractor" result was a full-size
+// riding tractor, which contradicts the one line of copy that sells it
+// ("without a tractor payment"), and the grain-mill results were photographs
+// of identifiable people in rural India, which is not this chapter and not
+// ours to borrow. They fall back to the chapter's line art until there is a
+// photograph of the real thing. Drop a file at public/tools/<key>.jpg and add
+// the `photo` line to turn one on.
 // ---------------------------------------------------------------------------
 const TOOL_COMMONS: {
+  key: string;
   name: Bilingual;
   note: Bilingual;
   goal: number;
   raised: number;
+  /** Photograph behind the glass. */
+  photo?: string;
+  /** Fallback line art, if the photograph is missing. */
+  art?: string;
 }[] = [
   {
+    key: 'walk-behind-tractor',
+    art: laAzuela,
     name: { en: 'Walk-behind tractor', es: 'Tractor de dos ruedas' },
     note: {
       en: 'Breaks ground on a quarter acre without a tractor payment.',
@@ -68,6 +88,9 @@ const TOOL_COMMONS: {
     raised: 1580,
   },
   {
+    key: 'butchering-kit',
+    photo: '/tools/butchering-kit.jpg',
+    art: laGallina,
     name: { en: 'Butchering kit', es: 'Equipo de matanza' },
     note: {
       en: 'Gambrel, saw, knives and a cooler — the day Doug teaches it.',
@@ -77,6 +100,8 @@ const TOOL_COMMONS: {
     raised: 540,
   },
   {
+    key: 'grain-mill',
+    art: elPan,
     name: { en: 'Grain mill', es: 'Molino de grano' },
     note: {
       en: 'Whole wheat to flour, for the households that bake.',
@@ -86,6 +111,9 @@ const TOOL_COMMONS: {
     raised: 210,
   },
   {
+    key: 'canning-setup',
+    photo: '/tools/canning-setup.jpg',
+    art: laConserva,
     name: { en: 'Canning setup', es: 'Equipo de conservas' },
     note: {
       en: 'Pressure canners and jars that circulate through the harvest.',
@@ -95,19 +123,6 @@ const TOOL_COMMONS: {
     raised: 500,
   },
 ];
-
-// The land fund, drawn as one acre filling a hundred square feet at a time.
-//
-// An acre is 43,560 sq ft, so at 100 sq ft a tile that is 436 squares — which
-// makes no tidy rectangle, hence the centred short row in WoodcutFill. The
-// count is the unit the page shows: "212 of 436 squares" is ground, "49%" is
-// a statistic, and this fund has no deadline for a percentage to run against.
-//
-// PLACEHOLDER: price a square with the chapter before this faces a donor. The
-// goal follows from it, so there is one number to set, not two.
-const ACRE_SQUARES = Math.round(43560 / 100);
-const LAND_PRICE_PER_SQUARE = 25;
-const LAND_RAISED = 5300;
 
 // Amounts carry what they buy, in the chapter's units. PLACEHOLDER impact lines.
 const AMOUNTS: { value: number; buys: Bilingual }[] = [
@@ -148,53 +163,31 @@ const copy = {
   },
   funded: { en: 'Fully given', es: 'Completo' },
   toGo: { en: 'to go', es: 'faltan' },
-
-  gatheringEyebrow: { en: 'UNDERWRITE A GATHERING', es: 'PATROCINA UNA REUNIÓN' },
-  gatheringBody: {
-    en: 'Cover the food and materials for one month’s gathering. We’ll name the month you carried in the year’s record — or leave you out of it entirely, if you’d rather it stay between you and God.',
-    es: 'Cubre la comida y los materiales de la reunión de un mes. Nombraremos el mes que sostuviste en el registro del año — o te dejaremos fuera por completo, si prefieres que quede entre tú y Dios.',
+  // The window is the amount picker, so it needs one line of instruction.
+  pickGlass: {
+    en: 'Pick a piece of glass to light it — the size is the amount.',
+    es: 'Elige un vidrio para encenderlo — el tamaño es la cantidad.',
   },
-  gatheringLink: { en: 'See what a month looks like', es: 'Mira cómo es un mes' },
-
-  feastEyebrow: { en: 'GIVE ON A FEAST', es: 'DA EN UNA FIESTA' },
-  feastBody: {
-    en: 'The chapter keeps the farmers’ feasts. Some households would rather give on one of them than on the first of the month — an offering with a day attached to it.',
-    es: 'El capítulo guarda las fiestas de los labradores. Hay hogares que prefieren dar en una de ellas y no el primero del mes — una ofrenda con un día propio.',
+  // What a lit piece asks for, right where it was lit.
+  glassMessage: { en: 'Leave a word with it (optional)', es: 'Deja unas palabras (opcional)' },
+  glassPlaceholder: {
+    en: 'For the Hernández family · In thanksgiving · St. Isidore, pray for us',
+    es: 'Por la familia Hernández · En acción de gracias · San Isidro, ruega por nosotros',
   },
-  feastNext: { en: 'Next', es: 'Próxima' },
+  glassNameLabel: { en: 'Your name (optional)', es: 'Tu nombre (opcional)' },
+  glassGive: { en: 'Light this piece', es: 'Enciende este vidrio' },
+  glassCancel: { en: 'Cancel', es: 'Cancelar' },
 
-  kindEyebrow: { en: 'GIVE WHAT YOU HAVE', es: 'DA LO QUE TIENES' },
-  kindBody: {
-    en: 'Not everything worth giving is money. A trailer for a weekend, a freezer, seed stock, a ram at breeding time, an acre someone can practise on, a Saturday of your hands. Tell us what you’ve got and we’ll find who needs it.',
-    es: 'No todo lo que vale la pena dar es dinero. Un remolque por un fin de semana, un congelador, semilla, un carnero en temporada, un acre donde alguien pueda practicar, un sábado de tus manos. Dinos qué tienes y encontraremos quién lo necesita.',
-  },
-  kindCta: { en: 'Offer something', es: 'Ofrece algo' },
-
-  landEyebrow: { en: 'THE LAND FUND', es: 'EL FONDO DE LA TIERRA' },
-  landSquares: { en: 'squares', es: 'cuadros' },
-  landSquareNote: {
-    en: 'One square is a hundred square feet of ground. No deadline — it fills as it fills.',
-    es: 'Un cuadro son cien pies cuadrados de tierra. Sin fecha límite — se llena como se llene.',
-  },
-  landBody: {
-    en: 'Resettlement is the first pillar and the slowest one. The land fund is a long patience: money set aside toward helping a family onto working ground. It is not a campaign with a deadline, and we would rather say so than invent urgency.',
-    es: 'El reasentamiento es el primer pilar y el más lento. El fondo de la tierra es una paciencia larga: dinero apartado para ayudar a una familia a establecerse en tierra de labor. No es una campaña con fecha límite, y preferimos decirlo a inventar urgencia.',
-  },
-
-  // What the form funds when nobody has chosen a section. Without this the
-  // amounts sat above no stated purpose at all.
+  // What the form funds when nobody has chosen a section.
   generalFund: {
     en: 'General fund: food, materials, and supplies for gatherings',
     es: 'Fondo general: comida, materiales y provisiones para las reuniones',
   },
-  givingToward: { en: 'Giving toward', es: 'Para' },
-  changeDesignation: { en: 'change', es: 'cambiar' },
-  landFundName: { en: 'The land fund', es: 'El fondo de la tierra' },
 
   whereEyebrow: { en: 'WHERE IT GOES', es: 'A DÓNDE VA' },
   whereBody: {
-    en: 'The chapter is run by its members; no one draws a salary. Gifts are reported to the chapter at the start of each year, and anything given toward a named tool is spent on that tool or returned.',
-    es: 'El capítulo lo llevan sus miembros; nadie cobra sueldo. Los donativos se informan al capítulo al comenzar cada año, y lo que se da para una herramienta nombrada se gasta en ella o se devuelve.',
+    en: 'The chapter is run by its members, no one takes a salary. Gifts are reported to the chapter at the start of each year, and anything given is set aside for that specific fund. General donations are spent as the chapter’s needs come.',
+    es: 'El capítulo lo llevan sus miembros, nadie cobra sueldo. Los donativos se informan al capítulo al comenzar cada año, y lo que se da queda apartado para ese fondo en particular. Lo que se da en general se gasta conforme surgen las necesidades del capítulo.',
   },
 } satisfies Record<string, Bilingual>;
 
@@ -204,35 +197,9 @@ const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 const slug = (name: string) =>
   name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-/**
- * What a gift is FOR. Set by the "Give toward this" controls further down the
- * page, which scroll back up to the one form rather than opening a second one.
- *
- * `key` is the value that belongs on the gift record once there is a gift
- * record to put it on — see the note in GiveBox. It is deliberately a stable
- * machine string ("tool:grain-mill"), not the display label, so the tool
- * totals can be summed from real gifts without matching on prose that gets
- * reworded or translated.
- */
-type Designation = { key: string; label: Bilingual };
-
 const Dar = () => {
   const { t, locale } = useLocale();
-  const [offerOpen, setOfferOpen] = useState(false);
-  const [designation, setDesignation] = useState<Designation | null>(null);
-  const giveRef = useRef<HTMLDivElement>(null);
 
-  // One form on this page, not one per section. Choosing a section sets what
-  // the gift is for and sends the reader back to it. rAF so the scroll starts
-  // after React has painted the designation line, or it lands a row short.
-  const designate = (d: Designation) => {
-    setDesignation(d);
-    requestAnimationFrame(() => {
-      giveRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      giveRef.current?.focus({ preventScroll: true });
-    });
-  };
-  const feast = useMemo(() => nextFeast(chapterToday()), []);
 
   // --- live chapter numbers: social proof that can't drift from the truth ---
   const [neighbors, setNeighbors] = useState<number | null>(null);
@@ -278,12 +245,6 @@ const Dar = () => {
       }
     })();
   }, []);
-
-  // Squares paid for, not a percentage of a goal — the unit the section shows.
-  const landSquares = Math.min(
-    ACRE_SQUARES,
-    Math.floor(LAND_RAISED / LAND_PRICE_PER_SQUARE),
-  );
 
   const commonsTotal = TOOL_COMMONS.reduce((s, i) => s + i.goal, 0);
   const commonsRaised = TOOL_COMMONS.reduce((s, i) => s + i.raised, 0);
@@ -338,12 +299,7 @@ const Dar = () => {
       {/* The ask — amounts, cadence, one question                          */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16">
-        {/* tabIndex -1 so the scroll can hand focus over: a sighted reader
-            sees the jump, a screen-reader user otherwise wouldn't know the
-            page had moved. */}
-        <div ref={giveRef} tabIndex={-1} className="outline-none">
-          <GiveBox designation={designation} onClear={() => setDesignation(null)} />
-        </div>
+        <GiveBox />
       </section>
 
       {/* ---------------------------------------------------------------- */}
@@ -390,167 +346,31 @@ const Dar = () => {
           </header>
         </div>
 
-        <ul className="mx-auto mt-12 max-w-2xl divide-y divide-mesquite/10 border-y border-mesquite/15">
-          {TOOL_COMMONS.map((item) => {
-            const pct = (item.raised / item.goal) * 100;
-            const done = item.raised >= item.goal;
-            const remaining = Math.max(0, item.goal - item.raised);
-            return (
-              <li key={item.name.en} className="py-6">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h3 className="font-heading text-xl text-mesquite">{t(item.name)}</h3>
-                  <p className="font-serif text-sm tabular-nums text-piedra">
-                    {done ? (
-                      <span className="font-caps text-[10px] tracking-[0.18em] text-ocre">
-                        {t(copy.funded).toUpperCase()}
-                      </span>
-                    ) : (
-                      <>
-                        {usd(item.raised)} <span className="text-piedra/60">/ {usd(item.goal)}</span>
-                      </>
-                    )}
-                  </p>
-                </div>
-                <p className="prose-body mt-1 text-sm leading-relaxed text-mesquite/80">
-                  {t(item.note)}
-                </p>
-                <div className="mt-3">
-                  <FurrowMeter percent={pct} label={`${t(item.name)} — ${Math.round(pct)}%`} />
-                </div>
-                {!done && (
-                  <div className="mt-3 flex items-center justify-between gap-4">
-                    <span className="font-serif text-xs italic text-piedra/80">
-                      {usd(remaining)} {t(copy.toGo)}
-                    </span>
-                    <DesignateButton
-                      label={locale === 'es' ? 'Dar hacia esto' : 'Give toward this'}
-                      onClick={() =>
-                        designate({
-                          key: `tool:${slug(item.name.en)}`,
-                          label: item.name,
-                        })
-                      }
-                    />
-                  </div>
-                )}
-              </li>
-            );
-          })}
+        <p className="mx-auto mt-10 max-w-2xl text-center font-serif text-sm italic text-piedra">
+          {t(copy.pickGlass)}
+        </p>
+
+        {/* A card per tool. The window carries the progress AND the ask, so
+            there is no separate meter and no separate amount control. */}
+        <ul className="mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          {TOOL_COMMONS.map((item) => (
+            <ToolWindow key={item.key} item={item} />
+          ))}
         </ul>
       </section>
 
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* Three smaller ways                                                */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="container-wide py-16">
-        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-10 md:grid-cols-3">
-          <article className="flex flex-col">
-            <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
-              {t(copy.gatheringEyebrow)}
-            </p>
-            <p className="prose-body mt-3 flex-1 text-sm leading-relaxed text-mesquite/85">
-              {t(copy.gatheringBody)}
-            </p>
-            <Link
-              to={buildPath('testimonio', locale)}
-              className="mt-4 font-heading text-sm text-ocre no-underline hover:text-mesquite"
-              style={{ textDecoration: 'none' }}
-            >
-              {t(copy.gatheringLink)} →
-            </Link>
-          </article>
-
-          <article className="flex flex-col">
-            <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
-              {t(copy.feastEyebrow)}
-            </p>
-            <p className="prose-body mt-3 flex-1 text-sm leading-relaxed text-mesquite/85">
-              {t(copy.feastBody)}
-            </p>
-            {feast && (
-              <p className="mt-4 font-serif text-sm italic text-piedra">
-                {t(copy.feastNext)}: {feast.feast.name[locale]},{' '}
-                {formatDate(feast.date, locale, { month: 'long', day: 'numeric' })}
-              </p>
-            )}
-          </article>
-
-          <article className="flex flex-col">
-            <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
-              {t(copy.kindEyebrow)}
-            </p>
-            <p className="prose-body mt-3 flex-1 text-sm leading-relaxed text-mesquite/85">
-              {t(copy.kindBody)}
-            </p>
-            <button
-              type="button"
-              onClick={() => setOfferOpen(true)}
-              className="mt-4 self-start font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
-            >
-              {t(copy.kindCta)} →
-            </button>
-          </article>
-        </div>
-      </section>
-
-      <div className="rule container-wide" />
-
-      {/* ---------------------------------------------------------------- */}
-      {/* Land fund + transparency                                          */}
+      {/* Where it goes                                                     */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose py-16">
-        <p className="display-caps text-xs tracking-[0.25em] text-ocre">{t(copy.landEyebrow)}</p>
-        <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/85">
-          {t(copy.landBody)}
-        </p>
-
-        <div className="mt-8">
-          <WoodcutFill
-            total={ACRE_SQUARES}
-            filled={landSquares}
-            cols={22}
-            label={`${t(copy.landEyebrow)}: ${landSquares} / ${ACRE_SQUARES} ${t(copy.landSquares)}`}
-          />
-          <p className="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <span className="font-serif text-sm tabular-nums text-mesquite">
-              <span className="font-heading text-2xl">{landSquares}</span>
-              <span className="text-piedra">
-                {' '}/ {ACRE_SQUARES} {t(copy.landSquares)}
-              </span>
-            </span>
-            <span className="font-serif text-xs italic text-piedra/80">
-              {t(copy.landSquareNote)}
-            </span>
-          </p>
-        </div>
-
-        <div className="mt-5 text-right">
-          <DesignateButton
-            label={locale === 'es' ? 'Dar al fondo' : 'Give to the fund'}
-            onClick={() => designate({ key: 'land-fund', label: copy.landFundName })}
-          />
-        </div>
-
-        <div className="rule my-12" />
-
         <p className="display-caps text-xs tracking-[0.25em] text-ocre">{t(copy.whereEyebrow)}</p>
         <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/85">
           {t(copy.whereBody)}
         </p>
       </section>
 
-      <ContactModal
-        open={offerOpen}
-        onClose={() => setOfferOpen(false)}
-        defaultCategory="general"
-        defaultMessage={
-          locale === 'es'
-            ? 'Me gustaría ofrecer lo siguiente al capítulo:\n\n'
-            : 'I’d like to offer the chapter the following:\n\n'
-        }
-      />
     </Layout>
   );
 };
@@ -559,13 +379,7 @@ const Dar = () => {
 // The ask itself. Cadence and amount live on one control; sending recurring
 // donors to a second page is the most reliable way to lose them.
 // ---------------------------------------------------------------------------
-const GiveBox = ({
-  designation,
-  onClear,
-}: {
-  designation: Designation | null;
-  onClear: () => void;
-}) => {
+const GiveBox = () => {
   const { t, locale } = useLocale();
   const [monthly, setMonthly] = useState(true); // recurring pre-selected
   const [amount, setAmount] = useState<number | null>(25);
@@ -605,31 +419,12 @@ const GiveBox = ({
         ))}
       </div>
 
-      {/* What this gift is for, always — the general fund by default, or the
-          section the reader came from, with the way back out. Amounts above
-          no stated purpose is the thing this fixes. */}
+      {/* The form funds the general pot. A tool is given for at the tool,
+          not up here — see the panel under each window. */}
       <div className="mb-5 border-l-2 border-ocre/40 pl-3">
-        {designation ? (
-          <>
-            <p className="font-caps text-[9px] tracking-[0.22em] text-piedra/70">
-              {t(copy.givingToward).toUpperCase()}
-            </p>
-            <p className="mt-1 flex flex-wrap items-baseline gap-x-3 font-heading text-base text-mesquite">
-              {t(designation.label)}
-              <button
-                type="button"
-                onClick={onClear}
-                className="font-serif text-xs italic text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
-              >
-                {t(copy.changeDesignation)}
-              </button>
-            </p>
-          </>
-        ) : (
-          <p className="font-serif text-sm italic leading-snug text-piedra">
-            {t(copy.generalFund)}
-          </p>
-        )}
+        <p className="font-serif text-sm italic leading-snug text-piedra">
+          {t(copy.generalFund)}
+        </p>
       </div>
 
       <p className="mb-3 font-caps text-[9px] tracking-[0.22em] text-piedra/70">
@@ -731,21 +526,98 @@ const InertGive = ({ label }: { label: string }) => {
 };
 
 /**
- * Sends the reader to the one form with the gift's purpose already set.
+ * One tool: the window, and — once a piece is lit — the giving itself, right
+ * there under it.
  *
- * Deliberately NOT an InertGive: these aren't the moment of payment, so
- * confessing "we can't take gifts online yet" here would answer a question
- * nobody had asked. The form says it, once, where the giving happens.
+ * The giving does NOT jump back to the form at the top of the page. GiveBrick
+ * is right about this: you pick your piece, say your word over it and pay from
+ * the same spot. Scrolling someone away from the thing they just chose is how
+ * you lose them, and the message only makes sense beside the piece it belongs
+ * to.
  */
-const DesignateButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
-  >
-    {label} →
-  </button>
-);
+const ToolWindow = ({ item }: { item: (typeof TOOL_COMMONS)[number] }) => {
+  const { t, locale } = useLocale();
+  const [picked, setPicked] = useState<{ index: number; value: number } | null>(null);
+  const [message, setMessage] = useState('');
+  const [giver, setGiver] = useState('');
+
+  const done = item.raised >= item.goal;
+  const remaining = Math.max(0, item.goal - item.raised);
+
+  return (
+    <li className="flex flex-col">
+      <GlassWindow
+        seedKey={item.key}
+        goal={item.goal}
+        raised={item.raised}
+        photo={item.photo}
+        art={item.art}
+        picked={picked?.index ?? null}
+        label={`${t(item.name)} — ${usd(item.raised)} of ${usd(item.goal)}`}
+        onPick={(piece) => setPicked((v) => (v?.index === piece.index ? null : piece))}
+      />
+
+      <h3 className="mt-4 font-heading text-lg leading-snug text-mesquite">{t(item.name)}</h3>
+      <p className="prose-body mt-1 flex-1 text-sm leading-relaxed text-mesquite/80">
+        {t(item.note)}
+      </p>
+      <p className="mt-3 font-serif text-sm tabular-nums text-piedra">
+        {done ? (
+          <span className="font-caps text-[10px] tracking-[0.18em] text-ocre">
+            {t(copy.funded).toUpperCase()}
+          </span>
+        ) : (
+          <>
+            {usd(item.raised)}
+            <span className="text-piedra/60"> / {usd(item.goal)}</span>
+            <span className="text-piedra/60"> · {usd(remaining)} {t(copy.toGo)}</span>
+          </>
+        )}
+      </p>
+
+      {/* Opens in place, under the piece that was lit. */}
+      {picked && (
+        <div className="mt-4 border-t border-mesquite/15 pt-4">
+          <p className="font-heading text-lg text-mesquite tabular-nums">{usd(picked.value)}</p>
+
+          <label className="mt-3 block">
+            <span className="font-caps text-[9px] tracking-[0.2em] text-piedra/70">
+              {t(copy.glassMessage).toUpperCase()}
+            </span>
+            <textarea
+              rows={2}
+              value={message}
+              onChange={(e) => setMessage(e.target.value.slice(0, 160))}
+              placeholder={t(copy.glassPlaceholder)}
+              className="mt-1 w-full rounded-sm border border-mesquite/20 bg-cal/60 p-2 font-serif text-sm text-mesquite placeholder:text-piedra/40 focus:border-mesquite focus:bg-cal focus:outline-none"
+            />
+          </label>
+
+          <label className="mt-2 block">
+            <span className="font-caps text-[9px] tracking-[0.2em] text-piedra/70">
+              {t(copy.glassNameLabel).toUpperCase()}
+            </span>
+            <input
+              value={giver}
+              onChange={(e) => setGiver(e.target.value.slice(0, 60))}
+              className="mt-1 w-full border-b border-mesquite/25 bg-transparent py-1 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none"
+            />
+          </label>
+
+          <InertGive label={`${t(copy.glassGive)} · ${usd(picked.value)}`} />
+
+          <button
+            type="button"
+            onClick={() => setPicked(null)}
+            className="mt-2 w-full text-center font-serif text-xs italic text-piedra transition hover:text-mesquite"
+          >
+            {t(copy.glassCancel)}
+          </button>
+        </div>
+      )}
+    </li>
+  );
+};
 
 /** One live figure. A stat tile, not a chart — there's no shape to plot. */
 const Stat = ({ n, label, divided = false }: { n: number | null; label: string; divided?: boolean }) => (
