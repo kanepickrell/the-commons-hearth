@@ -2,7 +2,11 @@
 // The founding vision of the chapter — four pillars, in field-manual language.
 //
 // Changes from the prior version:
-//   - Pillar prose rewritten to track the CLM Field Manual phrasing.
+//   - Pillar prose rewritten to track the CLM Field Manual phrasing, then
+//     put back into the first person: the manual writes "The Catholic Land
+//     Movement exists to...", which on our own Vision page reads like a
+//     third party describing us. Two pillars named the organisation; both
+//     now say "we". The page has already said whose vision it is.
 //   - Resettlement re-framed: it's not about owning land per se, it's
 //     about productive property as the substrate that re-roots families
 //     as integrated social units (in land, work, parish, community).
@@ -44,8 +48,8 @@ export default function Vision() {
       roman: 'II',
       name: { en: 'Education', es: 'Educación' },
       verse: {
-        en: 'The Catholic Land Movement exists to grow peer-to-peer networks of education in production land and hand crafts.',
-        es: 'El Movimiento Católico de la Tierra existe para cultivar redes de educación entre vecinos en los oficios de la tierra y de la mano.',
+        en: 'We exist to grow peer-to-peer networks of education in production land and hand crafts.',
+        es: 'Existimos para cultivar redes de educación entre vecinos en los oficios de la tierra y de la mano.',
       },
       practice: {
         en: 'These skills used to pass between neighbors — canning, carpentry, animal husbandry, the care of soil. We learn them back from one another, in workshops and in kitchens, and we pass them on before they are lost.',
@@ -72,8 +76,8 @@ export default function Vision() {
       roman: 'IV',
       name: { en: 'Glorification', es: 'Glorificación' },
       verse: {
-        en: 'All Catholic Land Movement activity aligns with Gospel teaching — true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
-        es: 'Toda la actividad del Movimiento Católico de la Tierra se alinea con la enseñanza del Evangelio — la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
+        en: 'All our activity aligns with Gospel teaching: true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
+        es: 'Toda nuestra actividad se alinea con la enseñanza del Evangelio: la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
       },
       practice: {
         en: 'Christ placed a meal at the center of His Church. The seed, the soil, the harvest, the table — all of it is ordered toward worship. Our labor is an offering.',
