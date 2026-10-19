@@ -483,7 +483,7 @@ export default function Bienvenido() {
             />
 
             <p className="mt-2 font-serif text-xs italic text-mesquite/50">
-              {t({ en: 'Optional — leave blank if you want.', es: 'Opcional — déjalo en blanco si quieres.' })}
+              {t({ en: 'Optional. Leave blank if you want.', es: 'Opcional. Déjalo en blanco si quieres.' })}
             </p>
 
             <div className="mt-8 flex items-center justify-between">
@@ -515,7 +515,7 @@ export default function Bienvenido() {
             />
 
             <p className="mt-2 font-serif text-xs italic text-mesquite/50">
-              {t({ en: 'Optional — leave blank if you want.', es: 'Opcional — déjalo en blanco si quieres.' })}
+              {t({ en: 'Optional. Leave blank if you want.', es: 'Opcional. Déjalo en blanco si quieres.' })}
             </p>
 
             <div className="mt-8 flex items-center justify-between">
@@ -634,8 +634,8 @@ export default function Bienvenido() {
               </p>
               <p className="mb-3 font-serif text-sm italic text-mesquite/60">
                 {t({
-                  en: 'Add your own — a skill or craft not listed above.',
-                  es: 'Agrega el tuyo — un oficio que no esté en la lista.',
+                  en: 'Add your own. A skill or craft not listed above.',
+                  es: 'Agrega el tuyo. Un oficio que no esté en la lista.',
                 })}
               </p>
 

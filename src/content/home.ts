@@ -77,8 +77,8 @@ export const homeCopy = {
   // a visitor where we are, and Austin to San Antonio is the more concrete
   // way to say it anyway.
   approach: {
-    en: 'We believe family, faith, and place are gifts we receive, not things we build from nothing. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you — across every parish from Austin to San Antonio.',
-    es: 'Creemos que la familia, la fe, y el lugar son dones que recibimos, no cosas que hacemos de la nada. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado — en cada parroquia desde Austin hasta San Antonio.',
+    en: 'We believe family, faith, and place are gifts we receive, not things we build from nothing. A good culture grows slowly, from tending what we’ve been given. We help households become places that make, grow, and give, not just consume. Whether you’re planning a rural resettlement or simply learning to bake sourdough, we’re here to connect, teach, and build alongside you, across every parish from Austin to San Antonio.',
+    es: 'Creemos que la familia, la fe, y el lugar son dones que recibimos, no cosas que hacemos de la nada. Una buena cultura crece despacio, de cuidar lo que nos ha sido dado. Ayudamos a que los hogares se vuelvan lugares que hacen, cultivan, y dan, no sólo que consumen. Ya sea que estés planeando un reasentamiento rural o simplemente aprendiendo a hacer pan de masa madre, estamos aquí para conectar, enseñar, y construir a tu lado, en cada parroquia desde Austin hasta San Antonio.',
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
@@ -157,12 +157,12 @@ export const homeCopy = {
   // The empty state, split so "join the chapter" can be the link it wants to
   // be rather than a second button repeating the sentence underneath it.
   emptyBefore: {
-    en: 'No gathering scheduled yet — ',
-    es: 'Todavía no hay reunión programada — ',
+    en: 'No gathering scheduled yet. ',
+    es: 'Todavía no hay reunión programada. ',
   } satisfies Bilingual,
   emptyLink: {
-    en: 'join the chapter',
-    es: 'únete al capítulo',
+    en: 'Join the chapter',
+    es: 'Únete al capítulo',
   } satisfies Bilingual,
   emptyAfter: {
     en: ' to hear first.',
