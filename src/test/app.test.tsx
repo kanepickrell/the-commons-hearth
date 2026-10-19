@@ -314,6 +314,20 @@ describe('app renders', () => {
     expect(document.documentElement.lang).toBe('es');
   });
 
+  // The homepage's "Join the chapter" lands on /participate, so joining has
+  // to be reachable from there. It used to be reachable only by RSVPing to a
+  // specific gathering, which left the button unable to keep its promise.
+  it('participate offers a way to actually join', async () => {
+    visit('/participate');
+    const join = await waitFor(() => screen.getByRole('button', { name: /Create your profile/i }));
+
+    // And it is honest about the wait before you sign up, not after.
+    expect(screen.getByText(/steward approves new profiles/i)).toBeInTheDocument();
+
+    join.click();
+    await waitFor(() => expect(screen.getByText('Join the chapter')).toBeInTheDocument());
+  });
+
   it('unknown route shows not-found', async () => {
     visit('/nope');
     await waitFor(() => expect(screen.getByText(/404/)).toBeInTheDocument());

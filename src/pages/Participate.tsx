@@ -17,13 +17,18 @@
 // Quadragesimo Anno) used to live at the bottom of movement III. It now
 // lives on its own /resources page so it can grow. See Resources.tsx.
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { Layout } from '@/components/Layout';
+import { SignInModal } from '@/components/SignInModal';
+import { useAuth } from '@/hooks/useAuth';
 import { buildPath } from '@/i18n/routes';
 
 export default function Participate() {
   const { t, locale } = useLocale();
+  const { user } = useAuth();
+  const [joinOpen, setJoinOpen] = useState(false);
 
   const movements = [
     {
@@ -130,7 +135,17 @@ export default function Participate() {
         </div>
       </section>
 
-      {/* Closing — point to the gatherings page */}
+      {/* Closing — two doors.
+          The homepage's "Join the chapter" button lands here, and until now
+          this page never once offered joining: it ended by pointing at the
+          gatherings list, and the only way to actually make an account was to
+          RSVP to a specific gathering. That left the one button promising
+          membership unable to deliver it, and the six-step onboarding at
+          /bienvenido reachable only as a side effect of an RSVP.
+
+          Coming first is still the primary door, because that is this page's
+          whole argument and the chapter's. The second door is for the reader
+          who has already decided. */}
       <section className="py-16 text-center md:py-20">
         <div className="container-narrow">
           <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
@@ -142,15 +157,57 @@ export default function Participate() {
               es: 'El primer movimiento es el único que te pide algo hoy. Encuentra una reunión y ven.',
             })}
           </p>
-          <Link
-            to={buildPath('talleres', locale)}
-            className="mt-8 inline-flex items-center gap-2 font-heading text-lg text-ocre no-underline hover:text-mesquite"
-            style={{ textDecoration: 'none' }}
-          >
-            {t({ en: 'See upcoming gatherings', es: 'Ver próximas reuniones' })} →
-          </Link>
+
+          <div className="mx-auto mt-8 flex max-w-xs flex-col items-center gap-5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-10">
+            <Link
+              to={buildPath('talleres', locale)}
+              className="font-heading text-lg text-ocre no-underline hover:text-mesquite"
+              style={{ textDecoration: 'none' }}
+            >
+              {t({ en: 'See upcoming gatherings', es: 'Ver próximas reuniones' })} →
+            </Link>
+
+            {user ? (
+              <Link
+                to={buildPath('miPerfil', locale)}
+                className="font-heading text-lg text-ocre no-underline hover:text-mesquite"
+                style={{ textDecoration: 'none' }}
+              >
+                {t({ en: 'My profile', es: 'Mi perfil' })} →
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setJoinOpen(true)}
+                className="font-heading text-lg text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
+              >
+                {t({ en: 'Create your profile', es: 'Crea tu perfil' })} →
+              </button>
+            )}
+          </div>
+
+          {/* Said plainly, because a new profile waits on a steward and a
+              reader should know that before signing up rather than after. */}
+          {!user && (
+            <p className="mx-auto mt-5 max-w-sm font-serif text-xs italic text-piedra">
+              {t({
+                en: 'A steward approves new profiles, usually after they have met you at a gathering.',
+                es: 'Un mayordomo aprueba los perfiles nuevos, normalmente después de conocerte en una reunión.',
+              })}
+            </p>
+          )}
         </div>
       </section>
+
+      <SignInModal
+        open={joinOpen}
+        onClose={() => setJoinOpen(false)}
+        title={{ en: 'Join the chapter', es: 'Únete al capítulo' }}
+        subtitle={{
+          en: 'Sign in to create your profile. The link sets up an account if you are new.',
+          es: 'Inicia sesión para crear tu perfil. El enlace crea una cuenta si eres nuevo.',
+        }}
+      />
     </Layout>
   );
 }
