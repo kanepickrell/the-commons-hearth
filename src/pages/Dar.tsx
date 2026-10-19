@@ -37,6 +37,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { ContactModal } from '@/components/ContactModal';
 import { WheatMeter, FurrowMeter } from '@/components/giving/WheatMeter';
+import { WoodcutFill } from '@/components/giving/WoodcutFill';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { buildPath } from '@/i18n/routes';
 import { chapterToday, formatDate } from '@/lib/dates';
@@ -94,6 +95,19 @@ const TOOL_COMMONS: {
     raised: 500,
   },
 ];
+
+// The land fund, drawn as one acre filling a hundred square feet at a time.
+//
+// An acre is 43,560 sq ft, so at 100 sq ft a tile that is 436 squares — which
+// makes no tidy rectangle, hence the centred short row in WoodcutFill. The
+// count is the unit the page shows: "212 of 436 squares" is ground, "49%" is
+// a statistic, and this fund has no deadline for a percentage to run against.
+//
+// PLACEHOLDER: price a square with the chapter before this faces a donor. The
+// goal follows from it, so there is one number to set, not two.
+const ACRE_SQUARES = Math.round(43560 / 100);
+const LAND_PRICE_PER_SQUARE = 25;
+const LAND_RAISED = 5300;
 
 // Amounts carry what they buy, in the chapter's units. PLACEHOLDER impact lines.
 const AMOUNTS: { value: number; buys: Bilingual }[] = [
@@ -157,6 +171,11 @@ const copy = {
   kindCta: { en: 'Offer something', es: 'Ofrece algo' },
 
   landEyebrow: { en: 'THE LAND FUND', es: 'EL FONDO DE LA TIERRA' },
+  landSquares: { en: 'squares', es: 'cuadros' },
+  landSquareNote: {
+    en: 'One square is a hundred square feet of ground. No deadline — it fills as it fills.',
+    es: 'Un cuadro son cien pies cuadrados de tierra. Sin fecha límite — se llena como se llene.',
+  },
   landBody: {
     en: 'Resettlement is the first pillar and the slowest one. The land fund is a long patience: money set aside toward helping a family onto working ground. It is not a campaign with a deadline, and we would rather say so than invent urgency.',
     es: 'El reasentamiento es el primer pilar y el más lento. El fondo de la tierra es una paciencia larga: dinero apartado para ayudar a una familia a establecerse en tierra de labor. No es una campaña con fecha límite, y preferimos decirlo a inventar urgencia.',
@@ -259,6 +278,12 @@ const Dar = () => {
       }
     })();
   }, []);
+
+  // Squares paid for, not a percentage of a goal — the unit the section shows.
+  const landSquares = Math.min(
+    ACRE_SQUARES,
+    Math.floor(LAND_RAISED / LAND_PRICE_PER_SQUARE),
+  );
 
   const commonsTotal = TOOL_COMMONS.reduce((s, i) => s + i.goal, 0);
   const commonsRaised = TOOL_COMMONS.reduce((s, i) => s + i.raised, 0);
@@ -480,6 +505,27 @@ const Dar = () => {
         <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/85">
           {t(copy.landBody)}
         </p>
+
+        <div className="mt-8">
+          <WoodcutFill
+            total={ACRE_SQUARES}
+            filled={landSquares}
+            cols={22}
+            label={`${t(copy.landEyebrow)}: ${landSquares} / ${ACRE_SQUARES} ${t(copy.landSquares)}`}
+          />
+          <p className="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <span className="font-serif text-sm tabular-nums text-mesquite">
+              <span className="font-heading text-2xl">{landSquares}</span>
+              <span className="text-piedra">
+                {' '}/ {ACRE_SQUARES} {t(copy.landSquares)}
+              </span>
+            </span>
+            <span className="font-serif text-xs italic text-piedra/80">
+              {t(copy.landSquareNote)}
+            </span>
+          </p>
+        </div>
+
         <div className="mt-5 text-right">
           <DesignateButton
             label={locale === 'es' ? 'Dar al fondo' : 'Give to the fund'}
