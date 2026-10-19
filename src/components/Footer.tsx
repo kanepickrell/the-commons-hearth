@@ -21,7 +21,7 @@ export const Footer = () => {
       rel: 'noopener noreferrer',
       className: 'text-sm text-piedra',
     },
-    `${t(s.nationalLink)} — catholiclandmovement.info`,
+    `${t(s.nationalLink)} · catholiclandmovement.info`,
   );
 
 

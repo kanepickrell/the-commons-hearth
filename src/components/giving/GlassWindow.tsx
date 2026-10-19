@@ -28,19 +28,28 @@ import { useId, useMemo } from 'react';
 /** Glass sizes, and what each one costs. Size is the amount. */
 const TIERS = [100, 50, 25, 10] as const;
 
-/** Lit-glass colours, from the chapter's palette. */
+/**
+ * The chapter's palette, cut twice: every piece of glass keeps its colour
+ * whether it has been paid for or not.
+ *
+ * `dark` is the same hue with the light behind it taken away — unlit glass in
+ * a church is not grey, it is a deep version of what it will be. That also
+ * means the window reads as a window before a penny is given, instead of as
+ * a dark slab waiting to become one.
+ */
 const GLASS = [
-  'hsl(32 56% 51%)', // ocre
-  'hsl(32 64% 62%)', // ocre, lighter
-  'hsl(0 61% 30%)', // rojo
-  'hsl(215 45% 31%)', // azul
-  'hsl(92 24% 32%)', // mesquite, greened
+  { lit: 'hsl(32 56% 51%)', dark: 'hsl(32 42% 21%)' }, // ocre
+  { lit: 'hsl(38 70% 60%)', dark: 'hsl(38 45% 24%)' }, // amber
+  { lit: 'hsl(0 61% 38%)', dark: 'hsl(0 48% 18%)' }, // rojo
+  { lit: 'hsl(215 45% 40%)', dark: 'hsl(215 42% 19%)' }, // azul
+  { lit: 'hsl(92 30% 38%)', dark: 'hsl(92 30% 17%)' }, // mesquite
+  { lit: 'hsl(140 28% 36%)', dark: 'hsl(140 30% 15%)' }, // bottle green
 ] as const;
 
-/** The lead, and unlit glass. */
-const GLASS_DARK = 'hsl(92 24% 22%)';
+/** The lead. */
+const GLASS_DARK = 'hsl(92 24% 14%)';
 
-type Piece = { i: number; value: number; x: number; y: number; w: number; h: number; hue: string };
+type Piece = { i: number; value: number; x: number; y: number; w: number; h: number; glass: (typeof GLASS)[number] };
 
 const rng = (seed: number) => () => {
   seed = (seed + 0x6d2b79f5) | 0;
@@ -140,8 +149,8 @@ const layout = (values: number[], next: () => number): Piece[] => {
       const len = (v * scale) / thickness;
       pieces.push(
         vertical
-          ? { i: i++, value: v, x: free.x, y: free.y + along, w: thickness, h: len, hue: GLASS[Math.floor(next() * GLASS.length)] }
-          : { i: i++, value: v, x: free.x + along, y: free.y, w: len, h: thickness, hue: GLASS[Math.floor(next() * GLASS.length)] },
+          ? { i: i++, value: v, x: free.x, y: free.y + along, w: thickness, h: len, glass: GLASS[Math.floor(next() * GLASS.length)] }
+          : { i: i++, value: v, x: free.x + along, y: free.y, w: len, h: thickness, glass: GLASS[Math.floor(next() * GLASS.length)] },
       );
       along += len;
     }
@@ -270,8 +279,8 @@ export const GlassWindow = ({
               y={p.y}
               width={p.w}
               height={p.h}
-              fill={isLit || isPicked ? p.hue : GLASS_DARK}
-              fillOpacity={isLit ? 0.34 : isPicked ? 0.55 : 0.93}
+              fill={isLit || isPicked ? p.glass.lit : p.glass.dark}
+              fillOpacity={isLit ? 0.34 : isPicked ? 0.55 : 0.92}
               stroke={GLASS_DARK}
               strokeWidth={0.9}
               style={isLit ? undefined : { cursor: 'pointer' }}

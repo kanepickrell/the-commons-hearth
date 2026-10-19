@@ -55,16 +55,16 @@ const PHOTO_BUCKET = 'month-photos';
 // goals, and wire `raised` to wherever giving is actually tracked before this
 // page faces a donor.
 //
-// PHOTOGRAPHS: two of the four have one. The walk-behind tractor and the
-// grain mill do NOT, on purpose — the stock photographs available for them
-// misrepresented the fund. Every "walk-behind tractor" result was a full-size
-// riding tractor, which contradicts the one line of copy that sells it
-// ("without a tractor payment"), and the grain-mill results were photographs
-// of identifiable people in rural India, which is not this chapter and not
-// ours to borrow. They fall back to the chapter's line art until there is a
-// photograph of the real thing. Drop a file at public/tools/<key>.jpg and add
-// the `photo` line to turn one on.
-// ---------------------------------------------------------------------------
+// PHOTOGRAPHS: all four have one, in public/tools/<key>.jpg. They are stock,
+// and they are placeholders — swap each for a photograph of the chapter's
+// actual tool as it is bought, the way the hero already pulls a real
+// gathering photo rather than an illustration of one. Each was checked
+// against the copy it sits under rather than taken on its caption: the first
+// "walk-behind tractor" results were full-size riding tractors, which
+// contradicts the one line that sells the fund, and the first "grain mill"
+// results were identifiable people in rural India, which is not this chapter
+// and not ours to borrow.
+//
 const TOOL_COMMONS: {
   key: string;
   name: Bilingual;
@@ -78,11 +78,12 @@ const TOOL_COMMONS: {
 }[] = [
   {
     key: 'walk-behind-tractor',
+    photo: '/tools/walk-behind-tractor.jpg',
     art: laAzuela,
     name: { en: 'Walk-behind tractor', es: 'Tractor de dos ruedas' },
     note: {
-      en: 'Breaks ground on a quarter acre without a tractor payment.',
-      es: 'Abre un cuarto de acre sin pagar un tractor entero.',
+      en: 'Lets a family break ground on a quarter acre without buying a tractor.',
+      es: 'Permite a una familia abrir un cuarto de acre sin comprar un tractor.',
     },
     goal: 4200,
     raised: 1580,
@@ -93,19 +94,20 @@ const TOOL_COMMONS: {
     art: laGallina,
     name: { en: 'Butchering kit', es: 'Equipo de matanza' },
     note: {
-      en: 'Gambrel, saw, knives and a cooler — the day Doug teaches it.',
-      es: 'Gancho, sierra, cuchillos y una hielera — el día que Doug lo enseña.',
+      en: 'Gambrel, saw, knives, and a cooler for Doug’s butchering workshop in November.',
+      es: 'Gancho, sierra, cuchillos y una hielera para el taller de matanza de Doug en noviembre.',
     },
     goal: 650,
     raised: 540,
   },
   {
     key: 'grain-mill',
+    photo: '/tools/grain-mill.jpg',
     art: elPan,
     name: { en: 'Grain mill', es: 'Molino de grano' },
     note: {
-      en: 'Whole wheat to flour, for the households that bake.',
-      es: 'De trigo entero a harina, para los hogares que hornean.',
+      en: 'Grinds whole wheat into flour for families who bake.',
+      es: 'Muele trigo entero en harina para las familias que hornean.',
     },
     goal: 900,
     raised: 210,
@@ -116,8 +118,8 @@ const TOOL_COMMONS: {
     art: laConserva,
     name: { en: 'Canning setup', es: 'Equipo de conservas' },
     note: {
-      en: 'Pressure canners and jars that circulate through the harvest.',
-      es: 'Ollas a presión y frascos que circulan en la cosecha.',
+      en: 'Pressure canners and jars, passed between families at harvest.',
+      es: 'Ollas a presión y frascos, que pasan entre las familias en la cosecha.',
     },
     goal: 500,
     raised: 500,
@@ -126,53 +128,57 @@ const TOOL_COMMONS: {
 
 // Amounts carry what they buy, in the chapter's units. PLACEHOLDER impact lines.
 const AMOUNTS: { value: number; buys: Bilingual }[] = [
-  { value: 10, buys: { en: 'Seed for a bed', es: 'Semilla para una cama' } },
-  { value: 25, buys: { en: 'Sponsors a workshop seat', es: 'Patrocina un lugar en un taller' } },
-  { value: 50, buys: { en: 'Materials for a demonstration', es: 'Materiales para una demostración' } },
-  { value: 100, buys: { en: 'A whole month’s gathering', es: 'La reunión de todo un mes' } },
+  { value: 10, buys: { en: 'Seed for one garden bed', es: 'Semilla para una cama de cultivo' } },
+  { value: 25, buys: { en: 'Covers one person’s spot at a workshop', es: 'Cubre el lugar de una persona en un taller' } },
+  { value: 50, buys: { en: 'Materials for one demonstration', es: 'Materiales para una demostración' } },
+  { value: 100, buys: { en: 'Food and supplies for one month’s gathering', es: 'Comida y provisiones para la reunión de un mes' } },
 ];
 
 const copy = {
   eyebrow: { en: 'SUPPORT THE CHAPTER', es: 'APOYA AL CAPÍTULO' },
-  heading: { en: 'Give toward something that lasts', es: 'Da hacia algo que permanece' },
+  heading: { en: 'Help equip families to work the land', es: 'Ayuda a equipar a las familias que trabajan la tierra' },
   lede: {
-    en: 'The movement’s whole argument is that ordinary families should own the things they work with. So most of what we ask for isn’t overhead — it’s tools, equipment and land the chapter holds in common and puts into members’ hands.',
-    es: 'Todo el argumento del movimiento es que las familias comunes deben poseer aquello con lo que trabajan. Por eso casi todo lo que pedimos no son gastos administrativos — son herramientas, equipo y tierra que el capítulo guarda en común y pone en manos de sus miembros.',
+    en: 'The Catholic Land Movement wants families to own the tools and land they work with. Most of what we raise goes to equipment and land the chapter owns together and lends to members.',
+    es: 'El Movimiento Católico de la Tierra quiere que las familias posean las herramientas y la tierra con las que trabajan. Casi todo lo que recaudamos va a equipo y tierra que el capítulo posee en conjunto y presta a sus miembros.',
   },
-  onceLabel: { en: 'Once', es: 'Una vez' },
-  monthlyLabel: { en: 'Every month', es: 'Cada mes' },
+  onceLabel: { en: 'Give once', es: 'Dar una vez' },
+  monthlyLabel: { en: 'Give monthly', es: 'Dar cada mes' },
   chooseAmount: { en: 'CHOOSE AN AMOUNT', es: 'ELIGE UNA CANTIDAD' },
+  giveSuffixMonthly: { en: 'monthly', es: 'al mes' },
   other: { en: 'Other', es: 'Otra' },
   giveOnce: { en: 'Give', es: 'Dar' },
   giveMonthly: { en: 'Give every month', es: 'Dar cada mes' },
   nameMe: {
-    en: 'You may name me in the year’s record.',
-    es: 'Pueden nombrarme en el registro del año.',
+    en: 'List my name in the chapter’s yearly record of givers.',
+    es: 'Incluye mi nombre en el registro anual de donantes del capítulo.',
   },
 
-  statsEyebrow: { en: 'WHAT YOUR GIVING JOINS', es: 'A LO QUE SE SUMA TU DONATIVO' },
-  statNeighbors: { en: 'neighbors', es: 'vecinos' },
+  statsEyebrow: { en: 'THE CHAPTER SO FAR', es: 'EL CAPÍTULO HASTA AHORA' },
+  statNeighbors: { en: 'members', es: 'miembros' },
   statParishes: { en: 'parishes', es: 'parroquias' },
   statGatherings: { en: 'gatherings this year', es: 'reuniones este año' },
 
   commonsEyebrow: { en: 'THE TOOL COMMONS', es: 'LAS HERRAMIENTAS COMUNES' },
-  commonsHeading: { en: 'Buy a thing the chapter keeps', es: 'Compra algo que el capítulo guarda' },
+  commonsHeading: { en: 'Help buy shared equipment', es: 'Ayuda a comprar equipo compartido' },
   commonsLede: {
-    en: 'Equipment no single household would buy alone, bought once and lent out all year. A gift here doesn’t get spent — it becomes a thing with a name, kept by the chapter and used by whoever needs it next.',
-    es: 'Equipo que ninguna familia compraría sola, comprado una vez y prestado todo el año. Un don aquí no se gasta — se convierte en algo con nombre, guardado por el capítulo y usado por quien lo necesite.',
+    en: 'Some equipment costs too much for one household. The chapter buys it once and lends it to members all year. Money given toward a tool goes to that tool only.',
+    es: 'Hay equipo que cuesta demasiado para un solo hogar. El capítulo lo compra una vez y lo presta a sus miembros todo el año. El dinero que se da para una herramienta se gasta sólo en esa herramienta.',
   },
-  funded: { en: 'Fully given', es: 'Completo' },
+  funded: { en: 'Fully funded', es: 'Totalmente financiado' },
   toGo: { en: 'to go', es: 'faltan' },
   // The window is the amount picker, so it needs one line of instruction.
   pickGlass: {
-    en: 'Pick a piece of glass to light it — the size is the amount.',
-    es: 'Elige un vidrio para encenderlo — el tamaño es la cantidad.',
+    en: 'Each piece of glass is a gift. Bigger pieces are bigger gifts. Pick one to give.',
+    es: 'Cada vidrio es un donativo. Los vidrios grandes son donativos grandes. Elige uno para dar.',
   },
-  // What a lit piece asks for, right where it was lit.
-  glassMessage: { en: 'Leave a word with it (optional)', es: 'Deja unas palabras (opcional)' },
+  // What a lit piece asks for, right where it was lit. The note is folded
+  // away: most givers won't leave one, and two labelled boxes sitting open
+  // under every window made the ask look like paperwork.
+  glassAddNote: { en: 'Add a note', es: 'Añade una nota' },
+  glassMessage: { en: 'Add a note (optional)', es: 'Añade una nota (opcional)' },
   glassPlaceholder: {
-    en: 'For the Hernández family · In thanksgiving · St. Isidore, pray for us',
-    es: 'Por la familia Hernández · En acción de gracias · San Isidro, ruega por nosotros',
+    en: 'In thanksgiving, or for whom you are giving',
+    es: 'En acción de gracias, o por quién das',
   },
   glassNameLabel: { en: 'Your name (optional)', es: 'Tu nombre (opcional)' },
   glassGive: { en: 'Light this piece', es: 'Enciende este vidrio' },
@@ -180,14 +186,14 @@ const copy = {
 
   // What the form funds when nobody has chosen a section.
   generalFund: {
-    en: 'General fund: food, materials, and supplies for gatherings',
-    es: 'Fondo general: comida, materiales y provisiones para las reuniones',
+    en: 'Goes to: food and supplies for our monthly gatherings',
+    es: 'Va a: comida y provisiones para nuestras reuniones mensuales',
   },
 
-  whereEyebrow: { en: 'WHERE IT GOES', es: 'A DÓNDE VA' },
+  whereEyebrow: { en: 'WHERE THE MONEY GOES', es: 'A DÓNDE VA EL DINERO' },
   whereBody: {
-    en: 'The chapter is run by its members, no one takes a salary. Gifts are reported to the chapter at the start of each year, and anything given is set aside for that specific fund. General donations are spent as the chapter’s needs come.',
-    es: 'El capítulo lo llevan sus miembros, nadie cobra sueldo. Los donativos se informan al capítulo al comenzar cada año, y lo que se da queda apartado para ese fondo en particular. Lo que se da en general se gasta conforme surgen las necesidades del capítulo.',
+    en: 'The chapter is run by volunteers. No one is paid. We report all gifts to members at the start of each year. Money given to a specific tool or fund is spent only on that. General gifts cover whatever the chapter needs most.',
+    es: 'El capítulo lo llevan voluntarios. Nadie cobra. Informamos de todos los donativos a los miembros al comenzar cada año. El dinero que se da a una herramienta o fondo en particular se gasta sólo en eso. Los donativos generales cubren lo que el capítulo más necesite.',
   },
 } satisfies Record<string, Bilingual>;
 
@@ -486,8 +492,8 @@ const GiveBox = () => {
           summed from real gifts instead of the placeholder numbers at the top
           of this file. Nothing persists it yet — there is no gift to persist. */}
       <InertGive
-        label={`${monthly ? t(copy.giveMonthly) : t(copy.giveOnce)}${
-          chosen ? ` ${usd(chosen)}` : ''
+        label={`${t(copy.giveOnce)}${chosen ? ` ${usd(chosen)}` : ''}${
+          monthly ? ` ${t(copy.giveSuffixMonthly)}` : ''
         }`}
       />
     </div>
@@ -540,6 +546,7 @@ const ToolWindow = ({ item }: { item: (typeof TOOL_COMMONS)[number] }) => {
   const [picked, setPicked] = useState<{ index: number; value: number } | null>(null);
   const [message, setMessage] = useState('');
   const [giver, setGiver] = useState('');
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const done = item.raised >= item.goal;
   const remaining = Math.max(0, item.goal - item.raised);
@@ -577,34 +584,66 @@ const ToolWindow = ({ item }: { item: (typeof TOOL_COMMONS)[number] }) => {
 
       {/* Opens in place, under the piece that was lit. */}
       {picked && (
-        <div className="mt-4 border-t border-mesquite/15 pt-4">
-          <p className="font-heading text-lg text-mesquite tabular-nums">{usd(picked.value)}</p>
+        <div className="mt-4 rounded-sm border border-mesquite/15 bg-cal/60 p-4">
+          <p className="text-center font-heading text-2xl text-mesquite tabular-nums">
+            {usd(picked.value)}
+          </p>
 
-          <label className="mt-3 block">
-            <span className="font-caps text-[9px] tracking-[0.2em] text-piedra/70">
-              {t(copy.glassMessage).toUpperCase()}
-            </span>
-            <textarea
-              rows={2}
-              value={message}
-              onChange={(e) => setMessage(e.target.value.slice(0, 160))}
-              placeholder={t(copy.glassPlaceholder)}
-              className="mt-1 w-full rounded-sm border border-mesquite/20 bg-cal/60 p-2 font-serif text-sm text-mesquite placeholder:text-piedra/40 focus:border-mesquite focus:bg-cal focus:outline-none"
-            />
-          </label>
+          {/* Folded away: most givers won't leave a note, and two open boxes
+              under every window turned the ask into paperwork. */}
+          <button
+            type="button"
+            onClick={() => setNoteOpen((v) => !v)}
+            aria-expanded={noteOpen}
+            aria-controls={`note-${item.key}`}
+            className="mx-auto mt-2 flex items-center gap-1.5 font-serif text-xs italic text-piedra transition-colors hover:text-ocre"
+          >
+            {t(copy.glassAddNote)}
+            <svg
+              width="9" height="9" viewBox="0 0 12 12" aria-hidden="true"
+              fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`transition-transform duration-300 ${noteOpen ? 'rotate-180' : ''}`}
+            >
+              <path d="M2 4.5L6 8.5L10 4.5" />
+            </svg>
+          </button>
 
-          <label className="mt-2 block">
-            <span className="font-caps text-[9px] tracking-[0.2em] text-piedra/70">
-              {t(copy.glassNameLabel).toUpperCase()}
-            </span>
-            <input
-              value={giver}
-              onChange={(e) => setGiver(e.target.value.slice(0, 60))}
-              className="mt-1 w-full border-b border-mesquite/25 bg-transparent py-1 font-serif text-sm text-mesquite focus:border-mesquite focus:outline-none"
-            />
-          </label>
+          <div
+            id={`note-${item.key}`}
+            className={`grid transition-all duration-300 ease-out ${
+              noteOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <label className="sr-only" htmlFor={`msg-${item.key}`}>
+                {t(copy.glassMessage)}
+              </label>
+              <textarea
+                id={`msg-${item.key}`}
+                rows={3}
+                tabIndex={noteOpen ? 0 : -1}
+                value={message}
+                onChange={(e) => setMessage(e.target.value.slice(0, 160))}
+                placeholder={t(copy.glassPlaceholder)}
+                className="mt-3 w-full resize-none rounded-sm border border-mesquite/20 bg-cal px-3 py-2 font-serif text-sm leading-relaxed text-mesquite placeholder:italic placeholder:text-piedra/40 focus:border-ocre focus:outline-none focus:ring-1 focus:ring-ocre/30"
+              />
 
-          <InertGive label={`${t(copy.glassGive)} · ${usd(picked.value)}`} />
+              <label className="sr-only" htmlFor={`who-${item.key}`}>
+                {t(copy.glassNameLabel)}
+              </label>
+              <input
+                id={`who-${item.key}`}
+                tabIndex={noteOpen ? 0 : -1}
+                value={giver}
+                onChange={(e) => setGiver(e.target.value.slice(0, 60))}
+                placeholder={t(copy.glassNameLabel)}
+                className="mt-2 w-full rounded-sm border border-mesquite/20 bg-cal px-3 py-2 font-serif text-sm text-mesquite placeholder:italic placeholder:text-piedra/40 focus:border-ocre focus:outline-none focus:ring-1 focus:ring-ocre/30"
+              />
+            </div>
+          </div>
+
+          <InertGive label={t(copy.glassGive)} />
 
           <button
             type="button"
