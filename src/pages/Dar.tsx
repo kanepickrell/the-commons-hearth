@@ -523,8 +523,8 @@ const InertGive = ({ label }: { label: string }) => {
       {touched && (
         <p className="mt-2 font-serif text-xs italic text-piedra">
           {locale === 'es'
-            ? 'Aún no podemos recibir donativos en línea — falta conectar el procesador de pagos.'
-            : 'We can’t take gifts online yet — the payment processor isn’t connected.'}
+            ? 'Aún no podemos recibir donativos en línea. Falta conectar el procesador de pagos.'
+            : 'We can’t take gifts online yet. The payment processor isn’t connected.'}
         </p>
       )}
     </div>
