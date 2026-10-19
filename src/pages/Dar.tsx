@@ -32,7 +32,7 @@
 //   · Exactly one optional question. Not five.
 // ---------------------------------------------------------------------------
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { ContactModal } from '@/components/ContactModal';
@@ -98,7 +98,7 @@ const TOOL_COMMONS: {
 // Amounts carry what they buy, in the chapter's units. PLACEHOLDER impact lines.
 const AMOUNTS: { value: number; buys: Bilingual }[] = [
   { value: 10, buys: { en: 'Seed for a bed', es: 'Semilla para una cama' } },
-  { value: 25, buys: { en: 'A seat at the table', es: 'Un lugar en la mesa' } },
+  { value: 25, buys: { en: 'Sponsors a workshop seat', es: 'Patrocina un lugar en un taller' } },
   { value: 50, buys: { en: 'Materials for a demonstration', es: 'Materiales para una demostración' } },
   { value: 100, buys: { en: 'A whole month’s gathering', es: 'La reunión de todo un mes' } },
 ];
@@ -110,11 +110,6 @@ const copy = {
     en: 'The movement’s whole argument is that ordinary families should own the things they work with. So most of what we ask for isn’t overhead — it’s tools, equipment and land the chapter holds in common and puts into members’ hands.',
     es: 'Todo el argumento del movimiento es que las familias comunes deben poseer aquello con lo que trabajan. Por eso casi todo lo que pedimos no son gastos administrativos — son herramientas, equipo y tierra que el capítulo guarda en común y pone en manos de sus miembros.',
   },
-  promise: {
-    en: 'No one here draws a salary.',
-    es: 'Aquí nadie cobra sueldo.',
-  },
-
   onceLabel: { en: 'Once', es: 'Una vez' },
   monthlyLabel: { en: 'Every month', es: 'Cada mes' },
   chooseAmount: { en: 'CHOOSE AN AMOUNT', es: 'ELIGE UNA CANTIDAD' },
@@ -167,6 +162,16 @@ const copy = {
     es: 'El reasentamiento es el primer pilar y el más lento. El fondo de la tierra es una paciencia larga: dinero apartado para ayudar a una familia a establecerse en tierra de labor. No es una campaña con fecha límite, y preferimos decirlo a inventar urgencia.',
   },
 
+  // What the form funds when nobody has chosen a section. Without this the
+  // amounts sat above no stated purpose at all.
+  generalFund: {
+    en: 'General fund: food, materials, and supplies for gatherings',
+    es: 'Fondo general: comida, materiales y provisiones para las reuniones',
+  },
+  givingToward: { en: 'Giving toward', es: 'Para' },
+  changeDesignation: { en: 'change', es: 'cambiar' },
+  landFundName: { en: 'The land fund', es: 'El fondo de la tierra' },
+
   whereEyebrow: { en: 'WHERE IT GOES', es: 'A DÓNDE VA' },
   whereBody: {
     en: 'The chapter is run by its members; no one draws a salary. Gifts are reported to the chapter at the start of each year, and anything given toward a named tool is spent on that tool or returned.',
@@ -176,9 +181,38 @@ const copy = {
 
 const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 
+/** Stable key for a designation, from the English name. */
+const slug = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/**
+ * What a gift is FOR. Set by the "Give toward this" controls further down the
+ * page, which scroll back up to the one form rather than opening a second one.
+ *
+ * `key` is the value that belongs on the gift record once there is a gift
+ * record to put it on — see the note in GiveBox. It is deliberately a stable
+ * machine string ("tool:grain-mill"), not the display label, so the tool
+ * totals can be summed from real gifts without matching on prose that gets
+ * reworded or translated.
+ */
+type Designation = { key: string; label: Bilingual };
+
 const Dar = () => {
   const { t, locale } = useLocale();
   const [offerOpen, setOfferOpen] = useState(false);
+  const [designation, setDesignation] = useState<Designation | null>(null);
+  const giveRef = useRef<HTMLDivElement>(null);
+
+  // One form on this page, not one per section. Choosing a section sets what
+  // the gift is for and sends the reader back to it. rAF so the scroll starts
+  // after React has painted the designation line, or it lands a row short.
+  const designate = (d: Designation) => {
+    setDesignation(d);
+    requestAnimationFrame(() => {
+      giveRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      giveRef.current?.focus({ preventScroll: true });
+    });
+  };
   const feast = useMemo(() => nextFeast(chapterToday()), []);
 
   // --- live chapter numbers: social proof that can't drift from the truth ---
@@ -254,12 +288,12 @@ const Dar = () => {
             <p className="prose-body mt-6 text-lg leading-relaxed text-mesquite/85">
               {t(copy.lede)}
             </p>
-            {/* Promise, first of three statements. */}
-            <p className="mt-5 font-caps text-[10px] tracking-[0.2em] text-ocre">
-              {t(copy.promise).toUpperCase()}
-            </p>
           </div>
 
+          {/* The caption is the ALT text and nothing else. Stewards write these
+              for themselves ("Chicken posing for audience"), and printing that
+              under a donation headline reads as a joke at the chapter's
+              expense. */}
           {heroPhoto && (
             <figure className="min-w-0">
               <div className="overflow-hidden rounded-sm border border-mesquite/15 bg-mesquite/[0.04]">
@@ -270,11 +304,6 @@ const Dar = () => {
                   loading="eager"
                 />
               </div>
-              {heroCaption && (
-                <figcaption className="mt-2 font-serif text-xs italic text-piedra">
-                  {heroCaption}
-                </figcaption>
-              )}
             </figure>
           )}
         </div>
@@ -284,7 +313,12 @@ const Dar = () => {
       {/* The ask — amounts, cadence, one question                          */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-prose pb-16">
-        <GiveBox />
+        {/* tabIndex -1 so the scroll can hand focus over: a sighted reader
+            sees the jump, a screen-reader user otherwise wouldn't know the
+            page had moved. */}
+        <div ref={giveRef} tabIndex={-1} className="outline-none">
+          <GiveBox designation={designation} onClear={() => setDesignation(null)} />
+        </div>
       </section>
 
       {/* ---------------------------------------------------------------- */}
@@ -363,9 +397,14 @@ const Dar = () => {
                     <span className="font-serif text-xs italic text-piedra/80">
                       {usd(remaining)} {t(copy.toGo)}
                     </span>
-                    <InertGive
+                    <DesignateButton
                       label={locale === 'es' ? 'Dar hacia esto' : 'Give toward this'}
-                      quiet
+                      onClick={() =>
+                        designate({
+                          key: `tool:${slug(item.name.en)}`,
+                          label: item.name,
+                        })
+                      }
                     />
                   </div>
                 )}
@@ -441,8 +480,11 @@ const Dar = () => {
         <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/85">
           {t(copy.landBody)}
         </p>
-        <div className="mt-5">
-          <InertGive label={locale === 'es' ? 'Dar al fondo' : 'Give to the fund'} quiet />
+        <div className="mt-5 text-right">
+          <DesignateButton
+            label={locale === 'es' ? 'Dar al fondo' : 'Give to the fund'}
+            onClick={() => designate({ key: 'land-fund', label: copy.landFundName })}
+          />
         </div>
 
         <div className="rule my-12" />
@@ -471,7 +513,13 @@ const Dar = () => {
 // The ask itself. Cadence and amount live on one control; sending recurring
 // donors to a second page is the most reliable way to lose them.
 // ---------------------------------------------------------------------------
-const GiveBox = () => {
+const GiveBox = ({
+  designation,
+  onClear,
+}: {
+  designation: Designation | null;
+  onClear: () => void;
+}) => {
   const { t, locale } = useLocale();
   const [monthly, setMonthly] = useState(true); // recurring pre-selected
   const [amount, setAmount] = useState<number | null>(25);
@@ -509,6 +557,33 @@ const GiveBox = () => {
             {opt.label}
           </button>
         ))}
+      </div>
+
+      {/* What this gift is for, always — the general fund by default, or the
+          section the reader came from, with the way back out. Amounts above
+          no stated purpose is the thing this fixes. */}
+      <div className="mb-5 border-l-2 border-ocre/40 pl-3">
+        {designation ? (
+          <>
+            <p className="font-caps text-[9px] tracking-[0.22em] text-piedra/70">
+              {t(copy.givingToward).toUpperCase()}
+            </p>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-3 font-heading text-base text-mesquite">
+              {t(designation.label)}
+              <button
+                type="button"
+                onClick={onClear}
+                className="font-serif text-xs italic text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
+              >
+                {t(copy.changeDesignation)}
+              </button>
+            </p>
+          </>
+        ) : (
+          <p className="font-serif text-sm italic leading-snug text-piedra">
+            {t(copy.generalFund)}
+          </p>
+        )}
       </div>
 
       <p className="mb-3 font-caps text-[9px] tracking-[0.22em] text-piedra/70">
@@ -565,17 +640,15 @@ const GiveBox = () => {
         <span className="prose-body text-sm leading-snug text-mesquite/80">{t(copy.nameMe)}</span>
       </label>
 
+      {/* When a processor exists, `designation?.key ?? 'general'` is what
+          belongs on the gift record, so tool totals and month claims can be
+          summed from real gifts instead of the placeholder numbers at the top
+          of this file. Nothing persists it yet — there is no gift to persist. */}
       <InertGive
         label={`${monthly ? t(copy.giveMonthly) : t(copy.giveOnce)}${
           chosen ? ` ${usd(chosen)}` : ''
         }`}
       />
-
-      {/* Promise, second of three statements — beside the button, where the
-          hesitation actually happens. */}
-      <p className="mt-3 text-center font-serif text-xs italic text-piedra">
-        {t(copy.promise)}
-      </p>
     </div>
   );
 };
@@ -587,23 +660,18 @@ const GiveBox = () => {
  * truth. Replace the onClick with a Stripe checkout session once the
  * integration is provisioned.
  */
-const InertGive = ({ label, quiet = false }: { label: string; quiet?: boolean }) => {
+const InertGive = ({ label }: { label: string }) => {
   const { locale } = useLocale();
   const [touched, setTouched] = useState(false);
 
   return (
-    <div className={quiet ? 'text-right' : 'mt-5'}>
+    <div className="mt-5">
       <button
         type="button"
         onClick={() => setTouched(true)}
-        className={
-          quiet
-            ? 'font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline'
-            : 'w-full rounded-sm bg-ocre px-5 py-3 font-heading text-lg text-cal transition hover:bg-mesquite'
-        }
+        className="w-full rounded-sm bg-ocre px-5 py-3 font-heading text-lg text-cal transition hover:bg-mesquite"
       >
         {label}
-        {quiet ? ' →' : ''}
       </button>
       {touched && (
         <p className="mt-2 font-serif text-xs italic text-piedra">
@@ -615,6 +683,23 @@ const InertGive = ({ label, quiet = false }: { label: string; quiet?: boolean })
     </div>
   );
 };
+
+/**
+ * Sends the reader to the one form with the gift's purpose already set.
+ *
+ * Deliberately NOT an InertGive: these aren't the moment of payment, so
+ * confessing "we can't take gifts online yet" here would answer a question
+ * nobody had asked. The form says it, once, where the giving happens.
+ */
+const DesignateButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="font-heading text-sm text-ocre underline-offset-4 transition hover:text-mesquite hover:underline"
+  >
+    {label} →
+  </button>
+);
 
 /** One live figure. A stat tile, not a chart — there's no shape to plot. */
 const Stat = ({ n, label, divided = false }: { n: number | null; label: string; divided?: boolean }) => (
