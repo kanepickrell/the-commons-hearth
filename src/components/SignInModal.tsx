@@ -157,8 +157,8 @@ export const SignInModal = ({ open, onClose, title, subtitle }: Props) => {
             </button>
             <p className="mt-3 font-serif text-[11px] italic leading-snug text-mesquite/50">
               {t({
-                en: 'No account needed — the link signs you in and sets one up if you’re new.',
-                es: 'No necesitas cuenta — el enlace te identifica y crea una si eres nuevo.',
+                en: 'No account needed. The link signs you in and sets one up if you’re new.',
+                es: 'No necesitas cuenta. El enlace te identifica y crea una si eres nuevo.',
               })}
             </p>
 

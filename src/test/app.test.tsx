@@ -75,10 +75,11 @@ describe('app renders', () => {
 
   it('home says so plainly when nothing is scheduled', async () => {
     visit('/');
-    await waitFor(() =>
-      expect(screen.getByText(/No gathering scheduled yet/)).toBeInTheDocument()
-    );
-    expect(screen.getByText('join the chapter')).toBeInTheDocument();
+    const line = await waitFor(() => screen.getByText(/No gathering scheduled yet/));
+    // Scoped to this sentence: the hero's CTA now carries the same words, and
+    // the link is capitalised because the em dash before it became a full
+    // stop, so it opens a sentence instead of continuing one.
+    expect(line.querySelector('a[href="/participate"]')?.textContent).toBe('Join the chapter');
   });
 
   it('home carries the mission', async () => {

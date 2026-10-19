@@ -33,8 +33,8 @@ const STARTERS = {
 
 const ERRORS: Record<string, { en: string; es: string }> = {
   rate_limited: {
-    en: 'You’ve sent a lot of messages this hour — give it a little while and try again.',
-    es: 'Has enviado muchos mensajes esta hora — espera un poco e inténtalo de nuevo.',
+    en: 'You’ve sent a lot of messages this hour. Give it a little while and try again.',
+    es: 'Has enviado muchos mensajes esta hora. Espera un poco e inténtalo de nuevo.',
   },
   daily_cap: {
     en: 'Chester has reached his limit for today. The contact form in the footer still works!',
@@ -193,8 +193,8 @@ export const ChesterWidget = () => {
               <div>
                 <p className="font-serif text-sm leading-relaxed text-mesquite">
                   {t({
-                    en: 'Hello — I’m Chester. Ask me about the next gathering, how the chapter works, or what the Church teaches about land, work, and the family.',
-                    es: 'Hola — soy Chester. Pregúntame sobre la próxima reunión, cómo funciona el capítulo, o lo que enseña la Iglesia sobre la tierra, el trabajo y la familia.',
+                    en: 'Hello, I’m Chester. Ask me about the next gathering, how the chapter works, or what the Church teaches about land, work, and the family.',
+                    es: 'Hola, soy Chester. Pregúntame sobre la próxima reunión, cómo funciona el capítulo, o lo que enseña la Iglesia sobre la tierra, el trabajo y la familia.',
                   })}
                 </p>
                 <div className="mt-4 flex flex-col gap-2">

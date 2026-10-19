@@ -30,7 +30,7 @@ const books: Book[] = [
     author: 'Hilaire Belloc, Fr. Vincent McNabb, et al.',
     note: {
       en: 'The founding anthology. Essays of the English land associations that started it all.',
-      es: 'La antología fundacional — los ensayos de las asociaciones agrarias inglesas que lo iniciaron todo.',
+      es: 'La antología fundacional: los ensayos de las asociaciones agrarias inglesas que lo iniciaron todo.',
     },
   },
   {
@@ -46,7 +46,7 @@ const books: Book[] = [
     author: 'Hilaire Belloc',
     note: {
       en: 'The property argument in full: why widely distributed ownership secures the family.',
-      es: 'El argumento de la propiedad por completo: por qué la propiedad ampliamente distribuida — ni el estado, ni el monopolio — asegura a la familia.',
+      es: 'El argumento de la propiedad por completo: por qué la propiedad ampliamente distribuida (ni el estado, ni el monopolio) asegura a la familia.',
     },
   },
   {
@@ -69,8 +69,8 @@ const books: Book[] = [
     title: 'The Independent Farmstead',
     author: 'Sean & Beth Dougherty',
     note: {
-      en: 'The practical how-to — pasture, water, and livestock for a real family homestead.',
-      es: 'El manual práctico — pasto, agua, y ganado para un rancho familiar de verdad.',
+      en: 'The practical how-to: pasture, water, and livestock for a real family homestead.',
+      es: 'El manual práctico: pasto, agua, y ganado para un rancho familiar de verdad.',
     },
   },
   // Add more books here.
@@ -102,7 +102,7 @@ const sourceDocuments: SourceDoc[] = [
     href: 'https://www.vatican.va/content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_15051891_rerum-novarum.html',
     note: {
       en: 'The source code. About forty pages. Workers, wages, property, family. The pillars of the CLM comes right out of this writing.',
-      es: 'El código fuente. Unas cuarenta páginas. El obrero, el salario, la propiedad, la familia — el fundamento sobre el que se construye todo lo demás.',
+      es: 'El código fuente. Unas cuarenta páginas. El obrero, el salario, la propiedad, la familia: el fundamento sobre el que se construye todo lo demás.',
     },
   },
   {
@@ -120,7 +120,7 @@ const sourceDocuments: SourceDoc[] = [
     href: 'https://www.papalencyclicals.net/pius12/poprural.htm',
     note: {
       en: 'Pius XII directly speaking to farmers on the dignity of rural life and of the family on the land.',
-      es: 'Pío XII a los labradores — la dignidad de la vida rural y de la familia en la tierra, en el propio siglo del movimiento.',
+      es: 'Pío XII a los labradores: la dignidad de la vida rural y de la familia en la tierra, en el propio siglo del movimiento.',
     },
   },
   {
@@ -129,7 +129,7 @@ const sourceDocuments: SourceDoc[] = [
     href: 'https://www.vatican.va/content/francesco/en/encyclicals/documents/papa-francesco_20150524_enciclica-laudato-si.html',
     note: {
       en: 'Pope Francis on care for creation, stewardship of the earth as a moral and spiritual duty.',
-      es: 'Sobre el cuidado de la creación — la custodia de la tierra como deber moral y espiritual.',
+      es: 'Sobre el cuidado de la creación: la custodia de la tierra como deber moral y espiritual.',
     },
   },
 ];
@@ -180,7 +180,7 @@ export default function Resources() {
         <p className="max-w-2xl font-serif text-lg leading-relaxed text-mesquite/80 md:text-xl">
           {t({
             en: 'Books, writers, and discussions recommended by our chapter leadership.',
-            es: 'Libros, escritores, documentos fuente, y conversaciones que el capítulo lee y escucha en común. Empieza donde quieras — la práctica y los principios se profundizan mutuamente.',
+            es: 'Libros, escritores, documentos fuente, y conversaciones que el capítulo lee y escucha en común. Empieza donde quieras. La práctica y los principios se profundizan mutuamente.',
           })}
         </p>
       </section>
@@ -193,8 +193,8 @@ export default function Resources() {
           </p>
           <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'A few that keep coming up at our gatherings — from the founders of the movement to a working family’s homestead.',
-              es: 'Unos que siguen surgiendo en nuestras reuniones — desde los fundadores del movimiento hasta el rancho de una familia trabajadora.',
+              en: 'A few that keep coming up at our gatherings, from the founders of the movement to a working family’s homestead.',
+              es: 'Unos que siguen surgiendo en nuestras reuniones, desde los fundadores del movimiento hasta el rancho de una familia trabajadora.',
             })}
           </p>
           <ul className="mx-auto max-w-2xl space-y-8">
@@ -270,8 +270,8 @@ export default function Resources() {
           </p>
           <p className="mx-auto mb-10 max-w-2xl font-serif leading-relaxed text-mesquite/70">
             {t({
-              en: 'A few conversations that introduce the movement well — start with the first.',
-              es: 'Unas conversaciones que presentan bien el movimiento — empieza por la primera.',
+              en: 'A few conversations that introduce the movement well. Start with the first.',
+              es: 'Unas conversaciones que presentan bien el movimiento. Empieza por la primera.',
             })}
           </p>
           <ul className="mx-auto max-w-2xl space-y-8">

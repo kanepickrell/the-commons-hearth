@@ -2,7 +2,11 @@
 // The founding vision of the chapter — four pillars, in field-manual language.
 //
 // Changes from the prior version:
-//   - Pillar prose rewritten to track the CLM Field Manual phrasing.
+//   - Pillar prose rewritten to track the CLM Field Manual phrasing, then
+//     put back into the first person: the manual writes "The Catholic Land
+//     Movement exists to...", which on our own Vision page reads like a
+//     third party describing us. Two pillars named the organisation; both
+//     now say "we". The page has already said whose vision it is.
 //   - Resettlement re-framed: it's not about owning land per se, it's
 //     about productive property as the substrate that re-roots families
 //     as integrated social units (in land, work, parish, community).
@@ -37,19 +41,19 @@ export default function Vision() {
       },
       practice: {
         en: 'You do not need many acres to begin. A backyard garden, a parish plot, a flock of hens in the side yard will do. A productive property is whatever land you can put to fruitful use. We start where we are and with what we already have.',
-        es: 'No necesitas muchos acres para comenzar. Un huerto en el patio, una parcela parroquial, unas gallinas al lado de la casa — la propiedad productiva es cualquier tierra que puedas hacer fructífera. Comenzamos donde estamos, con lo que ya tenemos.',
+        es: 'No necesitas muchos acres para comenzar. Un huerto en el patio, una parcela parroquial, unas gallinas al lado de la casa. La propiedad productiva es cualquier tierra que puedas hacer fructífera. Comenzamos donde estamos, con lo que ya tenemos.',
       },
     },
     {
       roman: 'II',
       name: { en: 'Education', es: 'Educación' },
       verse: {
-        en: 'The Catholic Land Movement exists to grow peer-to-peer networks of education in production land and hand crafts.',
-        es: 'El Movimiento Católico de la Tierra existe para cultivar redes de educación entre vecinos en los oficios de la tierra y de la mano.',
+        en: 'We exist to grow peer-to-peer networks of education in production land and hand crafts.',
+        es: 'Existimos para cultivar redes de educación entre vecinos en los oficios de la tierra y de la mano.',
       },
       practice: {
-        en: 'These skills used to pass between neighbors — canning, carpentry, animal husbandry, the care of soil. We learn them back from one another, in workshops and in kitchens, and we pass them on before they are lost.',
-        es: 'Estos oficios antes pasaban de vecino a vecino — la conserva, la carpintería, la cría de animales, el cuidado del suelo. Los reaprendemos unos de otros, en talleres y en cocinas, y los transmitimos antes de que se pierdan.',
+        en: 'These skills used to pass between neighbors: canning, carpentry, animal husbandry, the care of soil. We learn them back from one another, in workshops and in kitchens, and we pass them on before they are lost.',
+        es: 'Estos oficios antes pasaban de vecino a vecino: la conserva, la carpintería, la cría de animales, el cuidado del suelo. Los reaprendemos unos de otros, en talleres y en cocinas, y los transmitimos antes de que se pierdan.',
       },
     },
     {
@@ -64,20 +68,20 @@ export default function Vision() {
         es: 'Cultivar una red de apoyo práctico, intelectual, y espiritual dentro del capítulo.',
       },
       practice: {
-        en: 'When the call goes out to raise the barn, we go out to raise the barn. Mutual aid days, shared harvests, lending a hand and lending a tool — this is what makes a homestead, and a chapter, survive.',
-        es: 'Cuando llega el llamado para levantar el granero, vamos a levantar el granero. Días de ayuda mutua, cosechas compartidas, prestar la mano y prestar la herramienta — esto es lo que hace sobrevivir a un hogar, y a un capítulo.',
+        en: 'When the call goes out to raise the barn, we go out to raise the barn. Mutual aid days, shared harvests, lending a hand and lending a tool. This is what makes a homestead, and a chapter, survive.',
+        es: 'Cuando llega el llamado para levantar el granero, vamos a levantar el granero. Días de ayuda mutua, cosechas compartidas, prestar la mano y prestar la herramienta. Esto es lo que hace sobrevivir a un hogar, y a un capítulo.',
       },
     },
     {
       roman: 'IV',
       name: { en: 'Glorification', es: 'Glorificación' },
       verse: {
-        en: 'All Catholic Land Movement activity aligns with Gospel teaching — true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
-        es: 'Toda la actividad del Movimiento Católico de la Tierra se alinea con la enseñanza del Evangelio — la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
+        en: 'All our activity aligns with Gospel teaching: true reality as revealed by God. Prayer, spiritual life, sacramental life, and liturgical life are integrated into our chapter activity.',
+        es: 'Toda nuestra actividad se alinea con la enseñanza del Evangelio: la verdadera realidad revelada por Dios. La oración, la vida espiritual, la vida sacramental, y la vida litúrgica están integradas en la actividad de nuestro capítulo.',
       },
       practice: {
-        en: 'Christ placed a meal at the center of His Church. The seed, the soil, the harvest, the table — all of it is ordered toward worship. Our labor is an offering.',
-        es: 'Cristo puso una comida en el centro de Su Iglesia. La semilla, el suelo, la cosecha, la mesa — todo está ordenado hacia la adoración. Nuestra labor es una ofrenda.',
+        en: 'Christ placed a meal at the center of His Church. The seed, the soil, the harvest, the table: all of it is ordered toward worship. Our labor is an offering.',
+        es: 'Cristo puso una comida en el centro de Su Iglesia. La semilla, el suelo, la cosecha, la mesa: todo está ordenado hacia la adoración. Nuestra labor es una ofrenda.',
       },
     },
   ];

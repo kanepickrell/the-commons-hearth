@@ -68,8 +68,8 @@ const Santo = () => {
             <img
               src={retabloUrl}
               alt={t({
-                en: 'San Isidro Labrador — a 19th-century Mexican retablo. The saint stands in prayer with a rosary and staff; behind him, an angel plows a field with an ox team while a small parish church rises to the right.',
-                es: 'San Isidro Labrador — un retablo mexicano del siglo XIX. El santo está de pie en oración con un rosario y un bastón; detrás de él, un ángel ara el campo con una yunta de bueyes mientras una pequeña parroquia se alza a la derecha.',
+                en: 'San Isidro Labrador, a 19th-century Mexican retablo. The saint stands in prayer with a rosary and staff; behind him, an angel plows a field with an ox team while a small parish church rises to the right.',
+                es: 'San Isidro Labrador, un retablo mexicano del siglo XIX. El santo está de pie en oración con un rosario y un bastón; detrás de él, un ángel ara el campo con una yunta de bueyes mientras una pequeña parroquia se alza a la derecha.',
               })}
               className="block w-full rounded-sm"
             />

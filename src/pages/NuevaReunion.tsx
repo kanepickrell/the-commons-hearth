@@ -195,7 +195,7 @@ export default function NuevaReunion() {
           />
         </Field>
 
-        <Field label={t({ en: 'Craft', es: 'Oficio' })} hint={t({ en: 'Optional — sets the icon', es: 'Opcional — define el ícono' })}>
+        <Field label={t({ en: 'Craft', es: 'Oficio' })} hint={t({ en: 'Optional. Sets the icon', es: 'Opcional. Define el ícono' })}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {CRAFT_SLUGS.map((slug) => {
               const selected = craft === slug;
@@ -262,8 +262,8 @@ export default function NuevaReunion() {
         <Field
           label={t({ en: 'Map coordinates', es: 'Coordenadas del mapa' })}
           hint={t({
-            en: 'Optional — right-click the spot in Google Maps and paste "lat, lng"',
-            es: 'Opcional — clic derecho en el lugar en Google Maps y pega "lat, lng"',
+            en: 'Optional. Right-click the spot in Google Maps and paste "lat, lng"',
+            es: 'Opcional. Clic derecho en el lugar en Google Maps y pega "lat, lng"',
           })}
         >
           <input
