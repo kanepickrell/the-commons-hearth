@@ -158,11 +158,11 @@ const copy = {
   statParishes: { en: 'parishes', es: 'parroquias' },
   statGatherings: { en: 'gatherings this year', es: 'reuniones este año' },
 
-  commonsEyebrow: { en: 'THE TOOL COMMONS', es: 'LAS HERRAMIENTAS COMUNES' },
+  commonsEyebrow: { en: 'THE RESOURCE COMMONS', es: 'LOS RECURSOS COMUNES' },
   commonsHeading: { en: 'Help buy shared equipment', es: 'Ayuda a comprar equipo compartido' },
   commonsLede: {
-    en: 'Some equipment costs too much for one household. The chapter buys it once and lends it to members all year. Money given toward a tool goes to that tool only.',
-    es: 'Hay equipo que cuesta demasiado para un solo hogar. El capítulo lo compra una vez y lo presta a sus miembros todo el año. El dinero que se da para una herramienta se gasta sólo en esa herramienta.',
+    en: 'Some equipment costs too much for one household. The chapter buys it once and lends it to members all year. Money given towards a tool goes towards purchasing that asset only.',
+    es: 'Hay equipo que cuesta demasiado para un solo hogar. El capítulo lo compra una vez y lo presta a sus miembros todo el año. El dinero que se da para una herramienta se destina sólo a la compra de ese bien.',
   },
   funded: { en: 'Fully funded', es: 'Totalmente financiado' },
   toGo: { en: 'to go', es: 'faltan' },
@@ -325,7 +325,7 @@ const Dar = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* The tool commons                                                  */}
+      {/* The resource commons                                              */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-16">
         <div className="mx-auto grid max-w-4xl grid-cols-1 items-center gap-10 md:grid-cols-[150px_1fr]">
