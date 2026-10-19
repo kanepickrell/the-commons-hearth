@@ -239,8 +239,8 @@ export const MonthPhotoPanel = () => {
             {summaries.length === 0 ? (
               <p className="font-serif text-xs italic text-piedra">
                 {locale === 'es'
-                  ? 'No hay reseñas este mes todavía — añade una en "Resúmenes del mes" para poder enlazar fotos.'
-                  : 'No writeups this month yet — add one under "Month summaries" to link photos to it.'}
+                  ? 'No hay reseñas este mes todavía. Añade una en "Resúmenes del mes" para poder enlazar fotos.'
+                  : 'No writeups this month yet. Add one under "Month summaries" to link photos to it.'}
               </p>
             ) : (
               <select

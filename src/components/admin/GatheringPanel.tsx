@@ -105,8 +105,8 @@ export const GatheringPanel = () => {
         </h2>
         <p className="mt-2 font-serif text-lg italic text-mesquite/70">
           {t({
-            en: 'Upcoming gatherings. Edit details, add map coordinates, and approve — a gathering shows on the map once it is approved and has both coordinates and a craft.',
-            es: 'Reuniones próximas. Edita detalles, agrega coordenadas y aprueba — una reunión aparece en el mapa cuando está aprobada y tiene coordenadas y un oficio.',
+            en: 'Upcoming gatherings. Edit details, add map coordinates, and approve. A gathering shows on the map once it is approved and has both coordinates and a craft.',
+            es: 'Reuniones próximas. Edita detalles, agrega coordenadas y aprueba. Una reunión aparece en el mapa cuando está aprobada y tiene coordenadas y un oficio.',
           })}
         </p>
       </div>
@@ -401,8 +401,8 @@ function GatheringEditor({
         </div>
         <p className="mb-2 font-serif text-xs italic text-piedra">
           {t({
-            en: 'On Google Maps, right-click the spot — the first menu item copies lat/lng. Paste into the first field.',
-            es: 'En Google Maps, clic derecho en el lugar — el primer campo copia lat/lng. Pega en el primer campo.',
+            en: 'On Google Maps, right-click the spot. The first menu item copies lat/lng. Paste into the first field.',
+            es: 'En Google Maps, clic derecho en el lugar. El primer campo copia lat/lng. Pega en el primer campo.',
           })}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">

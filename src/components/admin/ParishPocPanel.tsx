@@ -312,7 +312,7 @@ function CoordsEditor({
       <p className="mb-3 font-serif text-xs italic text-piedra">
         {locale === 'es'
           ? 'Tip: en Google Maps, clic derecho sobre el marcador y pega las coordenadas en el primer campo.'
-          : 'Tip: on Google Maps, right-click the pin — the first menu item copies lat/lng. Paste into the first field.'}
+          : 'Tip: on Google Maps, right-click the pin. The first menu item copies lat/lng. Paste into the first field.'}
       </p>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
