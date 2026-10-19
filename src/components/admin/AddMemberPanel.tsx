@@ -131,7 +131,7 @@ export const AddMemberPanel = () => {
 
     toast({
       title: existed
-        ? t({ en: 'Member already had an account — profile updated', es: 'El miembro ya tenía cuenta — perfil actualizado' })
+        ? t({ en: 'Member already had an account. Profile updated', es: 'El miembro ya tenía cuenta. Perfil actualizado' })
         : t({ en: 'Member added', es: 'Miembro añadido' }),
     });
     reset();
@@ -275,8 +275,8 @@ export const AddMemberPanel = () => {
                 {(m.geocoded === 'not_found' || m.geocoded === 'error') && (
                   <span className="ml-2 font-serif text-xs italic text-rojo">
                     {t({
-                      en: '· couldn’t auto-locate parish — set coordinates in Parishes and contacts',
-                      es: '· no se pudo ubicar la parroquia — pon las coordenadas en Parroquias y contactos',
+                      en: '· couldn’t auto-locate parish. Set coordinates in Parishes and contacts',
+                      es: '· no se pudo ubicar la parroquia. Pon las coordenadas en Parroquias y contactos',
                     })}
                   </span>
                 )}
