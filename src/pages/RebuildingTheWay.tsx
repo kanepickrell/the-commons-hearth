@@ -1,0 +1,339 @@
+// src/pages/RebuildingTheWay.tsx
+// A working page for a long idea: CLM villages planted a day's walk apart
+// along El Camino Real de los Tejas.
+//
+// NOT LINKED ANYWHERE. It is deliberately absent from the nav, from the
+// footer, and from robots.txt, because this is a plan being argued with
+// rather than a thing the chapter is announcing. Anyone with the URL can
+// read it, which is what makes it shareable with two or three people — if
+// it needs to be properly private, gate it on `isAdmin` and it disappears
+// for everyone else.
+//
+// The data lives in src/content/camino.ts, including the warning that every
+// coordinate is town-centre accurate and nothing here is survey grade.
+//
+// What this page is for: holding the idea still long enough to be argued
+// with. The map is the part that earns its place — the gaps in the walking
+// route and the towns worth planting in are the SAME list, and that only
+// becomes obvious when you see them drawn on top of each other.
+
+import { lazy, Suspense } from 'react';
+import { Layout } from '@/components/Layout';
+import { useLocale } from '@/i18n/LocaleProvider';
+import {
+  GAPS, MEASURES, PHASES, SCALE, STAGES, STOPS,
+  TOTAL_MILES, VILLAGE_CORE, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
+} from '@/content/camino';
+
+const CaminoMap = lazy(() =>
+  import('@/components/camino/CaminoMap').then((m) => ({ default: m.CaminoMap })),
+);
+
+const Eyebrow = ({ children }: { children: React.ReactNode }) => (
+  <p className="display-caps text-xs tracking-[0.25em] text-ocre">{children}</p>
+);
+
+export default function RebuildingTheWay() {
+  const { t, locale } = useLocale();
+  const es = locale === 'es';
+
+  return (
+    <Layout>
+      {/* ---------------------------------------------------------------- */}
+      {/* Opening                                                          */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow pt-14 text-center md:pt-20">
+        <p className="mb-4 inline-block border border-rojo/30 bg-rojo/5 px-3 py-1 font-caps text-[10px] tracking-[0.2em] text-rojo">
+          {es ? 'BORRADOR · NO ENLAZADO' : 'WORKING DRAFT · NOT LINKED'}
+        </p>
+        <Eyebrow>{es ? 'EL CAMINO REAL DE LOS TEJAS' : 'EL CAMINO REAL DE LOS TEJAS'}</Eyebrow>
+        <h1 className="mt-4 font-heading text-4xl leading-tight text-mesquite md:text-5xl">
+          {es ? 'Reconstruyendo el Camino' : 'Rebuilding the Way'}
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl font-serif text-lg leading-relaxed text-mesquite/85">
+          {es
+            ? 'Una cadena de aldeas del Movimiento Católico de la Tierra, a un día de camino unas de otras, a lo largo del camino histórico de los Tejas. Veinte paradas, de Natchitoches a la Misión Espada.'
+            : 'A string of Catholic Land Movement villages, a day’s walk apart, along the historic road of the Tejas. Twenty stops, from Natchitoches to Mission Espada.'}
+        </p>
+
+        {/* The three numbers that make the case in one line: this is the
+            length of a Camino people already walk. */}
+        <dl className="mx-auto mt-10 grid max-w-xl grid-cols-3 border-y border-mesquite/15">
+          {[
+            { n: `~${TOTAL_MILES}`, l: es ? 'millas' : 'miles' },
+            { n: `${WALK_DAYS_AT_20}–${WALK_DAYS_AT_15}`, l: es ? 'días a pie' : 'days on foot' },
+            { n: String(STOPS.length), l: es ? 'paradas' : 'stops' },
+          ].map((x, i) => (
+            <div key={x.l} className={`px-3 py-5 ${i ? 'border-l border-mesquite/12' : ''}`}>
+              <dd className="font-heading text-[28px] leading-none text-mesquite tabular-nums md:text-[34px]">
+                {x.n}
+              </dd>
+              <dt className="mt-2 font-caps text-[9px] tracking-[0.18em] text-ocre">
+                {x.l.toUpperCase()}
+              </dt>
+            </div>
+          ))}
+        </dl>
+        <p className="mx-auto mt-4 max-w-xl font-serif text-xs italic text-piedra">
+          {es
+            ? 'Casi lo mismo que el Camino Francés, que suele caminarse en cinco semanas.'
+            : 'Almost exactly the Camino Francés, which people walk in about five weeks.'}
+        </p>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* The map                                                          */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-wide py-12 md:py-16">
+        <Suspense
+          fallback={
+            <div
+              className="rounded border border-mesquite/20 bg-cal/50"
+              style={{ height: 560 }}
+              aria-hidden="true"
+            />
+          }
+        >
+          <CaminoMap />
+        </Suspense>
+
+        {/* Legend. The stages are the colours; the soft red spans are the
+            gaps, which are also the plan. */}
+        <div className="mx-auto mt-5 flex max-w-4xl flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          {STAGES.map((s) => (
+            <span key={s.key} className="flex items-center gap-2 font-serif text-xs text-mesquite/80">
+              <span
+                aria-hidden="true"
+                className="inline-block h-[3px] w-6"
+                style={{ background: `hsl(var(--${s.token}))` }}
+              />
+              {t(s.name)} · {s.miles} mi
+            </span>
+          ))}
+          <span className="flex items-center gap-2 font-serif text-xs italic text-rojo">
+            <span aria-hidden="true" className="inline-block h-3 w-6 rounded-sm bg-rojo/20" />
+            {es ? 'hueco para caminantes' : 'gap for walkers'}
+          </span>
+          <span className="flex items-center gap-2 font-serif text-xs italic text-piedra">
+            <span
+              aria-hidden="true"
+              className="inline-block h-3.5 w-3.5 rounded-full border-[3px] border-rojo bg-cal"
+            />
+            {es ? 'candidata a aldea ancla' : 'anchor village candidate'}
+          </span>
+        </div>
+
+        <p className="mx-auto mt-4 max-w-2xl text-center font-serif text-xs italic text-piedra/80">
+          {es
+            ? 'Coordenadas a nivel de pueblo, para planear y discutir. Antes de que alguien camine esto, hay que tomar puntos GPS en la puerta de cada iglesia.'
+            : 'Town-centre coordinates, good for planning and arguing. Before anyone walks this, every stop needs a GPS point taken at the church door.'}
+        </p>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Where the road breaks — and where the villages go                 */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'DONDE SE ROMPE EL CAMINO' : 'WHERE THE ROAD BREAKS'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'El hueco y el plan son la misma lista' : 'The gap and the plan are the same list'}
+        </h2>
+        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Un hueco es un tramo sin parroquia, sin alojamiento y sin razón para que un peregrino se detenga. Eso es exactamente un pueblo con tierra barata, una calle principal vaciándose y sitio para una aldea. El problema y la oportunidad son el mismo lugar.'
+            : 'A gap is a stretch with no parish, no lodging and no reason for a pilgrim to stop. That is exactly a town with cheap land, an emptying main street and room for a village. The problem and the opportunity are the same place.'}
+        </p>
+
+        <ul className="mt-8 divide-y divide-mesquite/10 border-y border-mesquite/15">
+          {GAPS.map((g) => (
+            <li key={g.from} className="py-5">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 className="font-heading text-xl text-mesquite">
+                  {g.from} → {g.to}
+                </h3>
+                <p className="font-serif text-sm tabular-nums text-piedra">
+                  {g.miles} mi · {g.hostsNeeded} {es ? 'anfitriones' : 'hosts needed'}
+                </p>
+              </div>
+              <p className="prose-body mt-2 text-sm leading-relaxed text-mesquite/80">{t(g.why)}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* The stages, and every stop                                        */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'LAS ETAPAS' : 'THE STAGES'}</Eyebrow>
+        <div className="mt-8 space-y-10">
+          {STAGES.map((stage) => {
+            const stops = STOPS.filter((s) => s.stage === stage.key);
+            return (
+              <article key={stage.key}>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 border-b border-mesquite/15 pb-2">
+                  <h3 className="flex items-center gap-3 font-heading text-2xl text-mesquite">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-[3px] w-7"
+                      style={{ background: `hsl(var(--${stage.token}))` }}
+                    />
+                    {t(stage.name)}
+                  </h3>
+                  <p className="font-serif text-sm tabular-nums text-piedra">{stage.miles} mi</p>
+                </div>
+                <p className="prose-body mt-3 text-sm italic leading-relaxed text-piedra">
+                  {t(stage.summary)}
+                </p>
+
+                <ol className="mt-4 space-y-3">
+                  {stops.map((s) => (
+                    <li key={s.n} className="flex gap-3">
+                      <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-mesquite/25 font-heading text-xs text-mesquite">
+                        {s.n}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-heading text-base leading-snug text-mesquite">
+                          {s.name}
+                          {s.anchorCandidate && (
+                            <span className="ml-2 font-caps text-[9px] tracking-[0.15em] text-rojo">
+                              {es ? 'ANCLA' : 'ANCHOR'}
+                            </span>
+                          )}
+                        </p>
+                        {/* The address is here so it can be pasted straight
+                            into a maps search while planning a leg. */}
+                        <p className="font-serif text-xs text-piedra/80">{s.address}</p>
+                        {s.note && (
+                          <p className="prose-body mt-1 text-sm leading-snug text-mesquite/80">
+                            {t(s.note)}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* The anchor village                                                */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'LA ALDEA ANCLA' : 'THE ANCHOR VILLAGE'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'Revivir un pueblo, no construir uno' : 'Revive a town, don’t build one'}
+        </h2>
+        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Muchos pueblos de esta ruta ya tienen los huesos: una parroquia antigua con menos fieles, una calle principal vacía, una escuela cerrada, tierra barata cerca. Las familias del movimiento revivirían esos pueblos en vez de levantar algo al lado.'
+            : 'Many towns on this route already have the bones: an old parish with a shrinking congregation, an empty main street, a closed school, cheap land nearby. Chapter families would revive those towns rather than build beside them.'}
+        </p>
+
+        <ul className="mt-7 grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
+          {VILLAGE_CORE.map((item) => (
+            <li key={item.en} className="flex gap-3 border-b border-mesquite/10 pb-3">
+              <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 flex-shrink-0 rotate-45 bg-ocre" />
+              <span className="prose-body text-base text-mesquite/85">{t(item)}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p className="prose-body mt-7 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Los peregrinos son el motor de arranque. Traen dinero al pueblo antes de que las granjas maduren: hospedaje, comida, pan, oficios. Eso cubre los años más duros del reasentamiento.'
+            : 'Pilgrims are the startup engine. They bring money into a town before its farms are mature: lodging, meals, bread, crafts. That bridges the hardest years of resettlement.'}
+        </p>
+
+        {/* Said plainly, because it is the thing most likely to sink this. */}
+        <p className="mt-6 border-l-2 border-rojo/40 pl-4 font-serif text-base italic leading-relaxed text-mesquite">
+          {es
+            ? 'El riesgo real es parecer un enclave. Si la gente del pueblo ve a los recién llegados como forasteros, el modelo falla. Cada aldea empieza uniéndose a la parroquia y a la vida del pueblo que ya existen, no construyendo al lado.'
+            : 'The real risk is looking like an enclave. If the townspeople see newcomers as outsiders, the model fails. Every village starts by joining the parish and the town life that are already there, not building beside them.'}
+        </p>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* What it adds up to                                                */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'A CUÁNTO LLEGA' : 'WHAT IT ADDS UP TO'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'Una aldea ayuda a una familia. Veinte son una cultura.' : 'One homestead helps one family. Twenty villages are a culture.'}
+        </h2>
+        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Las cifras de abajo son ilustrativas, y el cálculo está a la vista para que se pueda discutir en vez de creer.'
+            : 'The figures below are illustrative, and the working is shown so they can be argued with rather than believed.'}
+        </p>
+
+        <ul className="mt-8 divide-y divide-mesquite/10 border-y border-mesquite/15">
+          {SCALE.map((x) => (
+            <li key={x.label.en} className="flex flex-wrap items-baseline gap-x-4 py-4">
+              <span className="font-heading text-2xl text-mesquite tabular-nums">{x.figure}</span>
+              <span className="font-heading text-base text-mesquite/85">{t(x.label)}</span>
+              <span className="ml-auto font-serif text-xs italic text-piedra">{t(x.working)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Phasing + what to measure                                         */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12 pb-20">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+          <div>
+            <Eyebrow>{es ? 'POR ETAPAS' : 'PHASING'}</Eyebrow>
+            <ol className="mt-6 space-y-6 border-l border-mesquite/20 pl-6">
+              {PHASES.map((p) => (
+                <li key={p.years} className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="absolute -left-[1.72rem] top-[0.4rem] h-2 w-2 rotate-45 bg-ocre"
+                  />
+                  <p className="display-caps text-xs tracking-[0.2em] text-ocre">
+                    {es ? 'AÑOS' : 'YEARS'} {p.years}
+                  </p>
+                  <h3 className="mt-1 font-heading text-xl text-mesquite">{t(p.title)}</h3>
+                  <p className="prose-body mt-2 text-sm leading-relaxed text-mesquite/80">
+                    {t(p.body)}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div>
+            <Eyebrow>{es ? 'QUÉ MEDIR' : 'WHAT TO MEASURE'}</Eyebrow>
+            <p className="prose-body mt-6 text-sm leading-relaxed text-mesquite/80">
+              {es
+                ? 'Concreto para poner delante de un obispo, un donante o un ayuntamiento.'
+                : 'Concrete enough to put in front of a bishop, a donor or a town council.'}
+            </p>
+            <ul className="mt-5 space-y-3">
+              {MEASURES.map((m) => (
+                <li key={m.en} className="flex gap-3 border-b border-mesquite/10 pb-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-2 h-1.5 w-1.5 flex-shrink-0 rotate-45 bg-ocre"
+                  />
+                  <span className="prose-body text-base text-mesquite/85">{t(m)}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-8 font-serif text-sm italic leading-relaxed text-piedra">
+              {es
+                ? 'Lo que falta aquí: quién posee la tierra y cómo. VeraxPatria y el financiamiento sin intereses son la pieza que convierte esto de un mapa en un plan, y todavía no está escrita en esta página.'
+                : 'What this page is still missing: who owns the land, and how. VeraxPatria and the zero-interest financing are the piece that turns this from a map into a plan, and it isn’t written here yet.'}
+            </p>
+          </div>
+        </div>
+      </section>
+    </Layout>
+  );
+}
