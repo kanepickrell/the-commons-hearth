@@ -16,5 +16,5 @@ Allow: /
 # A working plan, not an announcement. Unlisted on the site and kept
 # out of search until the chapter decides otherwise.
 User-agent: *
-Disallow: /rebuild-the-way
-Disallow: /reconstruir-el-camino
+Disallow: /restore-the-way
+Disallow: /restaurar-el-camino

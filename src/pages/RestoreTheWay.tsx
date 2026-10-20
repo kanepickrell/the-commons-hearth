@@ -1,4 +1,4 @@
-// src/pages/RebuildTheWay.tsx
+// src/pages/RestoreTheWay.tsx
 // A working page for a long idea: CLM villages planted a day's walk apart
 // along El Camino Real de los Tejas.
 //
@@ -34,7 +34,7 @@ const Eyebrow = ({ children }: { children: React.ReactNode }) => (
   <p className="display-caps text-xs tracking-[0.25em] text-ocre">{children}</p>
 );
 
-export default function RebuildTheWay() {
+export default function RestoreTheWay() {
   const { t, locale } = useLocale();
   const es = locale === 'es';
 
@@ -49,7 +49,7 @@ export default function RebuildTheWay() {
         </p>
         <Eyebrow>{es ? 'EL CAMINO REAL DE LOS TEJAS' : 'EL CAMINO REAL DE LOS TEJAS'}</Eyebrow>
         <h1 className="mt-4 font-heading text-4xl leading-tight text-mesquite md:text-5xl">
-          {es ? 'Reconstruir el Camino' : 'Rebuild The Way'}
+          {es ? 'Restaurar el Camino' : 'Restore The Way'}
         </h1>
         <p className="mx-auto mt-6 max-w-2xl font-serif text-lg leading-relaxed text-mesquite/85">
           {es
