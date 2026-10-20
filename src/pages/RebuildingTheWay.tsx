@@ -21,8 +21,8 @@ import { createElement, lazy, Suspense } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
 import {
-  ARITHMETIC, CLAIMS, GAPS, GROUND, MEASURES, PHASES, PRINCIPLES, STAGES, STOPS,
-  THESIS, VERDICT_LABEL,
+  GAPS, GROUND, IMPACT, LAND_MODEL, MEASURES, PHASES, PRECEDENTS, PRINCIPLES,
+  STAGES, STOPS, THESIS,
   TOTAL_MILES, VILLAGE_CORE, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
 } from '@/content/camino';
 
@@ -366,87 +366,138 @@ export default function RebuildingTheWay() {
       </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Impact, audited                                                   */}
-      {/*                                                                   */}
-      {/* Written as an audit rather than a case, because every figure here */}
-      {/* will be read by someone who can check it, and a number that does  */}
-      {/* not survive contact with a donor costs more than it earned. Two   */}
-      {/* of the five claims did not survive. That is the point.            */}
+      {/* What it adds up to                                                */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-narrow py-12">
-        <Eyebrow>{es ? 'IMPACTO, AUDITADO' : 'IMPACT, AUDITED'}</Eyebrow>
+        <Eyebrow>{es ? 'A CU\u00c1NTO LLEGA' : 'WHAT IT ADDS UP TO'}</Eyebrow>
         <h2 className="mt-3 font-heading text-3xl text-mesquite">
-          {es ? 'Una granja ayuda a una familia. Veinte aldeas son una cultura.' : 'One homestead helps one family. Twenty villages are a culture.'}
+          {es
+            ? 'Una granja ayuda a una familia. Veinte aldeas son una cultura.'
+            : 'One homestead helps one family. Twenty villages are a culture.'}
         </h2>
         <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
           {es
-            ? 'Cada cifra de abajo se comprobó contra una fuente. Dos de las cinco no sobrevivieron, y están corregidas aquí en vez de repetidas. Es más barato encontrar esto nosotros que delante de un donante.'
-            : 'Every figure below was checked against a source. Two of the five did not survive, and are corrected here rather than repeated. It is cheaper to find that ourselves than in front of a donor.'}
+            ? 'Cada cifra lleva al lado el supuesto del que depende, para que se pueda mover en vez de creerse.'
+            : 'Each figure carries the assumption it rests on, so it can be moved rather than believed.'}
         </p>
 
         <ul className="mt-9 space-y-9">
-          {CLAIMS.map((c) => (
-            <li key={c.id} className="border-t border-mesquite/15 pt-6">
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="font-caps text-[11px] tracking-[0.1em] text-ocre">{c.id}</span>
-                <span
-                  className={`font-caps text-[9px] tracking-[0.18em] ${
-                    c.verdict === 'holds'
-                      ? 'text-mesquite'
-                      : c.verdict === 'revised'
-                        ? 'text-rojo'
-                        : 'text-piedra'
-                  }`}
-                >
-                  {t(VERDICT_LABEL[c.verdict]).toUpperCase()}
-                </span>
-              </div>
-
-              <p className="mt-2 font-heading text-lg leading-snug text-mesquite">{t(c.claim)}</p>
-              <p className="prose-body mt-3 text-sm leading-relaxed text-mesquite/80">
-                {t(c.finding)}
+          {IMPACT.map((f) => (
+            <li key={f.id} className="border-t border-mesquite/15 pt-6">
+              <p className="flex flex-wrap items-baseline gap-x-3">
+                <span className="font-heading text-3xl text-mesquite tabular-nums">{f.figure}</span>
+                <span className="font-heading text-lg text-mesquite/85">{t(f.label)}</span>
               </p>
-
-              {c.revised && (
-                <p className="mt-3 border-l-2 border-rojo/40 pl-4 font-serif text-sm italic leading-relaxed text-mesquite">
-                  {t(c.revised)}
-                </p>
-              )}
-
-              {c.source &&
+              <p className="prose-body mt-3 text-sm leading-relaxed text-mesquite/80">{t(f.body)}</p>
+              <p className="mt-3 border-l-2 border-ocre/40 pl-4 font-serif text-sm italic leading-relaxed text-mesquite">
+                {t(f.basis)}
+              </p>
+              {f.source &&
                 createElement(
                   'a',
                   {
-                    href: c.source.href,
+                    href: f.source.href,
                     target: '_blank',
                     rel: 'noopener noreferrer',
                     className:
                       'mt-3 inline-block font-caps text-[11px] tracking-[0.15em] text-ocre no-underline hover:text-mesquite',
                   },
-                  <>{c.source.label} →</>,
+                  <>{f.source.label} →</>,
                 )}
             </li>
           ))}
         </ul>
+      </section>
 
-        {/* The figures that follow from assumptions rather than from the
-            world. Each assumption is printed so it can be moved. */}
-        <h3 className="mt-12 font-heading text-2xl text-mesquite">
-          {es ? 'La aritmética, con sus supuestos' : 'The arithmetic, with its assumptions'}
-        </h3>
-        <ul className="mt-5 divide-y divide-mesquite/10 border-y border-mesquite/15">
-          {ARITHMETIC.map((a) => (
-            <li key={a.label.en} className="py-4">
-              <p className="flex flex-wrap items-baseline gap-x-3">
-                <span className="font-heading text-2xl text-mesquite tabular-nums">{a.figure}</span>
-                <span className="font-heading text-base text-mesquite/85">{t(a.label)}</span>
-              </p>
-              <p className="prose-body mt-1 text-sm leading-relaxed text-piedra">
-                {t(a.assumption)}
-              </p>
+      {/* ---------------------------------------------------------------- */}
+      {/* How the land is held                                              */}
+      {/*                                                                   */}
+      {/* The page used to end by admitting it did not know this. It does   */}
+      {/* now, and it is the piece that makes the acreage reachable: the    */}
+      {/* trust holds the land, the family holds the lease and owns every   */}
+      {/* thing it builds.                                                  */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'C\u00d3MO SE TIENE LA TIERRA' : 'HOW THE LAND IS HELD'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es
+            ? 'La aldea tiene la tierra. La familia tiene la casa.'
+            : 'The village holds the land. The family holds the house.'}
+        </h2>
+
+        <ul className="mt-8 space-y-7">
+          {LAND_MODEL.map((m) => (
+            <li key={m.title.en} className="border-t border-mesquite/15 pt-5">
+              <h3 className="font-heading text-xl leading-snug text-mesquite">{t(m.title)}</h3>
+              <p className="prose-body mt-2 text-sm leading-relaxed text-mesquite/80">{t(m.body)}</p>
+              {m.source &&
+                createElement(
+                  'a',
+                  {
+                    href: m.source.href,
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                    className:
+                      'mt-3 inline-block font-caps text-[11px] tracking-[0.15em] text-ocre no-underline hover:text-mesquite',
+                  },
+                  <>{m.source.label} →</>,
+                )}
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Precedents                                                        */}
+      {/*                                                                   */}
+      {/* Each read for what it proves AND for how it fails. A precedent    */}
+      {/* used only for its good half is an advertisement.                  */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'PRECEDENTES' : 'PRECEDENTS'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'Esto ya se ha intentado' : 'This has been tried before'}
+        </h2>
+        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Cada uno le\u00eddo por lo que demuestra y por c\u00f3mo falla. Un precedente usado s\u00f3lo por su mitad buena es un anuncio.'
+            : 'Each read for what it proves and for how it fails. A precedent used only for its good half is an advertisement.'}
+        </p>
+
+        <div className="mt-9 space-y-9">
+          {PRECEDENTS.map((pc) => (
+            <article key={pc.name} className="border-t border-mesquite/15 pt-6">
+              <h3 className="font-heading text-2xl leading-snug text-mesquite">{pc.name}</h3>
+              <p className="font-serif text-xs italic text-piedra">{t(pc.where)}</p>
+
+              <p className="mt-4 font-caps text-[9px] tracking-[0.18em] text-ocre">
+                {es ? 'LO QUE DEMUESTRA' : 'WHAT IT PROVES'}
+              </p>
+              <p className="prose-body mt-1 text-sm leading-relaxed text-mesquite/80">
+                {t(pc.proves)}
+              </p>
+
+              <p className="mt-4 font-caps text-[9px] tracking-[0.18em] text-rojo">
+                {es ? 'DE QU\u00c9 ADVIERTE' : 'WHAT IT WARNS'}
+              </p>
+              <p className="prose-body mt-1 text-sm leading-relaxed text-mesquite/80">
+                {t(pc.warns)}
+              </p>
+
+              {createElement(
+                'a',
+                {
+                  href: pc.source.href,
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                  className:
+                    'mt-3 inline-block font-caps text-[11px] tracking-[0.15em] text-ocre no-underline hover:text-mesquite',
+                },
+                <>{pc.source.label} →</>,
+              )}
+            </article>
+          ))}
+        </div>
       </section>
 
       {/* ---------------------------------------------------------------- */}
@@ -496,8 +547,8 @@ export default function RebuildingTheWay() {
 
             <p className="mt-8 font-serif text-sm italic leading-relaxed text-piedra">
               {es
-                ? 'Lo que falta aquí: quién posee la tierra y cómo. VeraxPatria y el financiamiento sin intereses son la pieza que convierte esto de un mapa en un plan, y todavía no está escrita en esta página.'
-                : 'What this page is still missing: who owns the land, and how. VeraxPatria and the zero-interest financing are the piece that turns this from a map into a plan, and it isn’t written here yet.'}
+                ? 'Lo que falta: los números de peregrinos del Centro Padre Margil, el padrón de hogares de las veinte parroquias, y un precio por acre por condado. Tres llamadas.'
+                : 'Still missing: the pilgrim numbers from the Padre Margil centre, the registered-household count for each of the twenty parishes, and a price per acre by county. Three phone calls.'}
             </p>
           </div>
         </div>

@@ -671,6 +671,56 @@ export const PRINCIPLES: Principle[] = [
       },
     ],
   },
+  {
+    key: 'founding',
+    n: 8,
+    name: { en: 'Plant the way settlers plant', es: 'Plantar como plantan los colonos' },
+    claim: {
+      en: 'The Amish have founded hundreds of new settlements and the sequence is known. Follow it rather than inventing one.',
+      es: 'Los amish han fundado cientos de asentamientos nuevos y la secuencia se conoce. Seguirla en vez de inventar una.',
+    },
+    requirements: [
+      {
+        id: 'F1',
+        text: {
+          en: 'Send every village out from a mother chapter. A settlement whose first families all come from one place survives; one assembled from strangers answering an advert does not.',
+          es: 'Que cada aldea salga de un capítulo madre. Un asentamiento cuyas primeras familias vienen todas del mismo lugar sobrevive; uno armado con desconocidos que responden a un anuncio no.',
+        },
+      },
+      {
+        id: 'F2',
+        text: {
+          en: 'Agree the character of the village in writing before looking at any land. How strict, how shared, how much in common, what the rule is. Land first is the classic way to found a settlement that splits in five years.',
+          es: 'Acordar por escrito el carácter de la aldea antes de mirar ninguna tierra. Qué tan estricta, qué tan compartida, cuánto en común, cuál es la regla. Primero la tierra es la manera clásica de fundar un asentamiento que se parte en cinco años.',
+        },
+      },
+      {
+        id: 'F3',
+        text: {
+          en: 'Send scouts before buyers. Have people walk the county, meet the pastor, read the tax rolls and the school enrolment, and come back and report.',
+          es: 'Mandar exploradores antes que compradores. Que alguien recorra el condado, conozca al párroco, lea el padrón y la matrícula escolar, y vuelva a informar.',
+        },
+      },
+      {
+        id: 'F4',
+        text: {
+          en: 'Do not move until five to ten families are committed, and begin with no fewer than three households actually resident.',
+          es: 'No mudarse hasta que haya de cinco a diez familias comprometidas, y empezar con no menos de tres hogares realmente residentes.',
+        },
+        test: {
+          en: 'Three households on the ground, close enough to gather for worship without driving.',
+          es: 'Tres hogares en el sitio, lo bastante cerca para reunirse a rezar sin coche.',
+        },
+      },
+      {
+        id: 'F5',
+        text: {
+          en: 'Expect two families a year, not forty. That is the rate the best American precedent has actually managed, and the corridor gets its speed from running many villages at once rather than from hurrying any one of them.',
+          es: 'Esperar dos familias al año, no cuarenta. Es el ritmo que el mejor precedente estadounidense ha logrado de verdad, y el corredor gana velocidad por llevar muchas aldeas a la vez, no por apurar ninguna.',
+        },
+      },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -756,95 +806,77 @@ export const GROUND: {
 ];
 
 // ---------------------------------------------------------------------------
-// The impact claims, checked.
+// What it adds up to.
 //
-// Written as an AUDIT rather than as a case, because every one of these will
-// be read by someone who can check it, and a figure that does not survive
-// contact with a donor costs more than it earned. Each claim carries a
-// verdict and the source that settles it.
-//
-// Two of the five did not survive. That is the point of writing it this way.
+// The figures here are the corrected ones. Where an earlier draft multiplied
+// every pilgrim by a full thirty days, this counts pilgrim-days; where it
+// quoted acreage without a price, this prices it. The sources are kept
+// against each figure so the next person does not have to re-derive them.
 // ---------------------------------------------------------------------------
 
-export type Verdict = 'holds' | 'revised' | 'unverified';
-
-export type Claim = {
+export type Figure = {
   id: string;
-  claim: Bilingual;
-  verdict: Verdict;
-  finding: Bilingual;
-  /** Only on a 'revised' claim: the figure that replaces it. */
-  revised?: Bilingual;
+  figure: string;
+  label: Bilingual;
+  body: Bilingual;
+  /** The assumption the figure rests on, printed so it can be moved. */
+  basis: Bilingual;
   source?: { href: string; label: string };
 };
 
-export const VERDICT_LABEL: Record<Verdict, Bilingual> = {
-  holds: { en: 'Holds', es: 'Se sostiene' },
-  revised: { en: 'Revised', es: 'Corregido' },
-  unverified: { en: 'Unverified', es: 'Sin verificar' },
-};
-
-export const CLAIMS: Claim[] = [
+export const IMPACT: Figure[] = [
   {
-    id: 'C1',
-    claim: {
-      en: 'Pilgrims spend about $50 a day.',
-      es: 'Los peregrinos gastan unos $50 al día.',
+    id: 'I1',
+    figure: '600',
+    label: { en: 'households', es: 'hogares' },
+    body: {
+      en: 'Twenty villages of thirty families: about 3,000 people and some 1,800 children raised on farms, in parish schools, and in trades. The households are the unit that matters, because they are what has to be recruited, one at a time.',
+      es: 'Veinte aldeas de treinta familias: unas 3,000 personas y unos 1,800 niños criados en granjas, escuelas parroquiales y oficios. El hogar es la unidad que importa, porque es lo que hay que reclutar, uno por uno.',
     },
-    verdict: 'holds',
-    finding: {
-      en: 'Camino de Santiago pilgrims budget €30–50 a day, and honest 2026 pricing puts it at €50–65. Pilgrims spend less per day than ordinary tourists because they sleep in hostels and parish halls, but the spending creates more local jobs per euro than any other kind of holiday. $50 is a fair figure, and slightly conservative.',
-      es: 'Los peregrinos del Camino de Santiago presupuestan €30–50 al día, y con precios honestos de 2026 son €50–65. Gastan menos por día que un turista normal porque duermen en albergues y salones parroquiales, pero ese gasto crea más empleo local por euro que cualquier otro tipo de viaje. $50 es una cifra justa, incluso conservadora.',
+    basis: {
+      en: 'Five people a household, against a US average of 2.5. A bet on large families, and the figure most worth stating as a bet.',
+      es: 'Cinco personas por hogar, frente a un promedio de 2.5 en EE. UU. Una apuesta por familias grandes, y la cifra que más conviene declarar como apuesta.',
     },
-    source: { href: 'https://stingynomads.com/camino-de-santiago-cost/', label: 'Camino cost, 2026' },
   },
   {
-    id: 'C2',
-    claim: {
-      en: '5,000 pilgrims × 30 days × $50 = $7.5M a year into small-town economies.',
-      es: '5,000 peregrinos × 30 días × $50 = $7.5M al año en la economía de los pueblos.',
+    id: 'I2',
+    figure: '2 a year',
+    label: { en: 'families a village', es: 'familias por aldea' },
+    body: {
+      en: 'This is the growth rate the plan should assume. Clear Creek Abbey in Oklahoma, the strongest American precedent, drew roughly thirty-five families in its first decade and dozens since — on the order of two a year, with a monastery and a Latin Mass as the draw. The corridor gets its speed from running twenty villages at once, not from hurrying one.',
+      es: 'Este es el ritmo de crecimiento que el plan debe suponer. La abadía de Clear Creek, en Oklahoma, el precedente estadounidense más fuerte, atrajo unas treinta y cinco familias en su primera década y decenas desde entonces: del orden de dos al año, con un monasterio y la Misa tradicional como atractivo. El corredor gana velocidad llevando veinte aldeas a la vez, no apurando una.',
     },
-    verdict: 'revised',
-    finding: {
-      en: 'Almost nobody walks a whole Camino. Only about 6% of pilgrims walk the full route from Saint-Jean, while 30.5% start at Sarria — the last 100 km, about five days — and 51% start at one of the four points that sit exactly at the 100 km minimum for a Compostela. Multiplying every pilgrim by the full 30 days overstates the spend three or four times over.',
-      es: 'Casi nadie camina un Camino entero. Sólo un 6% de los peregrinos hace la ruta completa desde Saint-Jean, mientras que el 30.5% empieza en Sarria — los últimos 100 km, unos cinco días — y el 51% empieza en uno de los cuatro puntos que están justo en el mínimo de 100 km para la Compostela. Multiplicar cada peregrino por 30 días exagera el gasto tres o cuatro veces.',
+    basis: {
+      en: 'Thirty families a village at two a year is fifteen years per village. The corridor is a generation of work, and saying so is more persuasive than pretending otherwise.',
+      es: 'Treinta familias por aldea a dos al año son quince años por aldea. El corredor es el trabajo de una generación, y decirlo convence más que fingir lo contrario.',
     },
-    revised: {
-      en: 'Plan in pilgrim-days, not pilgrims. Applying the Camino’s own distribution gives about 10 days walked per pilgrim on average, so 5,000 pilgrims is roughly 50,000 pilgrim-days and about $2.5M a year, not $7.5M. $7.5M needs 150,000 pilgrim-days, which is around 15,000 pilgrims at the same mix. The village plans against beds filled per night, which is what pilgrim-days actually measures.',
-      es: 'Planear en días-peregrino, no en peregrinos. Con la distribución del propio Camino salen unos 10 días caminados por peregrino, así que 5,000 peregrinos son unos 50,000 días-peregrino y unos $2.5M al año, no $7.5M. Llegar a $7.5M pide 150,000 días-peregrino, cerca de 15,000 peregrinos con la misma mezcla. La aldea planea sobre camas llenas por noche, que es lo que mide el día-peregrino.',
+    source: { href: 'https://en.wikipedia.org/wiki/Clear_Creek_Abbey', label: 'Clear Creek Abbey' },
+  },
+  {
+    id: 'I3',
+    figure: '50,000',
+    label: { en: 'pilgrim-days a year', es: 'días-peregrino al año' },
+    body: {
+      en: 'About $2.5M a year into small-town economies, at 5,000 pilgrims and $50 a day. Pilgrim-days rather than pilgrims is the unit, because almost nobody walks a whole route: on the Camino only about 6% go the full distance, while 30% walk the last hundred kilometres. Ten days a pilgrim is the honest average, and beds filled per night is what a village actually plans against.',
+      es: 'Unos $2.5M al año en la economía de los pueblos, con 5,000 peregrinos y $50 al día. La unidad son días-peregrino y no peregrinos, porque casi nadie camina una ruta entera: en el Camino sólo un 6% hace la distancia completa, mientras un 30% camina los últimos cien kilómetros. Diez días por peregrino es el promedio honesto, y lo que una aldea planea de verdad son camas llenas por noche.',
+    },
+    basis: {
+      en: 'Nobody publishes how many walk the Camino de San Antonio Missions, so 5,000 is a guess. Ask the Padre Margil Pilgrimage Center for passports issued since 2022; that one answer prices the whole pilgrim economy.',
+      es: 'Nadie publica cuántos caminan el Camino de San Antonio Missions, así que 5,000 es una suposición. Pedir al Centro de Peregrinos Padre Margil los pasaportes emitidos desde 2022; esa sola respuesta pone precio a toda la economía de peregrinos.',
     },
     source: { href: 'https://americanpilgrims.org/statistics/', label: 'Camino statistics' },
   },
   {
-    id: 'C3',
-    claim: {
-      en: '20,000–40,000 acres under regenerative management.',
-      es: '20,000–40,000 acres bajo manejo regenerativo.',
+    id: 'I4',
+    figure: '21%',
+    label: { en: 'GDP lift, small towns', es: 'alza del PIB, pueblos pequeños' },
+    body: {
+      en: 'University of Santiago research found some small municipalities on the Camino raised GDP by as much as a fifth from pilgrims alone. Pilgrims spend less per day than ordinary tourists, because they sleep in hostels and parish halls, but each dollar creates more local work than any other kind of visitor. The effect lands hardest where there was least to begin with, which is the whole corridor.',
+      es: 'Un estudio de la Universidad de Santiago encontró que algunos municipios pequeños del Camino subieron su PIB hasta una quinta parte sólo por los peregrinos. Los peregrinos gastan menos por día que un turista normal, porque duermen en albergues y salones parroquiales, pero cada dólar crea más trabajo local que cualquier otro visitante. El efecto pega más fuerte donde menos había, que es todo el corredor.',
     },
-    verdict: 'revised',
-    finding: {
-      en: 'The acreage is reachable; the price of it is the thing the plan has not costed. Texas rural land averaged $4,827 an acre statewide in early 2025, and the Gulf Coast–Brazos Bottom region — which covers the Bryan and Caldwell stretch of this road — is the most expensive rural market in the state at $11,369. At those rates 20,000–40,000 acres is roughly $96M at the statewide average and $227M–$455M through the Brazos Bottom.',
-      es: 'La superficie es alcanzable; lo que el plan no ha costeado es su precio. La tierra rural de Tejas promedió $4,827 por acre en todo el estado a principios de 2025, y la región Gulf Coast–Brazos Bottom — que cubre el tramo de Bryan y Caldwell — es el mercado rural más caro del estado, a $11,369. A esos precios, 20,000–40,000 acres son unos $96M al promedio estatal y $227M–$455M por el Brazos Bottom.',
-    },
-    revised: {
-      en: 'This is not a land-buying programme at that scale, and should stop describing itself as one. The acres come mostly from families who already own land joining the corridor, from inheritance held rather than sold, and from the cheaper eastern counties — Houston County and east toward Louisiana — rather than the Brazos Bottom. Price every village against its own county before any acreage goes in a pitch.',
-      es: 'A esa escala esto no es un programa de compra de tierra, y debería dejar de describirse así. Los acres vienen sobre todo de familias que ya tienen tierra y se suman al corredor, de herencias que se conservan en vez de venderse, y de los condados del este, más baratos — el condado de Houston y hacia Luisiana — antes que del Brazos Bottom. Costear cada aldea contra su propio condado antes de poner superficie en una propuesta.',
-    },
-    source: {
-      href: 'https://trerc.tamu.edu/reports/texas-rural-land-markets-first-quarter-2025/',
-      label: 'Texas Rural Land Markets, Texas A&M',
-    },
-  },
-  {
-    id: 'C4',
-    claim: {
-      en: 'Small towns on the road would see a real economic lift.',
-      es: 'Los pueblos del camino verían una mejora económica real.',
-    },
-    verdict: 'holds',
-    finding: {
-      en: 'This is the best-evidenced claim on the page. Research from the University of Santiago found that some small municipalities on the Camino raised GDP by as much as 21% from pilgrims alone, and the effect lands hardest in rural places, where there was least to begin with. A corridor of small Texas and Louisiana towns is the same shape of place.',
-      es: 'Es la afirmación mejor respaldada de la página. Un estudio de la Universidad de Santiago encontró que algunos municipios pequeños del Camino subieron su PIB hasta un 21% sólo por los peregrinos, y el efecto pega más fuerte en lo rural, donde había menos para empezar. Un corredor de pueblos pequeños de Tejas y Luisiana es la misma clase de lugar.',
+    basis: {
+      en: 'The best-evidenced figure here, and it is evidence for the thing the project is actually for.',
+      es: 'La cifra mejor respaldada de aquí, y respalda justo aquello para lo que existe el proyecto.',
     },
     source: {
       href: 'https://sightmagazine.com.au/features/pilgrim-economics-camino-travellers-help-rural-spain-s-emptying-villages-survive/',
@@ -852,60 +884,112 @@ export const CLAIMS: Claim[] = [
     },
   },
   {
-    id: 'C5',
-    claim: {
-      en: '5,000 pilgrims a year will walk this road.',
-      es: '5,000 peregrinos al año caminarán este camino.',
+    id: 'I5',
+    figure: '$4,827',
+    label: { en: 'an acre, Texas average', es: 'por acre, promedio de Tejas' },
+    body: {
+      en: 'And $11,369 through the Gulf Coast–Brazos Bottom, which is the Bryan and Caldwell stretch of this road and the most expensive rural market in the state. Twenty thousand acres is therefore roughly $96M at the state average and over $200M through the Bottom. Buying that outright is not the plan and never could be.',
+      es: 'Y $11,369 en la región Gulf Coast–Brazos Bottom, que es el tramo de Bryan y Caldwell de este camino y el mercado rural más caro del estado. Veinte mil acres son entonces unos $96M al promedio estatal y más de $200M por el Bottom. Comprarlo de golpe no es el plan y nunca podría serlo.',
     },
-    verdict: 'unverified',
-    finding: {
-      en: 'Nobody publishes how many people walk the Camino de San Antonio Missions, so the one route in Texas that could calibrate this number is a blank. Everything downstream — beds, meals, how many villages the pilgrim economy can carry — rests on a figure nobody here has.',
-      es: 'Nadie publica cuánta gente camina el Camino de San Antonio Missions, así que la única ruta en Tejas que podría calibrar esta cifra está en blanco. Todo lo que sigue — camas, comidas, cuántas aldeas puede sostener la economía de peregrinos — descansa en un número que aquí nadie tiene.',
+    basis: {
+      en: 'Which is why the land is held in common and leased, not bought family by family. See below.',
+      es: 'Por eso la tierra se tiene en común y se arrienda, no se compra familia por familia. Ver abajo.',
     },
-    revised: {
-      en: 'First call to make: ask the Padre Margil Pilgrimage Center how many passports they have issued a year since 2022, and how many completed. That single answer prices the whole pilgrim economy.',
-      es: 'Primera llamada que hacer: preguntar al Centro de Peregrinos Padre Margil cuántos pasaportes han emitido por año desde 2022, y cuántos se completaron. Esa sola respuesta pone precio a toda la economía de peregrinos.',
+    source: {
+      href: 'https://trerc.tamu.edu/reports/texas-rural-land-markets-first-quarter-2025/',
+      label: 'Texas Rural Land Markets, Texas A&M',
     },
-    source: { href: 'https://caminosanantonio.org/', label: 'caminosanantonio.org' },
   },
 ];
 
-/**
- * The arithmetic that was never in doubt, kept separate from the claims that
- * were. These follow from the assumptions rather than from the world, and the
- * assumption is printed beside each so it can be moved.
- */
-export const ARITHMETIC: { figure: string; label: Bilingual; assumption: Bilingual }[] = [
+// ---------------------------------------------------------------------------
+// How the land is held.
+//
+// The page used to end by admitting it did not know. It does now: the
+// community land trust separates owning the land from working it, and the
+// instrument that makes it inheritable already exists and is in use.
+// ---------------------------------------------------------------------------
+export const LAND_MODEL: {
+  title: Bilingual;
+  body: Bilingual;
+  source?: { href: string; label: string };
+}[] = [
   {
-    figure: '3,000',
-    label: { en: 'people', es: 'personas' },
-    assumption: {
-      en: '20 villages × 30 families × 5. The five is the load-bearing assumption: the US average household is 2.5, so this is a bet on large families and should be called that.',
-      es: '20 aldeas × 30 familias × 5. El cinco es el supuesto que carga el peso: el hogar medio en EE. UU. es de 2.5, así que esto apuesta por familias grandes y hay que decirlo así.',
+    title: { en: 'Separate owning from working', es: 'Separar poseer de trabajar' },
+    body: {
+      en: 'A community landholding entity buys and keeps the land. Families do not buy the acres; they take a lease on them. That is what breaks the link between the price of farmland and the cost of starting a farm, and it is the only honest answer to an acre costing five figures.',
+      es: 'Una entidad comunitaria compra y conserva la tierra. Las familias no compran los acres; toman un arrendamiento sobre ellos. Eso rompe el vínculo entre el precio de la tierra y el costo de empezar una granja, y es la única respuesta honesta a un acre de cinco cifras.',
     },
   },
   {
-    figure: '600',
-    label: { en: 'households', es: 'hogares' },
-    assumption: {
-      en: 'The number that actually has to be recruited, one family at a time, over fifteen years. Forty a year.',
-      es: 'El número que de verdad hay que reclutar, familia por familia, en quince años. Cuarenta al año.',
+    title: { en: 'A 99-year inheritable lease', es: 'Un arriendo heredable de 99 años' },
+    body: {
+      en: 'The Agrarian Commons model leases farmland on 99-year renewable, inheritable terms. The family owns the house, the barn and every improvement it builds, and builds real equity in them. It cannot sell the land out from under the village, because it never held it. This is requirement S1 with a legal instrument attached.',
+      es: 'El modelo Agrarian Commons arrienda tierra agrícola a 99 años, renovable y heredable. La familia posee la casa, el granero y cada mejora que construye, y acumula patrimonio real en ellos. No puede vender la tierra por debajo de la aldea, porque nunca la tuvo. Es el requisito S1 con un instrumento legal detrás.',
+    },
+    source: { href: 'https://www.agrariantrust.org/', label: 'Agrarian Trust' },
+  },
+  {
+    title: { en: 'Certified trail land is worth more here', es: 'La tierra con sendero certificado vale más aquí' },
+    body: {
+      en: 'Land carrying a piece of the historic trail can be certified with the Park Service: technical help and project funding, in exchange for at least occasional public access. A village whose mission is hospitality gives up nothing it was not already giving. Weight that into which parcels the trust buys.',
+      es: 'La tierra que lleva un tramo del sendero histórico puede certificarse con el Servicio de Parques: ayuda técnica y fondos de proyecto, a cambio de al menos acceso público ocasional. Una aldea cuya misión es la hospitalidad no cede nada que no estuviera cediendo ya. Pesar eso al elegir qué parcelas compra el fideicomiso.',
+    },
+    source: { href: 'https://www.nps.gov/orgs/1453/certification.htm', label: 'Trail certification, NPS' },
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Precedents. Each is read for what it proves AND for how it fails, because a
+// precedent used only for its good half is an advertisement.
+// ---------------------------------------------------------------------------
+export const PRECEDENTS: {
+  name: string;
+  where: Bilingual;
+  proves: Bilingual;
+  warns: Bilingual;
+  source: { href: string; label: string };
+}[] = [
+  {
+    name: 'Clear Creek Abbey',
+    where: { en: 'Hulbert, Oklahoma, since 1999', es: 'Hulbert, Oklahoma, desde 1999' },
+    proves: {
+      en: 'Families really will move across the country and settle around a house of prayer. An informal census found thirty-five families, 145 people and 96 children; dozens more have come since, from California, Texas and Kansas. The heart-first model is not theoretical.',
+      es: 'Las familias de verdad cruzan el país y se asientan alrededor de una casa de oración. Un censo informal contó treinta y cinco familias, 145 personas y 96 niños; han llegado decenas más desde entonces, de California, Tejas y Kansas. El modelo del corazón primero no es teórico.',
+    },
+    warns: {
+      en: 'It took a quarter of a century, with a monastery as the draw. Two families a year is the real rate. Any plan promising forty a year across a corridor is promising twenty Clear Creeks running at once.',
+      es: 'Tardó un cuarto de siglo, con un monasterio como atractivo. Dos familias al año es el ritmo real. Cualquier plan que prometa cuarenta al año en un corredor está prometiendo veinte Clear Creeks a la vez.',
+    },
+    source: { href: 'https://en.wikipedia.org/wiki/Clear_Creek_Abbey', label: 'Clear Creek Abbey' },
+  },
+  {
+    name: 'St. Marys',
+    where: { en: 'Kansas, since the 1980s', es: 'Kansas, desde los años ochenta' },
+    proves: {
+      en: 'A rural town can reverse its decline. St. Marys went from about 1,800 residents to roughly 2,800, a 50% rise, while the rural counties around it emptied. Critical mass is real and it is measurable.',
+      es: 'Un pueblo rural puede revertir su declive. St. Marys pasó de unos 1,800 habitantes a cerca de 2,800, un alza del 50%, mientras los condados rurales alrededor se vaciaban. La masa crítica es real y es medible.',
+    },
+    warns: {
+      en: 'It is also the clearest picture of the failure mode. The newcomers became a majority and reporting from the town records longtime residents who feel pushed to the edge of their own place. The group there is canonically irregular besides, which is not this movement\u2019s position. Read St. Marys as the enclave warning, not as the model.',
+      es: 'También es el retrato más claro del modo de fracaso. Los recién llegados se volvieron mayoría, y la prensa local recoge a vecinos de toda la vida que se sienten empujados al margen de su propio pueblo. El grupo de allí además es canónicamente irregular, que no es la posición de este movimiento. Leer St. Marys como la advertencia del enclave, no como el modelo.',
+    },
+    source: {
+      href: 'https://kansasreflector.com/2024/07/11/in-this-kansas-town-an-insular-catholic-sect-leaves-some-residents-feeling-left-out/',
+      label: 'Kansas Reflector',
     },
   },
   {
-    figure: '~1,800',
-    label: { en: 'children', es: 'niños' },
-    assumption: {
-      en: 'At three children a household. The outline said 1,000+, which is the conservative end of its own arithmetic.',
-      es: 'A tres hijos por hogar. El esquema decía 1,000+, que es el extremo conservador de su propia aritmética.',
+    name: 'Amish daughter settlements',
+    where: { en: 'North America, three centuries', es: 'Norteamérica, tres siglos' },
+    proves: {
+      en: 'Planting new settlements is a solved problem with a written sequence: scouts go first, the character of the place is agreed before any land is looked at, five to ten families commit, and no fewer than three households arrive together, close enough to gather for worship. Most of the chapter\u2019s founding requirements are lifted straight from it.',
+      es: 'Plantar asentamientos nuevos es un problema resuelto, con una secuencia escrita: primero van exploradores, se acuerda el carácter del lugar antes de mirar tierra, se comprometen de cinco a diez familias, y llegan juntos no menos de tres hogares, lo bastante cerca para rezar juntos. Casi todos los requisitos de fundación del capítulo vienen de ahí.',
     },
-  },
-  {
-    figure: '30',
-    label: { en: 'families a parish', es: 'familias por parroquia' },
-    assumption: {
-      en: 'Whether that turns a parish around depends entirely on how big it is now. Get the registered-household count for each of the twenty before claiming any of them grow.',
-      es: 'Si eso cambia una parroquia depende por completo de cuán grande es ahora. Conseguir el número de hogares registrados de las veinte antes de afirmar que alguna crece.',
+    warns: {
+      en: 'Settlements fail, and they fail on character rather than on land. Families who agree about acreage and disagree about how strict the place will be split within a few years. Agreeing the rule first is not bureaucracy; it is the thing that holds.',
+      es: 'Los asentamientos fracasan, y fracasan por el carácter, no por la tierra. Las familias que coinciden en los acres y discrepan en qué tan estricto será el lugar se parten en pocos años. Acordar la regla primero no es burocracia; es lo que sostiene.',
     },
+    source: { href: 'https://amishamerica.com/mother-daughter-amish-communities/', label: 'Amish America' },
   },
 ];
