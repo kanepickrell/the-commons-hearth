@@ -754,3 +754,158 @@ export const GROUND: {
     label: 'Plan your pilgrimage',
   },
 ];
+
+// ---------------------------------------------------------------------------
+// The impact claims, checked.
+//
+// Written as an AUDIT rather than as a case, because every one of these will
+// be read by someone who can check it, and a figure that does not survive
+// contact with a donor costs more than it earned. Each claim carries a
+// verdict and the source that settles it.
+//
+// Two of the five did not survive. That is the point of writing it this way.
+// ---------------------------------------------------------------------------
+
+export type Verdict = 'holds' | 'revised' | 'unverified';
+
+export type Claim = {
+  id: string;
+  claim: Bilingual;
+  verdict: Verdict;
+  finding: Bilingual;
+  /** Only on a 'revised' claim: the figure that replaces it. */
+  revised?: Bilingual;
+  source?: { href: string; label: string };
+};
+
+export const VERDICT_LABEL: Record<Verdict, Bilingual> = {
+  holds: { en: 'Holds', es: 'Se sostiene' },
+  revised: { en: 'Revised', es: 'Corregido' },
+  unverified: { en: 'Unverified', es: 'Sin verificar' },
+};
+
+export const CLAIMS: Claim[] = [
+  {
+    id: 'C1',
+    claim: {
+      en: 'Pilgrims spend about $50 a day.',
+      es: 'Los peregrinos gastan unos $50 al día.',
+    },
+    verdict: 'holds',
+    finding: {
+      en: 'Camino de Santiago pilgrims budget €30–50 a day, and honest 2026 pricing puts it at €50–65. Pilgrims spend less per day than ordinary tourists because they sleep in hostels and parish halls, but the spending creates more local jobs per euro than any other kind of holiday. $50 is a fair figure, and slightly conservative.',
+      es: 'Los peregrinos del Camino de Santiago presupuestan €30–50 al día, y con precios honestos de 2026 son €50–65. Gastan menos por día que un turista normal porque duermen en albergues y salones parroquiales, pero ese gasto crea más empleo local por euro que cualquier otro tipo de viaje. $50 es una cifra justa, incluso conservadora.',
+    },
+    source: { href: 'https://stingynomads.com/camino-de-santiago-cost/', label: 'Camino cost, 2026' },
+  },
+  {
+    id: 'C2',
+    claim: {
+      en: '5,000 pilgrims × 30 days × $50 = $7.5M a year into small-town economies.',
+      es: '5,000 peregrinos × 30 días × $50 = $7.5M al año en la economía de los pueblos.',
+    },
+    verdict: 'revised',
+    finding: {
+      en: 'Almost nobody walks a whole Camino. Only about 6% of pilgrims walk the full route from Saint-Jean, while 30.5% start at Sarria — the last 100 km, about five days — and 51% start at one of the four points that sit exactly at the 100 km minimum for a Compostela. Multiplying every pilgrim by the full 30 days overstates the spend three or four times over.',
+      es: 'Casi nadie camina un Camino entero. Sólo un 6% de los peregrinos hace la ruta completa desde Saint-Jean, mientras que el 30.5% empieza en Sarria — los últimos 100 km, unos cinco días — y el 51% empieza en uno de los cuatro puntos que están justo en el mínimo de 100 km para la Compostela. Multiplicar cada peregrino por 30 días exagera el gasto tres o cuatro veces.',
+    },
+    revised: {
+      en: 'Plan in pilgrim-days, not pilgrims. Applying the Camino’s own distribution gives about 10 days walked per pilgrim on average, so 5,000 pilgrims is roughly 50,000 pilgrim-days and about $2.5M a year, not $7.5M. $7.5M needs 150,000 pilgrim-days, which is around 15,000 pilgrims at the same mix. The village plans against beds filled per night, which is what pilgrim-days actually measures.',
+      es: 'Planear en días-peregrino, no en peregrinos. Con la distribución del propio Camino salen unos 10 días caminados por peregrino, así que 5,000 peregrinos son unos 50,000 días-peregrino y unos $2.5M al año, no $7.5M. Llegar a $7.5M pide 150,000 días-peregrino, cerca de 15,000 peregrinos con la misma mezcla. La aldea planea sobre camas llenas por noche, que es lo que mide el día-peregrino.',
+    },
+    source: { href: 'https://americanpilgrims.org/statistics/', label: 'Camino statistics' },
+  },
+  {
+    id: 'C3',
+    claim: {
+      en: '20,000–40,000 acres under regenerative management.',
+      es: '20,000–40,000 acres bajo manejo regenerativo.',
+    },
+    verdict: 'revised',
+    finding: {
+      en: 'The acreage is reachable; the price of it is the thing the plan has not costed. Texas rural land averaged $4,827 an acre statewide in early 2025, and the Gulf Coast–Brazos Bottom region — which covers the Bryan and Caldwell stretch of this road — is the most expensive rural market in the state at $11,369. At those rates 20,000–40,000 acres is roughly $96M at the statewide average and $227M–$455M through the Brazos Bottom.',
+      es: 'La superficie es alcanzable; lo que el plan no ha costeado es su precio. La tierra rural de Tejas promedió $4,827 por acre en todo el estado a principios de 2025, y la región Gulf Coast–Brazos Bottom — que cubre el tramo de Bryan y Caldwell — es el mercado rural más caro del estado, a $11,369. A esos precios, 20,000–40,000 acres son unos $96M al promedio estatal y $227M–$455M por el Brazos Bottom.',
+    },
+    revised: {
+      en: 'This is not a land-buying programme at that scale, and should stop describing itself as one. The acres come mostly from families who already own land joining the corridor, from inheritance held rather than sold, and from the cheaper eastern counties — Houston County and east toward Louisiana — rather than the Brazos Bottom. Price every village against its own county before any acreage goes in a pitch.',
+      es: 'A esa escala esto no es un programa de compra de tierra, y debería dejar de describirse así. Los acres vienen sobre todo de familias que ya tienen tierra y se suman al corredor, de herencias que se conservan en vez de venderse, y de los condados del este, más baratos — el condado de Houston y hacia Luisiana — antes que del Brazos Bottom. Costear cada aldea contra su propio condado antes de poner superficie en una propuesta.',
+    },
+    source: {
+      href: 'https://trerc.tamu.edu/reports/texas-rural-land-markets-first-quarter-2025/',
+      label: 'Texas Rural Land Markets, Texas A&M',
+    },
+  },
+  {
+    id: 'C4',
+    claim: {
+      en: 'Small towns on the road would see a real economic lift.',
+      es: 'Los pueblos del camino verían una mejora económica real.',
+    },
+    verdict: 'holds',
+    finding: {
+      en: 'This is the best-evidenced claim on the page. Research from the University of Santiago found that some small municipalities on the Camino raised GDP by as much as 21% from pilgrims alone, and the effect lands hardest in rural places, where there was least to begin with. A corridor of small Texas and Louisiana towns is the same shape of place.',
+      es: 'Es la afirmación mejor respaldada de la página. Un estudio de la Universidad de Santiago encontró que algunos municipios pequeños del Camino subieron su PIB hasta un 21% sólo por los peregrinos, y el efecto pega más fuerte en lo rural, donde había menos para empezar. Un corredor de pueblos pequeños de Tejas y Luisiana es la misma clase de lugar.',
+    },
+    source: {
+      href: 'https://sightmagazine.com.au/features/pilgrim-economics-camino-travellers-help-rural-spain-s-emptying-villages-survive/',
+      label: 'Pilgrim economics, rural Spain',
+    },
+  },
+  {
+    id: 'C5',
+    claim: {
+      en: '5,000 pilgrims a year will walk this road.',
+      es: '5,000 peregrinos al año caminarán este camino.',
+    },
+    verdict: 'unverified',
+    finding: {
+      en: 'Nobody publishes how many people walk the Camino de San Antonio Missions, so the one route in Texas that could calibrate this number is a blank. Everything downstream — beds, meals, how many villages the pilgrim economy can carry — rests on a figure nobody here has.',
+      es: 'Nadie publica cuánta gente camina el Camino de San Antonio Missions, así que la única ruta en Tejas que podría calibrar esta cifra está en blanco. Todo lo que sigue — camas, comidas, cuántas aldeas puede sostener la economía de peregrinos — descansa en un número que aquí nadie tiene.',
+    },
+    revised: {
+      en: 'First call to make: ask the Padre Margil Pilgrimage Center how many passports they have issued a year since 2022, and how many completed. That single answer prices the whole pilgrim economy.',
+      es: 'Primera llamada que hacer: preguntar al Centro de Peregrinos Padre Margil cuántos pasaportes han emitido por año desde 2022, y cuántos se completaron. Esa sola respuesta pone precio a toda la economía de peregrinos.',
+    },
+    source: { href: 'https://caminosanantonio.org/', label: 'caminosanantonio.org' },
+  },
+];
+
+/**
+ * The arithmetic that was never in doubt, kept separate from the claims that
+ * were. These follow from the assumptions rather than from the world, and the
+ * assumption is printed beside each so it can be moved.
+ */
+export const ARITHMETIC: { figure: string; label: Bilingual; assumption: Bilingual }[] = [
+  {
+    figure: '3,000',
+    label: { en: 'people', es: 'personas' },
+    assumption: {
+      en: '20 villages × 30 families × 5. The five is the load-bearing assumption: the US average household is 2.5, so this is a bet on large families and should be called that.',
+      es: '20 aldeas × 30 familias × 5. El cinco es el supuesto que carga el peso: el hogar medio en EE. UU. es de 2.5, así que esto apuesta por familias grandes y hay que decirlo así.',
+    },
+  },
+  {
+    figure: '600',
+    label: { en: 'households', es: 'hogares' },
+    assumption: {
+      en: 'The number that actually has to be recruited, one family at a time, over fifteen years. Forty a year.',
+      es: 'El número que de verdad hay que reclutar, familia por familia, en quince años. Cuarenta al año.',
+    },
+  },
+  {
+    figure: '~1,800',
+    label: { en: 'children', es: 'niños' },
+    assumption: {
+      en: 'At three children a household. The outline said 1,000+, which is the conservative end of its own arithmetic.',
+      es: 'A tres hijos por hogar. El esquema decía 1,000+, que es el extremo conservador de su propia aritmética.',
+    },
+  },
+  {
+    figure: '30',
+    label: { en: 'families a parish', es: 'familias por parroquia' },
+    assumption: {
+      en: 'Whether that turns a parish around depends entirely on how big it is now. Get the registered-household count for each of the twenty before claiming any of them grow.',
+      es: 'Si eso cambia una parroquia depende por completo de cuán grande es ahora. Conseguir el número de hogares registrados de las veinte antes de afirmar que alguna crece.',
+    },
+  },
+];

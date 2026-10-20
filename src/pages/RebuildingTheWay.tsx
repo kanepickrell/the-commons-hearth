@@ -21,7 +21,8 @@ import { createElement, lazy, Suspense } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
 import {
-  GAPS, GROUND, MEASURES, PHASES, PRINCIPLES, SCALE, STAGES, STOPS, THESIS,
+  ARITHMETIC, CLAIMS, GAPS, GROUND, MEASURES, PHASES, PRINCIPLES, STAGES, STOPS,
+  THESIS, VERDICT_LABEL,
   TOTAL_MILES, VILLAGE_CORE, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
 } from '@/content/camino';
 
@@ -365,25 +366,84 @@ export default function RebuildingTheWay() {
       </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* What it adds up to                                                */}
+      {/* Impact, audited                                                   */}
+      {/*                                                                   */}
+      {/* Written as an audit rather than a case, because every figure here */}
+      {/* will be read by someone who can check it, and a number that does  */}
+      {/* not survive contact with a donor costs more than it earned. Two   */}
+      {/* of the five claims did not survive. That is the point.            */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-narrow py-12">
-        <Eyebrow>{es ? 'A CUÁNTO LLEGA' : 'WHAT IT ADDS UP TO'}</Eyebrow>
+        <Eyebrow>{es ? 'IMPACTO, AUDITADO' : 'IMPACT, AUDITED'}</Eyebrow>
         <h2 className="mt-3 font-heading text-3xl text-mesquite">
-          {es ? 'Una aldea ayuda a una familia. Veinte son una cultura.' : 'One homestead helps one family. Twenty villages are a culture.'}
+          {es ? 'Una granja ayuda a una familia. Veinte aldeas son una cultura.' : 'One homestead helps one family. Twenty villages are a culture.'}
         </h2>
         <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
           {es
-            ? 'Las cifras de abajo son ilustrativas, y el cálculo está a la vista para que se pueda discutir en vez de creer.'
-            : 'The figures below are illustrative, and the working is shown so they can be argued with rather than believed.'}
+            ? 'Cada cifra de abajo se comprobó contra una fuente. Dos de las cinco no sobrevivieron, y están corregidas aquí en vez de repetidas. Es más barato encontrar esto nosotros que delante de un donante.'
+            : 'Every figure below was checked against a source. Two of the five did not survive, and are corrected here rather than repeated. It is cheaper to find that ourselves than in front of a donor.'}
         </p>
 
-        <ul className="mt-8 divide-y divide-mesquite/10 border-y border-mesquite/15">
-          {SCALE.map((x) => (
-            <li key={x.label.en} className="flex flex-wrap items-baseline gap-x-4 py-4">
-              <span className="font-heading text-2xl text-mesquite tabular-nums">{x.figure}</span>
-              <span className="font-heading text-base text-mesquite/85">{t(x.label)}</span>
-              <span className="ml-auto font-serif text-xs italic text-piedra">{t(x.working)}</span>
+        <ul className="mt-9 space-y-9">
+          {CLAIMS.map((c) => (
+            <li key={c.id} className="border-t border-mesquite/15 pt-6">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="font-caps text-[11px] tracking-[0.1em] text-ocre">{c.id}</span>
+                <span
+                  className={`font-caps text-[9px] tracking-[0.18em] ${
+                    c.verdict === 'holds'
+                      ? 'text-mesquite'
+                      : c.verdict === 'revised'
+                        ? 'text-rojo'
+                        : 'text-piedra'
+                  }`}
+                >
+                  {t(VERDICT_LABEL[c.verdict]).toUpperCase()}
+                </span>
+              </div>
+
+              <p className="mt-2 font-heading text-lg leading-snug text-mesquite">{t(c.claim)}</p>
+              <p className="prose-body mt-3 text-sm leading-relaxed text-mesquite/80">
+                {t(c.finding)}
+              </p>
+
+              {c.revised && (
+                <p className="mt-3 border-l-2 border-rojo/40 pl-4 font-serif text-sm italic leading-relaxed text-mesquite">
+                  {t(c.revised)}
+                </p>
+              )}
+
+              {c.source &&
+                createElement(
+                  'a',
+                  {
+                    href: c.source.href,
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                    className:
+                      'mt-3 inline-block font-caps text-[11px] tracking-[0.15em] text-ocre no-underline hover:text-mesquite',
+                  },
+                  <>{c.source.label} →</>,
+                )}
+            </li>
+          ))}
+        </ul>
+
+        {/* The figures that follow from assumptions rather than from the
+            world. Each assumption is printed so it can be moved. */}
+        <h3 className="mt-12 font-heading text-2xl text-mesquite">
+          {es ? 'La aritmética, con sus supuestos' : 'The arithmetic, with its assumptions'}
+        </h3>
+        <ul className="mt-5 divide-y divide-mesquite/10 border-y border-mesquite/15">
+          {ARITHMETIC.map((a) => (
+            <li key={a.label.en} className="py-4">
+              <p className="flex flex-wrap items-baseline gap-x-3">
+                <span className="font-heading text-2xl text-mesquite tabular-nums">{a.figure}</span>
+                <span className="font-heading text-base text-mesquite/85">{t(a.label)}</span>
+              </p>
+              <p className="prose-body mt-1 text-sm leading-relaxed text-piedra">
+                {t(a.assumption)}
+              </p>
             </li>
           ))}
         </ul>
