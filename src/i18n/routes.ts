@@ -10,7 +10,7 @@ export type RouteKey =
   | 'participate'
   | 'resources'
   | 'history'
-  | 'rebuildingTheWay'
+  | 'rebuildTheWay'
   | 'memberDetail'
   | 'talleres'
   | 'tallerDetail'
@@ -29,7 +29,7 @@ export const routes: Record<RouteKey, { en: string; es: string }> = {
   resources:     { en: '/resources',       es: '/recursos' },
   history:       { en: '/history',         es: '/historia' },
   // Unlisted on purpose: a working plan, not an announcement. See the page.
-  rebuildingTheWay: { en: '/rebuilding-the-way', es: '/reconstruyendo-el-camino' },
+  rebuildTheWay: { en: '/rebuild-the-way',   es: '/reconstruir-el-camino' },
   memberDetail:  { en: '/members/:id',     es: '/miembros/:id' },
   nuevaReunion:  { en: '/workshops/new',   es: '/talleres/nueva' },
   talleres:      { en: '/workshops',       es: '/talleres' },

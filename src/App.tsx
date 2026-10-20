@@ -17,7 +17,7 @@ const Vision       = lazy(() => import("./pages/Vision.tsx"));
 const Participate  = lazy(() => import("./pages/Participate.tsx"));
 const Resources    = lazy(() => import("./pages/Resources.tsx"));
 const History      = lazy(() => import("./pages/History.tsx"));
-const RebuildingTheWay = lazy(() => import("./pages/RebuildingTheWay.tsx"));
+const RebuildTheWay = lazy(() => import("./pages/RebuildTheWay.tsx"));
 const MemberDetail = lazy(() => import("./pages/MemberDetail.tsx"));
 const Talleres     = lazy(() => import("./pages/Talleres.tsx"));
 const TallerDetail = lazy(() => import("./pages/TallerDetail.tsx"));
@@ -67,8 +67,8 @@ const App = () => (
                   <Route path={routes.history.es} element={<History />} />
 
                   {/* Unlisted: reachable by URL, linked from nowhere. */}
-                  <Route path={routes.rebuildingTheWay.en} element={<RebuildingTheWay />} />
-                  <Route path={routes.rebuildingTheWay.es} element={<RebuildingTheWay />} />
+                  <Route path={routes.rebuildTheWay.en} element={<RebuildTheWay />} />
+                  <Route path={routes.rebuildTheWay.es} element={<RebuildTheWay />} />
 
                   {/* Legacy /ofrendas URLs redirect to /vision */}
                   <Route path="/ofrendas"      element={<Navigate to="/vision" replace />} />

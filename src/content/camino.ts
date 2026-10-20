@@ -40,57 +40,36 @@ export const STAGES: {
   /** Road miles across the whole stage, from the first pass. */
   miles: number;
   token: 'rojo' | 'ocre' | 'azul' | 'mesquite' | 'piedra';
-  summary: Bilingual;
 }[] = [
   {
     key: 'louisiana',
     name: { en: 'Louisiana', es: 'Luisiana' },
     miles: 90,
     token: 'rojo',
-    summary: {
-      en: 'Basilica to the Sabine River country. The old Spanish capital sits in the middle of it.',
-      es: 'De la basílica al país del río Sabina. La antigua capital española está en medio.',
-    },
   },
   {
     key: 'missions',
     name: { en: 'The East Texas missions', es: 'Las misiones del este de Tejas' },
     miles: 77,
     token: 'ocre',
-    summary: {
-      en: 'Four stops within a day of each other, and the only stretch already walkable as it stands.',
-      es: 'Cuatro paradas a menos de un día entre sí, y el único tramo ya transitable tal como está.',
-    },
   },
   {
     key: 'middle',
     name: { en: 'The empty middle', es: 'El medio vacío' },
     miles: 132,
     token: 'mesquite',
-    summary: {
-      en: 'Crockett to Bryan is 85 miles with no parish stop. This is the gap, and the best case for the first anchor village.',
-      es: 'De Crockett a Bryan hay 85 millas sin parroquia. Este es el hueco, y el mejor caso para la primera aldea ancla.',
-    },
   },
   {
     key: 'milam',
     name: { en: 'Milam County to the Hill Country', es: 'Del condado de Milam a las colinas' },
     miles: 152,
     token: 'azul',
-    summary: {
-      en: 'Rancheria Grande and the San Xavier sites, then the fast-growing edge of the Hill Country.',
-      es: 'La Ranchería Grande y los sitios de San Xavier, y luego el borde de las colinas, que crece rápido.',
-    },
   },
   {
     key: 'missions-sa',
     name: { en: 'San Antonio', es: 'San Antonio' },
     miles: 41,
     token: 'piedra',
-    summary: {
-      en: 'The cathedral and the four missions, ending at Espada, where this joins the official Camino.',
-      es: 'La catedral y las cuatro misiones, terminando en Espada, donde esto se une al Camino oficial.',
-    },
   },
 ];
 
@@ -266,45 +245,6 @@ export const GAPS: {
       en: 'Includes the Sabine crossing. Needs a host and a bridge route a walker can actually use.',
       es: 'Incluye el cruce del Sabina. Necesita un anfitrión y un puente que un caminante pueda usar de verdad.',
     },
-  },
-];
-
-/** What an anchor village has to have before it is one. */
-export const VILLAGE_CORE: Bilingual[] = [
-  { en: 'A parish', es: 'Una parroquia' },
-  { en: 'A small school or homeschool co-op', es: 'Una escuela pequeña o cooperativa de educación en casa' },
-  { en: 'A pilgrim house', es: 'Una casa de peregrinos' },
-  { en: 'A farm market and co-op', es: 'Un mercado agrícola y una cooperativa' },
-  { en: 'A trades shop and apprenticeships', es: 'Un taller de oficios y aprendices' },
-  { en: 'Land held in trust or shared financing', es: 'Tierra en fideicomiso o con financiamiento compartido' },
-];
-
-/** The arithmetic, stated as arithmetic so it can be argued with. */
-export const SCALE: { figure: string; label: Bilingual; working: Bilingual }[] = [
-  {
-    figure: '~3,000',
-    label: { en: 'people', es: 'personas' },
-    working: { en: '20 villages × 30 families × 5', es: '20 aldeas × 30 familias × 5' },
-  },
-  {
-    figure: '20–40k',
-    label: { en: 'acres', es: 'acres' },
-    working: { en: '1,000–2,000 acres a village', es: '1,000–2,000 acres por aldea' },
-  },
-  {
-    figure: '1,000+',
-    label: { en: 'children', es: 'niños' },
-    working: { en: 'raised on farms, in parish schools', es: 'criados en granjas y escuelas parroquiales' },
-  },
-  {
-    figure: '20',
-    label: { en: 'parishes', es: 'parroquias' },
-    working: { en: 'shrinking today, growing instead', es: 'hoy encogiéndose, creciendo en cambio' },
-  },
-  {
-    figure: '$7.5M',
-    label: { en: 'pilgrim spending a year', es: 'gasto de peregrinos al año' },
-    working: { en: '5,000 pilgrims × 30 days × $50', es: '5,000 peregrinos × 30 días × $50' },
   },
 ];
 
@@ -789,6 +729,22 @@ export const GROUND: {
   },
   {
     title: {
+      en: 'The road crosses four jurisdictions',
+      es: 'El camino cruza cuatro jurisdicciones',
+    },
+    body: {
+      en: 'Stops 1\u20133 are in the Diocese of Alexandria in Louisiana. Stops 4\u20139 are in the Diocese of Tyler, which holds San Augustine, Nacogdoches, Cherokee and Houston counties. Stops 10\u201316 are in the Diocese of Austin, which holds Brazos, Burleson, Milam, Bastrop and Hays. The last stops are in the Archdiocese of San Antonio.',
+      es: 'Las paradas 1\u20133 est\u00e1n en la Di\u00f3cesis de Alexandria, en Luisiana. Las paradas 4\u20139 est\u00e1n en la Di\u00f3cesis de Tyler, que abarca los condados de San Augustine, Nacogdoches, Cherokee y Houston. Las paradas 10\u201316 est\u00e1n en la Di\u00f3cesis de Austin, que abarca Brazos, Burleson, Milam, Bastrop y Hays. Las \u00faltimas est\u00e1n en la Arquidi\u00f3cesis de San Antonio.',
+    },
+    soWhat: {
+      en: 'Four bishops, two states, two ecclesiastical provinces. No single chancery can approve this road, and no single one can stop it either. Start where the chapter already has a relationship and let the next diocese see a working village rather than a proposal.',
+      es: 'Cuatro obispos, dos estados, dos provincias eclesi\u00e1sticas. Ninguna canciller\u00eda sola puede aprobar este camino, y ninguna sola puede detenerlo. Empezar donde el cap\u00edtulo ya tiene relaci\u00f3n y dejar que la pr\u00f3xima di\u00f3cesis vea una aldea funcionando, no una propuesta.',
+    },
+    href: 'https://www.dioceseoftyler.org/our-diocese/',
+    label: 'Diocese of Tyler counties',
+  },
+  {
+    title: {
       en: 'The walking season is September to June',
       es: 'La temporada de caminar es de septiembre a junio',
     },
@@ -885,6 +841,23 @@ export const IMPACT: Figure[] = [
   },
   {
     id: 'I5',
+    figure: '5%',
+    label: { en: 'of US beef processing', es: 'del sacrificio de res en EE. UU.' },
+    body: {
+      en: 'Four companies hold about 80% of American beef processing and only about 5% sits in small and very small plants. Ranchers drive one to two hours to reach a USDA-inspected floor, and in bad years book a year ahead. A village cannot build one alone; twenty villages can, and every one of them needs it. This is the clearest candidate for the first thing the corridor builds together, and the USDA is currently putting money toward exactly this gap.',
+      es: 'Cuatro empresas tienen cerca del 80% del sacrificio de res en Estados Unidos y s\u00f3lo un 5% est\u00e1 en plantas peque\u00f1as. Los ganaderos manejan una o dos horas para llegar a una planta con inspecci\u00f3n federal, y en a\u00f1os malos reservan con un a\u00f1o de anticipaci\u00f3n. Una aldea no puede construir una sola; veinte s\u00ed, y todas la necesitan. Es el candidato m\u00e1s claro para lo primero que el corredor construya junto, y el USDA est\u00e1 poniendo dinero justo en ese hueco.',
+    },
+    basis: {
+      en: 'It is also principle 4 at corridor scale: a human need turned into an industry, taken back. And it is the anchor employer requirement M1 with a specific business attached.',
+      es: 'Es tambi\u00e9n el principio 4 a escala de corredor: una necesidad humana vuelta industria, recuperada. Y es el requisito M1 del empleador ancla con un negocio concreto detr\u00e1s.',
+    },
+    source: {
+      href: 'https://tscra.org/texas-ranchers-are-seeing-the-effects-of-decreased-capacity-in-meat-processing-plants/',
+      label: 'Texas & Southwestern Cattle Raisers',
+    },
+  },
+  {
+    id: 'I6',
     figure: '$4,827',
     label: { en: 'an acre, Texas average', es: 'por acre, promedio de Tejas' },
     body: {
@@ -930,12 +903,15 @@ export const LAND_MODEL: {
     source: { href: 'https://www.agrariantrust.org/', label: 'Agrarian Trust' },
   },
   {
-    title: { en: 'Certified trail land is worth more here', es: 'La tierra con sendero certificado vale más aquí' },
+    title: { en: 'Buy land that is already farmed', es: 'Comprar tierra que ya se trabaja' },
     body: {
-      en: 'Land carrying a piece of the historic trail can be certified with the Park Service: technical help and project funding, in exchange for at least occasional public access. A village whose mission is hospitality gives up nothing it was not already giving. Weight that into which parcels the trust buys.',
-      es: 'La tierra que lleva un tramo del sendero histórico puede certificarse con el Servicio de Parques: ayuda técnica y fondos de proyecto, a cambio de al menos acceso público ocasional. Una aldea cuya misión es la hospitalidad no cede nada que no estuviera cediendo ya. Pesar eso al elegir qué parcelas compra el fideicomiso.',
+      en: 'Texas taxes qualifying open-space land on what it produces rather than what it would sell for, and the saving is commonly 90% or more of taxable value. But the land must have been in agricultural use for five of the preceding seven years. Idle land loses the valuation and the trust pays full freight for years. So buy working ground, and make continuous agricultural use a condition of every lease.',
+      es: 'Tejas grava la tierra abierta que califica por lo que produce y no por lo que valdr\u00eda en venta, y el ahorro suele ser del 90% o m\u00e1s del valor gravable. Pero la tierra debe haber estado en uso agr\u00edcola cinco de los siete a\u00f1os anteriores. La tierra ociosa pierde la valuaci\u00f3n y el fideicomiso paga completo durante a\u00f1os. As\u00ed que comprar tierra en trabajo, y hacer del uso agr\u00edcola continuo una condici\u00f3n de cada arriendo.',
     },
-    source: { href: 'https://www.nps.gov/orgs/1453/certification.htm', label: 'Trail certification, NPS' },
+    source: {
+      href: 'https://comptroller.texas.gov/taxes/property-tax/ag-timber/',
+      label: 'Texas Comptroller, ag appraisal',
+    },
   },
 ];
 

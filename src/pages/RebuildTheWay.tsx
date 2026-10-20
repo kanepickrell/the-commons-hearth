@@ -1,4 +1,4 @@
-// src/pages/RebuildingTheWay.tsx
+// src/pages/RebuildTheWay.tsx
 // A working page for a long idea: CLM villages planted a day's walk apart
 // along El Camino Real de los Tejas.
 //
@@ -23,7 +23,7 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import {
   GAPS, GROUND, IMPACT, LAND_MODEL, MEASURES, PHASES, PRECEDENTS, PRINCIPLES,
   STAGES, STOPS, THESIS,
-  TOTAL_MILES, VILLAGE_CORE, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
+  TOTAL_MILES, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
 } from '@/content/camino';
 
 const CaminoMap = lazy(() =>
@@ -34,7 +34,7 @@ const Eyebrow = ({ children }: { children: React.ReactNode }) => (
   <p className="display-caps text-xs tracking-[0.25em] text-ocre">{children}</p>
 );
 
-export default function RebuildingTheWay() {
+export default function RebuildTheWay() {
   const { t, locale } = useLocale();
   const es = locale === 'es';
 
@@ -49,7 +49,7 @@ export default function RebuildingTheWay() {
         </p>
         <Eyebrow>{es ? 'EL CAMINO REAL DE LOS TEJAS' : 'EL CAMINO REAL DE LOS TEJAS'}</Eyebrow>
         <h1 className="mt-4 font-heading text-4xl leading-tight text-mesquite md:text-5xl">
-          {es ? 'Reconstruyendo el Camino' : 'Rebuilding the Way'}
+          {es ? 'Reconstruir el Camino' : 'Rebuild The Way'}
         </h1>
         <p className="mx-auto mt-6 max-w-2xl font-serif text-lg leading-relaxed text-mesquite/85">
           {es
@@ -190,10 +190,6 @@ export default function RebuildingTheWay() {
                   </h3>
                   <p className="font-serif text-sm tabular-nums text-piedra">{stage.miles} mi</p>
                 </div>
-                <p className="prose-body mt-3 text-sm italic leading-relaxed text-piedra">
-                  {t(stage.summary)}
-                </p>
-
                 <ol className="mt-4 space-y-3">
                   {stops.map((s) => (
                     <li key={s.n} className="flex gap-3">
@@ -326,43 +322,6 @@ export default function RebuildingTheWay() {
             </article>
           ))}
         </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* The anchor village                                                */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="container-narrow py-12">
-        <Eyebrow>{es ? 'LA ALDEA ANCLA' : 'THE ANCHOR VILLAGE'}</Eyebrow>
-        <h2 className="mt-3 font-heading text-3xl text-mesquite">
-          {es ? 'Revivir un pueblo, no construir uno' : 'Revive a town, don’t build one'}
-        </h2>
-        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
-          {es
-            ? 'Muchos pueblos de esta ruta ya tienen los huesos: una parroquia antigua con menos fieles, una calle principal vacía, una escuela cerrada, tierra barata cerca. Las familias del movimiento revivirían esos pueblos en vez de levantar algo al lado.'
-            : 'Many towns on this route already have the bones: an old parish with a shrinking congregation, an empty main street, a closed school, cheap land nearby. Chapter families would revive those towns rather than build beside them.'}
-        </p>
-
-        <ul className="mt-7 grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
-          {VILLAGE_CORE.map((item) => (
-            <li key={item.en} className="flex gap-3 border-b border-mesquite/10 pb-3">
-              <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 flex-shrink-0 rotate-45 bg-ocre" />
-              <span className="prose-body text-base text-mesquite/85">{t(item)}</span>
-            </li>
-          ))}
-        </ul>
-
-        <p className="prose-body mt-7 max-w-2xl text-base leading-relaxed text-mesquite/85">
-          {es
-            ? 'Los peregrinos son el motor de arranque. Traen dinero al pueblo antes de que las granjas maduren: hospedaje, comida, pan, oficios. Eso cubre los años más duros del reasentamiento.'
-            : 'Pilgrims are the startup engine. They bring money into a town before its farms are mature: lodging, meals, bread, crafts. That bridges the hardest years of resettlement.'}
-        </p>
-
-        {/* Said plainly, because it is the thing most likely to sink this. */}
-        <p className="mt-6 border-l-2 border-rojo/40 pl-4 font-serif text-base italic leading-relaxed text-mesquite">
-          {es
-            ? 'El riesgo real es parecer un enclave. Si la gente del pueblo ve a los recién llegados como forasteros, el modelo falla. Cada aldea empieza uniéndose a la parroquia y a la vida del pueblo que ya existen, no construyendo al lado.'
-            : 'The real risk is looking like an enclave. If the townspeople see newcomers as outsiders, the model fails. Every village starts by joining the parish and the town life that are already there, not building beside them.'}
-        </p>
       </section>
 
       {/* ---------------------------------------------------------------- */}
