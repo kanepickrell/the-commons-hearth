@@ -177,7 +177,8 @@ export const uiStrings = {
       en: 'We operate under the national Catholic Land Movement organization',
       es: 'Parte del Movimiento Católico de la Tierra',
     },
-    sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · AD 2026', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · AD 2026' },
+    // "EST" is an English abbreviation, so the Spanish seal says DESDE.
+    sealLine: { en: 'CLM CENTRAL TEXAS · SAN ISIDRO LABRADOR · EST 2025', es: 'CLM CENTRO DE TEJAS · SAN ISIDRO LABRADOR · DESDE 2025' },
     reachUs: { en: 'Still Have Questions?', es: 'Escríbenos' },
   },
   contact: {
