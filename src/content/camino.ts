@@ -349,3 +349,408 @@ export const MEASURES: Bilingual[] = [
 export const TOTAL_MILES = STAGES.reduce((s, x) => s + x.miles, 0);
 export const WALK_DAYS_AT_15 = Math.round(TOTAL_MILES / 15);
 export const WALK_DAYS_AT_20 = Math.round(TOTAL_MILES / 20);
+
+// ---------------------------------------------------------------------------
+// The thesis. Almanzo's father, in Farmer Boy, tells his son on Independence
+// Day that it was not warriors and frontiersmen who built the country but the
+// farmers who stayed put and took care of their own.
+// ---------------------------------------------------------------------------
+export const THESIS: Bilingual = {
+  en: 'El Camino Real was opened by soldiers and friars passing through. The Way is restored by farmers who stay.',
+  es: 'El Camino Real lo abrieron soldados y frailes de paso. El Camino lo restauran los labradores que se quedan.',
+};
+
+// ---------------------------------------------------------------------------
+// The charter.
+//
+// Written as REQUIREMENTS rather than as an essay, because the point of this
+// list is to be checked against a real town. Each one is a thing a village
+// either does or does not do, and most carry a test that settles it. They are
+// numbered so they can be argued with by number.
+//
+// Provenance: principles 1-7 come from Craig's talk on localism and
+// stability, by way of the chapter's notes on it; principle 0 is the
+// chapter's own, and comes first because every other requirement assumes it.
+// ---------------------------------------------------------------------------
+
+export type Requirement = {
+  /** Stable handle, so a requirement can be referred to by number. */
+  id: string;
+  text: Bilingual;
+  /** How you would settle whether a village actually meets it. */
+  test?: Bilingual;
+};
+
+export type Principle = {
+  key: string;
+  n: number;
+  name: Bilingual;
+  claim: Bilingual;
+  requirements: Requirement[];
+};
+
+export const PRINCIPLES: Principle[] = [
+  {
+    key: 'parish',
+    n: 0,
+    name: { en: 'The parish is the heart', es: 'La parroquia es el corazón' },
+    claim: {
+      en: 'Every body needs a heart. A village is not a settlement with a church in it; it is a parish with a village grown around it.',
+      es: 'Todo cuerpo necesita un corazón. Una aldea no es un asentamiento con una iglesia dentro; es una parroquia con una aldea crecida a su alrededor.',
+    },
+    requirements: [
+      {
+        id: 'P1',
+        text: {
+          en: 'Form around a parish that already exists. Found no village where there is no church to join.',
+          es: 'Formarse en torno a una parroquia que ya existe. No fundar ninguna aldea donde no haya iglesia a la cual unirse.',
+        },
+        test: {
+          en: 'Name the parish and its pastor before buying an acre.',
+          es: 'Nombrar la parroquia y a su párroco antes de comprar un acre.',
+        },
+      },
+      {
+        id: 'P2',
+        text: {
+          en: 'Put the village core inside a walk of the church door.',
+          es: 'Poner el centro de la aldea a una caminata de la puerta de la iglesia.',
+        },
+        test: {
+          en: 'The furthest house in the core is a walk to Mass, not a drive.',
+          es: 'La casa más lejana del centro llega a Misa a pie, no en coche.',
+        },
+      },
+      {
+        id: 'P3',
+        text: {
+          en: 'Keep the parish calendar, not a second one beside it.',
+          es: 'Guardar el calendario de la parroquia, y no un segundo calendario al lado.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'hospitality',
+    n: 1,
+    name: { en: 'Hospitality is the mission', es: 'La hospitalidad es la misión' },
+    claim: {
+      en: 'The layman\u2019s job is not bridges but walls, so that there are thresholds to welcome people through.',
+      es: 'El trabajo del laico no son los puentes sino los muros, para que haya umbrales por donde dar la bienvenida.',
+    },
+    requirements: [
+      {
+        id: 'H1',
+        text: {
+          en: 'Give the village a clear edge and a front door: a pilgrim house near the church, and a gate or marker a walker can see.',
+          es: 'Dar a la aldea un borde claro y una puerta: una casa de peregrinos junto a la iglesia, y una entrada o señal que un caminante pueda ver.',
+        },
+      },
+      {
+        id: 'H2',
+        text: {
+          en: 'Meet every pilgrim with the same rite: a stamp, a blessing, and a meal.',
+          es: 'Recibir a cada peregrino con el mismo rito: un sello, una bendición, y una comida.',
+        },
+      },
+      {
+        id: 'H3',
+        text: {
+          en: 'Feed pilgrims at family tables, not in a hall. Rotate the host families so the welcome comes from households rather than from staff.',
+          es: 'Dar de comer a los peregrinos en mesas de familia, no en un salón. Rotar las familias anfitrionas para que la bienvenida venga de los hogares y no del personal.',
+        },
+        test: {
+          en: 'No household hosts twice before every household has hosted once.',
+          es: 'Ningún hogar recibe dos veces antes de que todos hayan recibido una.',
+        },
+      },
+      {
+        id: 'H4',
+        text: {
+          en: 'Keep the welcome itself a gift. Sell bread, beds and crafts around it; never sell the welcome.',
+          es: 'Mantener la bienvenida como un don. Vender pan, camas y artesanía alrededor; nunca vender la bienvenida.',
+        },
+        test: {
+          en: 'A pilgrim with no money is fed and housed the same as one with money.',
+          es: 'Un peregrino sin dinero come y duerme igual que uno con dinero.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'witness',
+    n: 2,
+    name: { en: 'Witness, not programs', es: 'Testimonio, no programas' },
+    claim: {
+      en: 'People do not convert to an argument. They convert to a community they want to belong to.',
+      es: 'La gente no se convierte a un argumento. Se convierte a una comunidad a la que quiere pertenecer.',
+    },
+    requirements: [
+      {
+        id: 'W1',
+        text: {
+          en: 'Run no evangelisation programme. Vespers, a family dinner, a milking and a feast day are the witness.',
+          es: 'No montar ningún programa de evangelización. Las vísperas, una cena familiar, un ordeño y una fiesta son el testimonio.',
+        },
+        test: {
+          en: 'Nothing on the village calendar exists only because visitors are coming.',
+          es: 'Nada en el calendario de la aldea existe sólo porque vienen visitantes.',
+        },
+      },
+      {
+        id: 'W2',
+        text: {
+          en: 'Time the road\u2019s calendar so pilgrims arrive at the good moments: harvest, saints\u2019 days, weddings.',
+          es: 'Ajustar el calendario del camino para que los peregrinos lleguen en los buenos momentos: la cosecha, las fiestas de los santos, las bodas.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'stability',
+    n: 3,
+    name: { en: 'Design for the kids who stay', es: 'Diseñar para los hijos que se quedan' },
+    claim: {
+      en: 'Stability is the missing link. The test of a culture is whether the next generation stays.',
+      es: 'La estabilidad es el eslabón que falta. La prueba de una cultura es si se queda la siguiente generación.',
+    },
+    requirements: [
+      {
+        id: 'S1',
+        text: {
+          en: 'Hold land for inheritance, not resale. Use trusts or covenants that make flipping hard.',
+          es: 'Tener la tierra para heredarla, no para revenderla. Usar fideicomisos o convenios que dificulten la reventa.',
+        },
+      },
+      {
+        id: 'S2',
+        text: {
+          en: 'Build work a grown child can step into: trades, apprenticeships, family businesses with room to add a son or daughter.',
+          es: 'Crear trabajo donde un hijo ya crecido pueda entrar: oficios, aprendizajes, negocios familiares con sitio para un hijo o una hija.',
+        },
+      },
+      {
+        id: 'S3',
+        text: {
+          en: 'Keep starter housing available for young couples in the village.',
+          es: 'Mantener vivienda inicial disponible para parejas jóvenes en la aldea.',
+        },
+      },
+      {
+        id: 'S4',
+        text: {
+          en: 'Measure the share of village children who settle in the corridor as adults. This is the number that decides whether any of the rest worked.',
+          es: 'Medir cuántos hijos de la aldea se establecen en el corredor de adultos. Este es el número que decide si lo demás sirvió.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'reclaim',
+    n: 4,
+    name: { en: 'Take back what was industrialised', es: 'Recuperar lo que se industrializó' },
+    claim: {
+      en: 'The test of localism: take a human need that has been turned into an industry, and do it yourselves.',
+      es: 'La prueba del localismo: toma una necesidad humana que se volvió industria, y háganla ustedes mismos.',
+    },
+    requirements: [
+      {
+        id: 'R1',
+        text: {
+          en: 'Marry your own: a potluck, a pig, local music, the whole village.',
+          es: 'Casar a los suyos: una comida compartida, un cerdo, música local, la aldea entera.',
+        },
+      },
+      {
+        id: 'R2',
+        text: {
+          en: 'Bury your own: a village cemetery, coffins from the woodshop, the vigil kept by the community.',
+          es: 'Enterrar a los suyos: un cementerio de la aldea, ataúdes del taller, el velorio guardado por la comunidad.',
+        },
+      },
+      {
+        id: 'R3',
+        text: {
+          en: 'Keep the old at home and in the village, not sent away.',
+          es: 'Cuidar a los ancianos en casa y en la aldea, sin mandarlos lejos.',
+        },
+      },
+      {
+        id: 'R4',
+        text: {
+          en: 'Name three needs the village has taken back from an industry, and add one each year.',
+          es: 'Nombrar tres necesidades que la aldea le haya quitado a una industria, y añadir una cada año.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'reinhabit',
+    n: 5,
+    name: { en: 'Reinhabit, don\u2019t build new', es: 'Rehabitar, no construir de nuevo' },
+    claim: {
+      en: 'The corridor towns already have the bones. Moving into them and fixing them together is cheaper, and it is the opposite of a development arriving.',
+      es: 'Los pueblos del corredor ya tienen los huesos. Mudarse a ellos y arreglarlos juntos es más barato, y es lo contrario de un desarrollo que llega.',
+    },
+    requirements: [
+      {
+        id: 'B1',
+        text: {
+          en: 'Buy and restore buildings that are already standing on the existing main street. Build nothing new beside the town.',
+          es: 'Comprar y restaurar edificios que ya están en pie en la calle principal. No construir nada nuevo al lado del pueblo.',
+        },
+        test: {
+          en: 'Count the village buildings that stood before the chapter arrived. It should be most of them.',
+          es: 'Contar los edificios de la aldea que ya estaban antes de que llegara el capítulo. Deberían ser la mayoría.',
+        },
+      },
+      {
+        id: 'B2',
+        text: {
+          en: 'Restore them together. The shared work is what binds the men, more than shared piety does.',
+          es: 'Restaurarlos juntos. El trabajo compartido es lo que une a los hombres, más que la piedad compartida.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'walkable',
+    n: 6,
+    name: { en: 'Walkable by design', es: 'Caminable por diseño' },
+    claim: {
+      en: 'Wherever work, neighbour and worship are within walking distance, you have already arrived at the village.',
+      es: 'Donde el trabajo, el vecino y el culto están a distancia de caminata, ya se ha llegado a la aldea.',
+    },
+    requirements: [
+      {
+        id: 'K1',
+        text: {
+          en: 'Keep church, school, shops, pilgrim house and homes close together, with the farms around the edge.',
+          es: 'Mantener juntos la iglesia, la escuela, las tiendas, la casa de peregrinos y las casas, con las granjas alrededor.',
+        },
+      },
+      {
+        id: 'K2',
+        text: {
+          en: 'Lay the village out so a child standing in the middle of it can see everything they love.',
+          es: 'Trazar la aldea para que un niño parado en medio pueda ver todo lo que ama.',
+        },
+        test: {
+          en: 'From the centre: the church, their house, and where their parents work.',
+          es: 'Desde el centro: la iglesia, su casa, y donde trabajan sus padres.',
+        },
+      },
+    ],
+  },
+  {
+    key: 'mass',
+    n: 7,
+    name: { en: 'Critical mass protects the place', es: 'La masa crítica protege el lugar' },
+    claim: {
+      en: 'Enough rooted families gain economic and civic weight, and a place with weight can refuse what is done to places without it.',
+      es: 'Suficientes familias arraigadas ganan peso económico y civil, y un lugar con peso puede rechazar lo que se le hace a los lugares sin él.',
+    },
+    requirements: [
+      {
+        id: 'M1',
+        text: {
+          en: 'Stand up one anchor employer paying a family wage: a dairy, a meat processor, a woodshop.',
+          es: 'Levantar un empleador ancla que pague un salario familiar: una lechería, un rastro, un taller de madera.',
+        },
+        test: {
+          en: 'A family can live on one wage earned inside the village.',
+          es: 'Una familia puede vivir de un solo salario ganado dentro de la aldea.',
+        },
+      },
+      {
+        id: 'M2',
+        text: {
+          en: 'Put men on the town council and the county board, so that outside capital cannot extract from the place under the name of development.',
+          es: 'Poner hombres en el ayuntamiento y en la comisión del condado, para que el capital de fuera no pueda extraer del lugar bajo el nombre de desarrollo.',
+        },
+      },
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// What is already on the ground.
+//
+// Researched rather than assumed, and it changes the plan: the road is
+// already a National Historic Trail, the southern end already has a working
+// pilgrim credential, and the certification programme already offers the
+// exact trade a village would want to make. Phase 0 is therefore not
+// "invent a route" but "join three things that exist".
+// ---------------------------------------------------------------------------
+export const GROUND: {
+  title: Bilingual;
+  body: Bilingual;
+  soWhat: Bilingual;
+  href: string;
+  label: string;
+}[] = [
+  {
+    title: {
+      en: 'The road is already a National Historic Trail',
+      es: 'El camino ya es un Sendero Histórico Nacional',
+    },
+    body: {
+      en: 'The National Park Service designated El Camino Real de los Tejas a National Historic Trail in 2004. It runs from the Rio Grande to Natchitoches, and its northern branch passes through San Marcos, New Braunfels and San Antonio.',
+      es: 'El Servicio de Parques Nacionales designó El Camino Real de los Tejas como Sendero Histórico Nacional en 2004. Va del río Grande a Natchitoches, y su ramal norte pasa por San Marcos, New Braunfels y San Antonio.',
+    },
+    soWhat: {
+      en: 'The corridor does not have to be invented or argued for. It already has a federal designation, a map, and an administering office.',
+      es: 'El corredor no hay que inventarlo ni defenderlo. Ya tiene designación federal, mapa, y una oficina que lo administra.',
+    },
+    href: 'https://www.nps.gov/elte/index.htm',
+    label: 'nps.gov/elte',
+  },
+  {
+    title: {
+      en: 'Certification trades public access for help',
+      es: 'La certificación cambia acceso público por ayuda',
+    },
+    body: {
+      en: 'A landowner whose property carries a piece of the historic trail can become a certified trail partner: the Park Service evaluates the site, and in exchange for at least occasional public access the partner gets technical assistance and access to project funding. More than ninety high-potential segments, over a hundred miles in all, have been identified across Texas and Louisiana.',
+      es: 'Un propietario cuyo terreno lleva un tramo del sendero histórico puede volverse socio certificado: el Servicio de Parques evalúa el sitio, y a cambio de al menos acceso público ocasional el socio recibe asistencia técnica y acceso a fondos. Se han identificado más de noventa tramos de alto potencial, más de cien millas en total, en Tejas y Luisiana.',
+    },
+    soWhat: {
+      en: 'This is the trade a village already wants to make. Hospitality to strangers is the mission, so "at least occasional public access" costs the village nothing it was not going to give away. Land with a certified segment on it is worth more to this project than land without.',
+      es: 'Es exactamente el trato que una aldea ya quiere hacer. La hospitalidad al forastero es la misión, así que "acceso público ocasional" no le cuesta a la aldea nada que no fuera a dar igual. Tierra con un tramo certificado vale más para este proyecto que tierra sin él.',
+    },
+    href: 'https://www.nps.gov/orgs/1453/certification.htm',
+    label: 'Trail certification, NPS',
+  },
+  {
+    title: {
+      en: 'The southern end already has a credential',
+      es: 'El extremo sur ya tiene credencial',
+    },
+    body: {
+      en: 'El Camino de San Antonio Missions is a working pilgrimage: a passport, stamps at each mission and the cathedral, and a certificate at the end. Walking it earns thirty kilometres of credit toward the Camino Inglés to Santiago. The pilgrim centre carries the name of Padre Margil.',
+      es: 'El Camino de San Antonio Missions ya funciona: un pasaporte, sellos en cada misión y en la catedral, y un certificado al final. Caminarlo da treinta kilómetros de crédito para el Camino Inglés a Santiago. El centro de peregrinos lleva el nombre del padre Margil.',
+    },
+    soWhat: {
+      en: 'Do not build a second credential. Extend this one north, stamp by stamp. And note the thread: the Franciscan the San Antonio pilgrim centre is named for is the same Margil the mission at Alto, stop 7, is named for. The two ends of this road are already named after the same man.',
+      es: 'No construir una segunda credencial. Extender esta hacia el norte, sello por sello. Y nótese el hilo: el franciscano que da nombre al centro de peregrinos de San Antonio es el mismo Margil de la misión de Alto, la parada 7. Los dos extremos de este camino ya llevan el nombre del mismo hombre.',
+    },
+    href: 'https://caminosanantonio.org/',
+    label: 'caminosanantonio.org',
+  },
+  {
+    title: {
+      en: 'The walking season is September to June',
+      es: 'La temporada de caminar es de septiembre a junio',
+    },
+    body: {
+      en: 'The San Antonio route is walked from late September through early June. Texas summers are too hot and much of the road has no shade.',
+      es: 'La ruta de San Antonio se camina de fines de septiembre a principios de junio. Los veranos de Tejas son demasiado calurosos y buena parte del camino no tiene sombra.',
+    },
+    soWhat: {
+      en: 'An eight-month season, which sets the pilgrim economy a village can count on and leaves the summer for the harvest. Plant shade along the road now; it takes as long to grow as the villages do.',
+      es: 'Una temporada de ocho meses, que fija la economía de peregrinos con la que una aldea puede contar y deja el verano para la cosecha. Sembrar sombra ahora: tarda en crecer lo mismo que las aldeas.',
+    },
+    href: 'https://caminosanantonio.org/plan-your-pilgrimage/self-guided/',
+    label: 'Plan your pilgrimage',
+  },
+];

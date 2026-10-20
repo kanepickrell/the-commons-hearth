@@ -17,11 +17,11 @@
 // route and the towns worth planting in are the SAME list, and that only
 // becomes obvious when you see them drawn on top of each other.
 
-import { lazy, Suspense } from 'react';
+import { createElement, lazy, Suspense } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
 import {
-  GAPS, MEASURES, PHASES, SCALE, STAGES, STOPS,
+  GAPS, GROUND, MEASURES, PHASES, PRINCIPLES, SCALE, STAGES, STOPS, THESIS,
   TOTAL_MILES, VILLAGE_CORE, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
 } from '@/content/camino';
 
@@ -79,6 +79,13 @@ export default function RebuildingTheWay() {
             ? 'Casi lo mismo que el Camino Francés, que suele caminarse en cinco semanas.'
             : 'Almost exactly the Camino Francés, which people walk in about five weeks.'}
         </p>
+
+        {/* The thesis, and the reason for the name. */}
+        <blockquote className="mx-auto mt-12 max-w-2xl border-t border-b border-mesquite/15 py-7">
+          <p className="font-heading text-xl leading-relaxed text-mesquite md:text-2xl">
+            {t(THESIS)}
+          </p>
+        </blockquote>
       </section>
 
       {/* ---------------------------------------------------------------- */}
@@ -216,6 +223,107 @@ export default function RebuildingTheWay() {
               </article>
             );
           })}
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* What is already on the ground                                     */}
+      {/*                                                                   */}
+      {/* Researched, not assumed, and it moves the plan: the road is       */}
+      {/* already a National Historic Trail, the southern end already has a */}
+      {/* working credential, and certification already offers the exact    */}
+      {/* trade a village wants to make. Phase 0 is joining three things    */}
+      {/* that exist, not inventing one.                                    */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'LO QUE YA EXISTE' : 'WHAT ALREADY EXISTS'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'No hay que inventar el camino' : 'The road does not need inventing'}
+        </h2>
+
+        <ul className="mt-8 space-y-8">
+          {GROUND.map((g) => (
+            <li key={g.href} className="border-t border-mesquite/15 pt-6">
+              <h3 className="font-heading text-xl leading-snug text-mesquite">{t(g.title)}</h3>
+              <p className="prose-body mt-3 text-sm leading-relaxed text-mesquite/80">
+                {t(g.body)}
+              </p>
+              <p className="mt-3 border-l-2 border-ocre/40 pl-4 font-serif text-sm italic leading-relaxed text-mesquite">
+                {t(g.soWhat)}
+              </p>
+              {createElement(
+                'a',
+                {
+                  href: g.href,
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                  className:
+                    'mt-3 inline-block font-caps text-[11px] tracking-[0.15em] text-ocre no-underline hover:text-mesquite',
+                },
+                <>{g.label} →</>,
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* The charter                                                       */}
+      {/*                                                                   */}
+      {/* Requirements, not an essay. Each is a thing a village either does */}
+      {/* or does not do, numbered so it can be argued with by number and   */}
+      {/* checked against a real town.                                      */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'LA CARTA DE LA ALDEA' : 'THE VILLAGE CHARTER'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'Lo que hace que una aldea sea una' : 'What makes a village one'}
+        </h2>
+        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Requisitos, no ideas. Cada uno es algo que una aldea hace o no hace, y casi todos llevan una prueba que lo zanja. Están numerados para poder discutirlos por número.'
+            : 'Requirements, not ideas. Each is a thing a village either does or does not do, and most carry a test that settles it. They are numbered so they can be argued with by number.'}
+        </p>
+
+        <div className="mt-10 space-y-10">
+          {PRINCIPLES.map((pr) => (
+            <article key={pr.key}>
+              <div className="flex gap-4 border-b border-mesquite/15 pb-3">
+                <span className="font-heading text-3xl leading-none text-ocre tabular-nums">
+                  {pr.n}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-heading text-2xl leading-snug text-mesquite">
+                    {t(pr.name)}
+                  </h3>
+                  <p className="prose-body mt-2 text-sm italic leading-relaxed text-piedra">
+                    {t(pr.claim)}
+                  </p>
+                </div>
+              </div>
+
+              <ul className="mt-4 space-y-4">
+                {pr.requirements.map((r) => (
+                  <li key={r.id} className="flex gap-4">
+                    <span className="mt-0.5 w-7 flex-shrink-0 font-caps text-[11px] tracking-[0.1em] text-ocre">
+                      {r.id}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="prose-body text-base leading-relaxed text-mesquite/90">
+                        {t(r.text)}
+                      </p>
+                      {r.test && (
+                        <p className="mt-1 font-serif text-sm italic leading-snug text-piedra">
+                          {es ? 'Prueba: ' : 'Test: '}
+                          {t(r.test)}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
         </div>
       </section>
 
