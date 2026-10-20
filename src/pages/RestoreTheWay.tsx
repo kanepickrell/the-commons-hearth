@@ -133,8 +133,8 @@ export default function RestoreTheWay() {
 
         <p className="mx-auto mt-4 max-w-2xl text-center font-serif text-xs italic text-piedra/80">
           {es
-            ? 'Coordenadas geocodificadas contra OpenStreetMap. Diecinueve de veintiuna dieron en la dirección o el sitio; faltan dos, Chireno y la misión de Alto. Las distancias siguen siendo por etapa, no por tramo.'
-            : 'Coordinates geocoded against OpenStreetMap. Nineteen of twenty-one resolved to the address or the site; two are still outstanding, Chireno and the Margil mission at Alto. Distances are still by stage, not by leg.'}
+            ? 'Coordenadas geocodificadas contra OpenStreetMap. Diecinueve de veintiuna dieron en la dirección o el sitio; faltan dos, Chireno y la misión de Alto. Las cinco paradas de San Antonio caben en trece millas: clic en 17–21 para acercar. Las distancias siguen siendo por etapa, no por tramo.'
+            : 'Coordinates geocoded against OpenStreetMap. Nineteen of twenty-one resolved to the address or the site; two are still outstanding, Chireno and the Margil mission at Alto. The five San Antonio stops fit inside thirteen miles: click 17–21 to zoom in. Distances are still by stage, not by leg.'}
         </p>
       </section>
 

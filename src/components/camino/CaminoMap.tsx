@@ -18,8 +18,10 @@
 // Leaflet writes vector colours onto SVG presentation attributes where
 // var() is never resolved. Same reason, same helper as ParishMap.
 
-import { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  MapContainer, TileLayer, Polyline, Marker, Popup, Tooltip, useMap, useMapEvents,
+} from 'react-leaflet';
 import L from 'leaflet';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { tokenColor, type BrandToken } from '@/lib/tokens';
@@ -45,6 +47,40 @@ const stamp = (n: number, color: string, anchor: boolean) =>
     ">${n}</div>`,
   });
 
+/**
+ * The last five stops are the official Camino de San Antonio Missions, and
+ * they sit inside thirteen miles. At corridor zoom that is four pixels, so
+ * five 26px stamps land on top of each other.
+ *
+ * Below this zoom they are drawn as one pill that flies the map down to them
+ * when clicked; above it they are five ordinary stamps. Eleven is where the
+ * tightest pair separates: Espada and San Juan are 1.06 miles apart, which
+ * at z11 and this latitude is about 26 pixels, one stamp's width.
+ *
+ * Marker clustering is already a dependency here and was the other option.
+ * It loses the numbers, and on a planning map the order of the stops is the
+ * information.
+ */
+const SA_SPLIT_ZOOM = 11;
+
+/** The grouped stamp. Wider than a numbered one, and reads as a range. */
+const groupStamp = (label: string, color: string) =>
+  L.divIcon({
+    className: '',
+    iconSize: [56, 26],
+    iconAnchor: [28, 13],
+    html: `<div style="
+      width:56px;height:26px;border-radius:9999px;
+      display:flex;align-items:center;justify-content:center;
+      background:${tokenColor('cal')};
+      border:2px solid ${color};
+      box-shadow:0 1px 3px hsl(0 0% 0% / 0.25);
+      font-family:'EB Garamond',Georgia,serif;font-size:12px;line-height:1;
+      color:${tokenColor('mesquite')};
+      cursor:zoom-in;
+    ">${label}</div>`,
+  });
+
 /** Fit to the whole corridor once, on mount. */
 const FitRoute = ({ points }: { points: [number, number][] }) => {
   const map = useMap();
@@ -55,9 +91,85 @@ const FitRoute = ({ points }: { points: [number, number][] }) => {
   return null;
 };
 
-export const CaminoMap = ({ height = 560 }: { height?: number }) => {
-  const { t, locale } = useLocale();
+const SA_STOPS = STOPS.filter((s) => s.stage === 'missions-sa');
 
+/** Centroid of the San Antonio five, for the grouped stamp. */
+const SA_CENTRE: [number, number] = [
+  SA_STOPS.reduce((a, s) => a + s.at[0], 0) / SA_STOPS.length,
+  SA_STOPS.reduce((a, s) => a + s.at[1], 0) / SA_STOPS.length,
+];
+
+const StopMarkers = () => {
+  const { t, locale } = useLocale();
+  const map = useMap();
+  const [zoom, setZoom] = useState(() => map.getZoom());
+  useMapEvents({ zoomend: (e) => setZoom(e.target.getZoom()) });
+
+  const grouped = zoom < SA_SPLIT_ZOOM;
+  const shown = grouped ? STOPS.filter((s) => s.stage !== 'missions-sa') : STOPS;
+
+  return (
+    <>
+      {shown.map((s) => (
+        <Marker
+          key={s.n}
+          position={s.at}
+          icon={stamp(s.n, tokenColor(stageToken(s.stage)), !!s.anchorCandidate)}
+        >
+          <Popup>
+            <div style={{ minWidth: 190 }}>
+              <p className="font-caps text-[10px] tracking-[0.18em] text-ocre">
+                {s.n} · {t(STAGES.find((x) => x.key === s.stage)!.name)}
+              </p>
+              <p className="mt-1 font-heading text-base leading-snug text-mesquite">{s.name}</p>
+              <p className="font-serif text-xs italic text-piedra">{s.town}</p>
+              {s.note && (
+                <p className="mt-2 font-serif text-xs leading-snug text-mesquite/80">{t(s.note)}</p>
+              )}
+              {s.anchorCandidate && (
+                <p className="mt-2 font-caps text-[9px] tracking-[0.18em] text-rojo">
+                  {locale === 'es' ? 'CANDIDATA A ALDEA ANCLA' : 'ANCHOR VILLAGE CANDIDATE'}
+                </p>
+              )}
+              <p className="mt-2 font-serif text-[11px] text-piedra/80">{s.address}</p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+
+      {/* Click zooms rather than opening a popup, because the useful thing
+          to do with five stops in thirteen miles is look closer. */}
+      {grouped && (
+        <Marker
+          position={SA_CENTRE}
+          icon={groupStamp(
+            `${SA_STOPS[0].n}–${SA_STOPS[SA_STOPS.length - 1].n}`,
+            tokenColor(stageToken('missions-sa')),
+          )}
+          eventHandlers={{
+            // Fit the five rather than flying to a fixed zoom, so the
+            // cathedral at the north end cannot land off the top edge.
+            click: () =>
+              map.flyToBounds(L.latLngBounds(SA_STOPS.map((s) => s.at)), {
+                padding: [48, 48],
+                duration: 0.8,
+              }),
+          }}
+        >
+          <Tooltip direction="right" offset={[16, 0]}>
+            <span className="font-serif text-xs">
+              {locale === 'es'
+                ? 'Las cinco paradas de San Antonio en trece millas. Clic para acercar.'
+                : 'The five San Antonio stops, in thirteen miles. Click to zoom in.'}
+            </span>
+          </Tooltip>
+        </Marker>
+      )}
+    </>
+  );
+};
+
+export const CaminoMap = ({ height = 560 }: { height?: number }) => {
   const points = useMemo(() => STOPS.map((s) => s.at), []);
 
   // One polyline per stage, so each leg carries its own colour. Each starts
@@ -130,34 +242,7 @@ export const CaminoMap = ({ height = 560 }: { height?: number }) => {
           />
         ))}
 
-        {STOPS.map((s) => (
-          <Marker
-            key={s.n}
-            position={s.at}
-            icon={stamp(s.n, tokenColor(stageToken(s.stage)), !!s.anchorCandidate)}
-          >
-            <Popup>
-              <div style={{ minWidth: 190 }}>
-                <p className="font-caps text-[10px] tracking-[0.18em] text-ocre">
-                  {s.n} · {t(STAGES.find((x) => x.key === s.stage)!.name)}
-                </p>
-                <p className="mt-1 font-heading text-base leading-snug text-mesquite">{s.name}</p>
-                <p className="font-serif text-xs italic text-piedra">{s.town}</p>
-                {s.note && (
-                  <p className="mt-2 font-serif text-xs leading-snug text-mesquite/80">
-                    {t(s.note)}
-                  </p>
-                )}
-                {s.anchorCandidate && (
-                  <p className="mt-2 font-caps text-[9px] tracking-[0.18em] text-rojo">
-                    {locale === 'es' ? 'CANDIDATA A ALDEA ANCLA' : 'ANCHOR VILLAGE CANDIDATE'}
-                  </p>
-                )}
-                <p className="mt-2 font-serif text-[11px] text-piedra/80">{s.address}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <StopMarkers />
       </MapContainer>
     </div>
   );
