@@ -133,8 +133,8 @@ export default function RestoreTheWay() {
 
         <p className="mx-auto mt-4 max-w-2xl text-center font-serif text-xs italic text-piedra/80">
           {es
-            ? 'Coordenadas a nivel de pueblo, para planear y discutir. Antes de que alguien camine esto, hay que tomar puntos GPS en la puerta de cada iglesia.'
-            : 'Town-centre coordinates, good for planning and arguing. Before anyone walks this, every stop needs a GPS point taken at the church door.'}
+            ? 'Coordenadas geocodificadas contra OpenStreetMap. Dieciocho de veinte dieron en la dirección o el sitio; faltan dos, Chireno y la misión de Alto. Las distancias siguen siendo por etapa, no por tramo.'
+            : 'Coordinates geocoded against OpenStreetMap. Eighteen of twenty resolved to the address or the site; two are still outstanding, Chireno and the Margil mission at Alto. Distances are still by stage, not by leg.'}
         </p>
       </section>
 
@@ -208,6 +208,18 @@ export default function RestoreTheWay() {
                         {/* The address is here so it can be pasted straight
                             into a maps search while planning a leg. */}
                         <p className="font-serif text-xs text-piedra/80">{s.address}</p>
+                        <p className="mt-0.5 font-serif text-xs italic text-piedra/70">
+                          {s.county} · {s.diocese}
+                          {s.kind === 'site' || s.kind === 'town' ? (
+                            <span className="text-rojo">
+                              {' '}
+                              · {es ? 'sin parroquia' : 'no parish'}
+                            </span>
+                          ) : null}
+                          {s.fix === 'town' ? (
+                            <span>{' '}· {es ? 'falta punto GPS' : 'GPS point outstanding'}</span>
+                          ) : null}
+                        </p>
                         {s.note && (
                           <p className="prose-body mt-1 text-sm leading-snug text-mesquite/80">
                             {t(s.note)}

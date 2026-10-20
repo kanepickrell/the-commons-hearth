@@ -2,13 +2,17 @@
 // The corridor: El Camino Real de los Tejas, read as a string of stages, and
 // the village plan hung on it.
 //
-// ⚠️ PLANNING DATA, NOT SURVEY DATA. Every coordinate below is the centre of
-// the town or the published location of the site, good to a few hundred
-// metres — enough to draw a corridor and argue about which towns to target,
-// nowhere near enough to plan a walking route. Before anyone walks this,
-// replace each `at` with a GPS point taken at the door of the church or the
-// gate of the site, and replace `milesToNext` with measured road miles in
-// walking mode rather than the segment estimates these came from.
+// COORDINATES are geocoded against OpenStreetMap, not estimated. Eighteen
+// of the twenty resolved to the street address or the named site. Two carry
+// fix: 'town' — Chireno and the Margil mission at Alto — and those are the
+// points someone still has to stand on with a phone. Two of the old
+// estimates were badly wrong and are worth remembering as a caution about
+// eyeballing a map: Los Adaes was out by about nine miles and the Rancheria
+// Grande by nearly six.
+//
+// DISTANCES are still the chapter's own first pass: road miles by segment,
+// not leg by leg, so the SEGMENT totals are the figures to trust and no
+// single leg should be quoted on its own.
 //
 // The distances here are the chapter's own first pass: road miles by
 // segment, not leg by leg, so `milesToNext` on an individual stop is an
@@ -25,8 +29,23 @@ export type Stop = {
   town: string;
   /** As given, so it can be pasted straight into a maps search. */
   address: string;
-  /** [lat, lng] — approximate, see the warning above. */
+  /** [lat, lng], geocoded against OpenStreetMap. See `fix`. */
   at: [number, number];
+  /**
+   * How good the point is. 'address' resolved to the street address or the
+   * named site; 'town' only resolved to the town centroid and still needs
+   * someone to stand at the door with a phone.
+   */
+  fix: 'address' | 'town';
+  /**
+   * Whether a village could anchor here at all. Requirement P1 says form
+   * around a parish that already exists, so a 'site' or a 'town' is a stop
+   * on the road and nothing more until a parish is there.
+   */
+  kind: 'parish' | 'mission' | 'site' | 'town';
+  county: string;
+  /** Which bishop. Four of them hold this road. */
+  diocese: 'Alexandria' | 'Tyler' | 'Austin' | 'San Antonio';
   stage: Stage;
   /** Why this stop is on the road at all. */
   note?: Bilingual;
@@ -75,19 +94,22 @@ export const STAGES: {
 
 export const STOPS: Stop[] = [
   {
-    n: 1, stage: 'louisiana', at: [31.7607, -93.0863],
+    n: 1, stage: 'louisiana', at: [31.7611, -93.0874], fix: 'address', kind: 'parish',
+    county: 'Natchitoches Parish, LA', diocese: 'Alexandria',
     name: 'Minor Basilica of the Immaculate Conception', town: 'Natchitoches, LA',
     address: '145 Church St, Natchitoches, LA 71457',
     note: { en: 'Start and blessing.', es: 'Inicio y bendición.' },
   },
   {
-    n: 2, stage: 'louisiana', at: [31.7633, -93.4254],
+    n: 2, stage: 'louisiana', at: [31.7085, -93.2932], fix: 'address', kind: 'site',
+    county: 'Natchitoches Parish, LA', diocese: 'Alexandria',
     name: 'Los Adaes State Historic Site', town: 'Robeline, LA',
     address: '6354 LA-485, Robeline, LA 71469',
     note: { en: 'The old capital of Spanish Texas.', es: 'La antigua capital de la Tejas española.' },
   },
   {
-    n: 3, stage: 'louisiana', at: [31.6315, -93.6438],
+    n: 3, stage: 'louisiana', at: [31.6329, -93.6491], fix: 'address', kind: 'parish',
+    county: 'Sabine Parish, LA', diocese: 'Alexandria',
     name: 'St. Joseph Catholic Church', town: 'Zwolle, LA',
     address: '307 Hammond St, Zwolle, LA 71486',
     note: {
@@ -96,22 +118,26 @@ export const STOPS: Stop[] = [
     },
   },
   {
-    n: 4, stage: 'missions', at: [31.5207, -94.1130],
+    n: 4, stage: 'missions', at: [31.5233, -94.1155], fix: 'address', kind: 'site',
+    county: 'San Augustine County', diocese: 'Tyler',
     name: 'Mission Dolores State Historic Site', town: 'San Augustine, TX',
     address: '701 S Broadway St, San Augustine, TX 75972',
     note: { en: 'First Texas stop.', es: 'Primera parada en Tejas.' },
   },
   {
-    n: 5, stage: 'missions', at: [31.4966, -94.3516],
+    n: 5, stage: 'missions', at: [31.4993, -94.3519], fix: 'town', kind: 'town',
+    county: 'Nacogdoches County', diocese: 'Tyler',
     name: 'Chireno', town: 'Chireno, TX', address: 'Chireno, TX 75937',
   },
   {
-    n: 6, stage: 'missions', at: [31.6035, -94.6555],
+    n: 6, stage: 'missions', at: [31.6247, -94.6323], fix: 'address', kind: 'parish',
+    county: 'Nacogdoches County', diocese: 'Tyler',
     name: 'Sacred Heart Catholic Church', town: 'Nacogdoches, TX',
     address: '2508 Appleby Sand Rd, Nacogdoches, TX 75965',
   },
   {
-    n: 7, stage: 'missions', at: [31.6516, -95.0683],
+    n: 7, stage: 'missions', at: [31.6505, -95.0727], fix: 'town', kind: 'mission',
+    county: 'Cherokee County', diocese: 'Tyler',
     name: 'Venerable Antonio Margil Catholic Mission', town: 'Alto, TX',
     address: '498 The Kings Hwy, Alto, TX 75925',
     note: {
@@ -120,13 +146,15 @@ export const STOPS: Stop[] = [
     },
   },
   {
-    n: 8, stage: 'missions', at: [31.5466, -95.2225],
+    n: 8, stage: 'missions', at: [31.5483, -95.2391], fix: 'address', kind: 'site',
+    county: 'Houston County', diocese: 'Tyler',
     name: 'Mission Tejas State Park', town: 'Grapeland, TX',
     address: '19343 State Hwy 21 E, Grapeland, TX 75844',
     note: { en: 'A walkable trail segment.', es: 'Un tramo de sendero transitable a pie.' },
   },
   {
-    n: 9, stage: 'middle', at: [31.3185, -95.4569],
+    n: 9, stage: 'middle', at: [31.3231, -95.4580], fix: 'address', kind: 'parish',
+    county: 'Houston County', diocese: 'Tyler',
     name: 'St. Francis of the Tejas', town: 'Crockett, TX',
     address: '609 N 4th St, Crockett, TX 75835',
     anchorCandidate: true,
@@ -136,7 +164,8 @@ export const STOPS: Stop[] = [
     },
   },
   {
-    n: 10, stage: 'middle', at: [30.6744, -96.3699],
+    n: 10, stage: 'middle', at: [30.6732, -96.3688], fix: 'address', kind: 'parish',
+    county: 'Brazos County', diocese: 'Austin',
     name: 'St. Joseph Catholic Church', town: 'Bryan, TX',
     address: '507 E 26th St, Bryan, TX 77803',
     note: {
@@ -145,7 +174,8 @@ export const STOPS: Stop[] = [
     },
   },
   {
-    n: 11, stage: 'middle', at: [30.5299, -96.6939],
+    n: 11, stage: 'middle', at: [30.5374, -96.6978], fix: 'address', kind: 'parish',
+    county: 'Burleson County', diocese: 'Austin',
     name: 'St. Mary Our Lady of Lourdes', town: 'Caldwell, TX',
     address: '500 W Old San Antonio Rd, Caldwell, TX 77836',
     anchorCandidate: true,
@@ -155,12 +185,14 @@ export const STOPS: Stop[] = [
     },
   },
   {
-    n: 12, stage: 'milam', at: [30.7549, -96.8305],
+    n: 12, stage: 'milam', at: [30.8053, -96.7529], fix: 'address', kind: 'site',
+    county: 'Milam County', diocese: 'Austin',
     name: 'Walk the Rancheria Grande', town: 'Gause, TX',
     address: '12374 FM 2095, Gause, TX 77857',
   },
   {
-    n: 13, stage: 'milam', at: [30.6549, -97.0014],
+    n: 13, stage: 'milam', at: [30.6578, -96.9986], fix: 'address', kind: 'parish',
+    county: 'Milam County', diocese: 'Austin',
     name: "St. Joseph's Catholic Church", town: 'Rockdale, TX',
     address: '234 San Gabriel St, Rockdale, TX 76567',
     anchorCandidate: true,
@@ -170,37 +202,44 @@ export const STOPS: Stop[] = [
     },
   },
   {
-    n: 14, stage: 'milam', at: [30.1105, -97.3153],
+    n: 14, stage: 'milam', at: [30.1095, -97.3185], fix: 'address', kind: 'parish',
+    county: 'Bastrop County', diocese: 'Austin',
     name: 'Ascension Catholic Church', town: 'Bastrop, TX',
     address: '804 Pine St, Bastrop, TX 78602',
   },
   {
-    n: 15, stage: 'milam', at: [29.8833, -97.9414],
+    n: 15, stage: 'milam', at: [29.8842, -97.9303], fix: 'address', kind: 'parish',
+    county: 'Hays County', diocese: 'Austin',
     name: 'St. John the Evangelist', town: 'San Marcos, TX',
     address: '624 E Hopkins St, San Marcos, TX 78666',
   },
   {
-    n: 16, stage: 'milam', at: [29.7030, -98.1245],
+    n: 16, stage: 'milam', at: [29.7034, -98.1283], fix: 'address', kind: 'parish',
+    county: 'Comal County', diocese: 'San Antonio',
     name: 'Sts. Peter and Paul', town: 'New Braunfels, TX',
     address: '386 N Castell Ave, New Braunfels, TX 78130',
   },
   {
-    n: 17, stage: 'missions-sa', at: [29.4252, -98.4946],
+    n: 17, stage: 'missions-sa', at: [29.4243, -98.4942], fix: 'address', kind: 'parish',
+    county: 'Bexar County', diocese: 'San Antonio',
     name: 'San Fernando Cathedral', town: 'San Antonio, TX',
     address: '115 Main Plaza, San Antonio, TX 78205',
   },
   {
-    n: 18, stage: 'missions-sa', at: [29.3906, -98.4820],
+    n: 18, stage: 'missions-sa', at: [29.3898, -98.4917], fix: 'address', kind: 'parish',
+    county: 'Bexar County', diocese: 'San Antonio',
     name: 'Mission Concepción', town: 'San Antonio, TX',
     address: '807 Mission Rd, San Antonio, TX 78210',
   },
   {
-    n: 19, stage: 'missions-sa', at: [29.3625, -98.4807],
+    n: 19, stage: 'missions-sa', at: [29.3603, -98.4789], fix: 'address', kind: 'parish',
+    county: 'Bexar County', diocese: 'San Antonio',
     name: 'Mission San José', town: 'San Antonio, TX',
     address: '6701 San Jose Dr, San Antonio, TX 78214',
   },
   {
-    n: 20, stage: 'missions-sa', at: [29.3203, -98.4553],
+    n: 20, stage: 'missions-sa', at: [29.3182, -98.4512], fix: 'address', kind: 'parish',
+    county: 'Bexar County', diocese: 'San Antonio',
     name: 'Mission Espada', town: 'San Antonio, TX',
     address: '10040 Espada Rd, San Antonio, TX 78214',
     note: {
@@ -783,15 +822,15 @@ export type Figure = {
 export const IMPACT: Figure[] = [
   {
     id: 'I1',
-    figure: '600',
+    figure: '450',
     label: { en: 'households', es: 'hogares' },
     body: {
-      en: 'Twenty villages of thirty families: about 3,000 people and some 1,800 children raised on farms, in parish schools, and in trades. The households are the unit that matters, because they are what has to be recruited, one at a time.',
-      es: 'Veinte aldeas de treinta familias: unas 3,000 personas y unos 1,800 niños criados en granjas, escuelas parroquiales y oficios. El hogar es la unidad que importa, porque es lo que hay que reclutar, uno por uno.',
+      en: 'Fifteen villages of thirty families: about 2,250 people and some 1,350 children raised on farms, in parish schools, and in trades. Fifteen, not twenty, because only fifteen of the twenty stops have a church. The other five are state historic sites and a crossroads, and requirement P1 will not let a village start where there is no parish to join.',
+      es: 'Quince aldeas de treinta familias: unas 2,250 personas y unos 1,350 niños criados en granjas, escuelas parroquiales y oficios. Quince, no veinte, porque sólo quince de las veinte paradas tienen iglesia. Las otras cinco son sitios históricos estatales y un cruce de caminos, y el requisito P1 no deja empezar una aldea donde no hay parroquia a la cual unirse.',
     },
     basis: {
-      en: 'Five people a household, against a US average of 2.5. A bet on large families, and the figure most worth stating as a bet.',
-      es: 'Cinco personas por hogar, frente a un promedio de 2.5 en EE. UU. Una apuesta por familias grandes, y la cifra que más conviene declarar como apuesta.',
+      en: 'Five people a household, against a US average of 2.5. A bet on large families, and the figure most worth stating as a bet. The village count is a hard ceiling until a new parish or mission opens somewhere along the five stops that have none.',
+      es: 'Cinco personas por hogar, frente a un promedio de 2.5 en EE. UU. Una apuesta por familias grandes, y la cifra que más conviene declarar como apuesta. El número de aldeas es un techo duro hasta que abra una parroquia o misión en alguna de las cinco paradas que no tienen ninguna.',
     },
   },
   {
