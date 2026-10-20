@@ -1,6 +1,7 @@
 // src/components/camino/CaminoMap.tsx
-// The corridor, drawn: twenty stops from Natchitoches to Espada, the stages
-// coloured, and the gaps marked where the road stops working on foot.
+// The corridor, drawn: twenty-one stops from Natchitoches to San Fernando
+// Cathedral, the stages coloured, and the gaps marked where the road stops
+// working on foot.
 //
 // Two things this map does that the parish map doesn't, and why:
 //

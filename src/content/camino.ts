@@ -2,8 +2,8 @@
 // The corridor: El Camino Real de los Tejas, read as a string of stages, and
 // the village plan hung on it.
 //
-// COORDINATES are geocoded against OpenStreetMap, not estimated. Eighteen
-// of the twenty resolved to the street address or the named site. Two carry
+// COORDINATES are geocoded against OpenStreetMap, not estimated. Nineteen
+// of the twenty-one resolved to the street address or the named site. Two carry
 // fix: 'town' — Chireno and the Margil mission at Alto — and those are the
 // points someone still has to stand on with a phone. Two of the old
 // estimates were badly wrong and are worth remembering as a caution about
@@ -86,8 +86,12 @@ export const STAGES: {
   },
   {
     key: 'missions-sa',
-    name: { en: 'San Antonio', es: 'San Antonio' },
-    miles: 41,
+    name: { en: 'The San Antonio missions', es: 'Las misiones de San Antonio' },
+    // 45 road miles from New Braunfels down past downtown to Espada, then the
+    // official 13-mile Camino de San Antonio Missions walked back north to the
+    // cathedral. The walker passes through the city twice on purpose: the last
+    // thirteen miles are a route that is already signed and already walked.
+    miles: 58,
     token: 'piedra',
   },
 ];
@@ -219,32 +223,60 @@ export const STOPS: Stop[] = [
     name: 'Sts. Peter and Paul', town: 'New Braunfels, TX',
     address: '386 N Castell Ave, New Braunfels, TX 78130',
   },
+  // The last five stops are the official Camino de San Antonio Missions, in
+  // its published direction: Espada, San Juan, San José, Concepción, the
+  // cathedral. Thirteen miles, and walking them earns a Compostela worth 30
+  // km of credit toward the Camino Inglés. Three of the four missions were
+  // founded in East Texas and walked here in 1731, so the corridor is not a
+  // route invented for this project. It is the route they took.
   {
-    n: 17, stage: 'missions-sa', at: [29.4243, -98.4942], fix: 'address', kind: 'parish',
+    n: 17, stage: 'missions-sa', at: [29.3182, -98.4512], fix: 'address', kind: 'parish',
     county: 'Bexar County', diocese: 'San Antonio',
-    name: 'San Fernando Cathedral', town: 'San Antonio, TX',
-    address: '115 Main Plaza, San Antonio, TX 78205',
+    name: 'Mission Espada', town: 'San Antonio, TX',
+    address: '10040 Espada Rd, San Antonio, TX 78214',
+    note: {
+      en: 'Founded in 1690 at Weches as San Francisco de los Tejas. Stop 8 is its birthplace, 240 miles back up the road.',
+      es: 'Fundada en 1690 en Weches como San Francisco de los Tejas. La parada 8 es su cuna, 240 millas atrás en el camino.',
+    },
   },
   {
-    n: 18, stage: 'missions-sa', at: [29.3898, -98.4917], fix: 'address', kind: 'parish',
+    n: 18, stage: 'missions-sa', at: [29.3330, -98.4553], fix: 'address', kind: 'parish',
     county: 'Bexar County', diocese: 'San Antonio',
-    name: 'Mission Concepción', town: 'San Antonio, TX',
-    address: '807 Mission Rd, San Antonio, TX 78210',
+    name: 'Mission San Juan Capistrano', town: 'San Antonio, TX',
+    address: '9101 Graf Rd, San Antonio, TX 78214',
+    note: {
+      en: 'East Texas as well: founded in 1716 as San José de los Nazonis, among the Nazoni Caddo.',
+      es: 'También del este de Tejas: fundada en 1716 como San José de los Nazonis, entre los caddo nazoni.',
+    },
   },
   {
     n: 19, stage: 'missions-sa', at: [29.3603, -98.4789], fix: 'address', kind: 'parish',
     county: 'Bexar County', diocese: 'San Antonio',
     name: 'Mission San José', town: 'San Antonio, TX',
     address: '6701 San Jose Dr, San Antonio, TX 78214',
+    note: {
+      en: 'Margil founded this one in 1720, and the missions at Los Adaes, San Augustine and Nacogdoches at the other end.',
+      es: 'Margil fundó esta en 1720, y las misiones de Los Adaes, San Augustine y Nacogdoches en el otro extremo.',
+    },
   },
   {
-    n: 20, stage: 'missions-sa', at: [29.3182, -98.4512], fix: 'address', kind: 'parish',
+    n: 20, stage: 'missions-sa', at: [29.3898, -98.4917], fix: 'address', kind: 'parish',
     county: 'Bexar County', diocese: 'San Antonio',
-    name: 'Mission Espada', town: 'San Antonio, TX',
-    address: '10040 Espada Rd, San Antonio, TX 78214',
+    name: 'Mission Concepción', town: 'San Antonio, TX',
+    address: '807 Mission Rd, San Antonio, TX 78210',
     note: {
-      en: 'The end, and where this road joins the official Camino de San Antonio.',
-      es: 'El final, y donde este camino se une al Camino oficial de San Antonio.',
+      en: 'Founded in East Texas in 1711 as Nuestra Señora de la Purísima Concepción de los Hainais.',
+      es: 'Fundada en el este de Tejas en 1711 como Nuestra Señora de la Purísima Concepción de los Hainais.',
+    },
+  },
+  {
+    n: 21, stage: 'missions-sa', at: [29.4246, -98.4942], fix: 'address', kind: 'parish',
+    county: 'Bexar County', diocese: 'San Antonio',
+    name: 'San Fernando Cathedral', town: 'San Antonio, TX',
+    address: '115 Main Plaza, San Antonio, TX 78205',
+    note: {
+      en: 'The end. Fifteen Canary Island families founded this parish on 9 March 1731, the same year the three missions arrived. The oldest parish community in Texas, and the mother church of the archdiocese.',
+      es: 'El final. Quince familias de las Islas Canarias fundaron esta parroquia el 9 de marzo de 1731, el mismo año en que llegaron las tres misiones. La comunidad parroquial más antigua de Tejas, e iglesia madre de la arquidiócesis.',
     },
   },
 ];
@@ -414,7 +446,7 @@ export const PRINCIPLES: Principle[] = [
     n: 1,
     name: { en: 'Hospitality is the mission', es: 'La hospitalidad es la misión' },
     claim: {
-      en: 'The layman\u2019s job is not bridges but walls, so that there are thresholds to welcome people through.',
+      en: 'The layman’s job is not bridges but walls, so that there are thresholds to welcome people through.',
       es: 'El trabajo del laico no son los puentes sino los muros, para que haya umbrales por donde dar la bienvenida.',
     },
     requirements: [
@@ -479,7 +511,7 @@ export const PRINCIPLES: Principle[] = [
       {
         id: 'W2',
         text: {
-          en: 'Time the road\u2019s calendar so pilgrims arrive at the good moments: harvest, saints\u2019 days, weddings.',
+          en: 'Time the road’s calendar so pilgrims arrive at the good moments: harvest, saints’ days, weddings.',
           es: 'Ajustar el calendario del camino para que los peregrinos lleguen en los buenos momentos: la cosecha, las fiestas de los santos, las bodas.',
         },
       },
@@ -566,7 +598,7 @@ export const PRINCIPLES: Principle[] = [
   {
     key: 'reinhabit',
     n: 5,
-    name: { en: 'Reinhabit, don\u2019t build new', es: 'Rehabitar, no construir de nuevo' },
+    name: { en: 'Reinhabit, don’t build new', es: 'Rehabitar, no construir de nuevo' },
     claim: {
       en: 'The corridor towns already have the bones. Moving into them and fixing them together is cheaper, and it is the opposite of a development arriving.',
       es: 'Los pueblos del corredor ya tienen los huesos. Mudarse a ellos y arreglarlos juntos es más barato, y es lo contrario de un desarrollo que llega.',
@@ -772,12 +804,12 @@ export const GROUND: {
       es: 'El camino cruza cuatro jurisdicciones',
     },
     body: {
-      en: 'Stops 1\u20133 are in the Diocese of Alexandria in Louisiana. Stops 4\u20139 are in the Diocese of Tyler, which holds San Augustine, Nacogdoches, Cherokee and Houston counties. Stops 10\u201316 are in the Diocese of Austin, which holds Brazos, Burleson, Milam, Bastrop and Hays. The last stops are in the Archdiocese of San Antonio.',
-      es: 'Las paradas 1\u20133 est\u00e1n en la Di\u00f3cesis de Alexandria, en Luisiana. Las paradas 4\u20139 est\u00e1n en la Di\u00f3cesis de Tyler, que abarca los condados de San Augustine, Nacogdoches, Cherokee y Houston. Las paradas 10\u201316 est\u00e1n en la Di\u00f3cesis de Austin, que abarca Brazos, Burleson, Milam, Bastrop y Hays. Las \u00faltimas est\u00e1n en la Arquidi\u00f3cesis de San Antonio.',
+      en: 'Stops 1–3 are in the Diocese of Alexandria in Louisiana. Stops 4–9 are in the Diocese of Tyler, which holds San Augustine, Nacogdoches, Cherokee and Houston counties. Stops 10–15 are in the Diocese of Austin, which holds Brazos, Burleson, Milam, Bastrop and Hays. The last six, from New Braunfels on, are in the Archdiocese of San Antonio.',
+      es: 'Las paradas 1–3 están en la Diócesis de Alexandria, en Luisiana. Las paradas 4–9 están en la Diócesis de Tyler, que abarca los condados de San Augustine, Nacogdoches, Cherokee y Houston. Las paradas 10–15 están en la Diócesis de Austin, que abarca Brazos, Burleson, Milam, Bastrop y Hays. Las últimas seis, desde New Braunfels, están en la Arquidiócesis de San Antonio.',
     },
     soWhat: {
       en: 'Four bishops, two states, two ecclesiastical provinces. No single chancery can approve this road, and no single one can stop it either. Start where the chapter already has a relationship and let the next diocese see a working village rather than a proposal.',
-      es: 'Cuatro obispos, dos estados, dos provincias eclesi\u00e1sticas. Ninguna canciller\u00eda sola puede aprobar este camino, y ninguna sola puede detenerlo. Empezar donde el cap\u00edtulo ya tiene relaci\u00f3n y dejar que la pr\u00f3xima di\u00f3cesis vea una aldea funcionando, no una propuesta.',
+      es: 'Cuatro obispos, dos estados, dos provincias eclesiásticas. Ninguna cancillería sola puede aprobar este camino, y ninguna sola puede detenerlo. Empezar donde el capítulo ya tiene relación y dejar que la próxima diócesis vea una aldea funcionando, no una propuesta.',
     },
     href: 'https://www.dioceseoftyler.org/our-diocese/',
     label: 'Diocese of Tyler counties',
@@ -797,6 +829,104 @@ export const GROUND: {
     },
     href: 'https://caminosanantonio.org/plan-your-pilgrimage/self-guided/',
     label: 'Plan your pilgrimage',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Why this road and not another one.
+//
+// Every claim here was checked against a source, and two were trimmed in the
+// checking. The Franciscan colleges are a staffing fact rather than a
+// founding one, and San Fernando's "oldest cathedral in America" is
+// contested, so what is printed is the part nobody disputes.
+//
+// The order is deliberate. It opens with whose road this was and closes with
+// the name of the state, because the last one is the argument: a stranger was
+// welcomed here once, and the welcome became the name of the place.
+// ---------------------------------------------------------------------------
+export const HERITAGE: {
+  id: string;
+  title: Bilingual;
+  body: Bilingual;
+  source: { href: string; label: string };
+}[] = [
+  {
+    id: 'H1',
+    title: { en: 'It was a friars’ road first', es: 'Primero fue camino de frailes' },
+    body: {
+      en: 'The missions along this corridor were staffed from two Franciscan colleges of Propaganda Fide, Querétaro and Zacatecas, from 1690 onward. Restoring it as a Catholic project is not a new use for the road.',
+      es: 'Las misiones de este corredor se atendieron desde dos colegios franciscanos de Propaganda Fide, Querétaro y Zacatecas, desde 1690. Restaurarlo como proyecto católico no es un uso nuevo del camino.',
+    },
+    source: {
+      href: 'https://www.nps.gov/elte/learn/historyculture/index.htm',
+      label: 'El Camino Real de los Tejas, National Park Service',
+    },
+  },
+  {
+    id: 'H2',
+    title: { en: 'One friar walked the whole of it', es: 'Un fraile lo caminó entero' },
+    body: {
+      en: 'Venerable Antonio Margil de Jesús went barefoot. He founded the missions at Los Adaes, San Augustine and Nacogdoches at the east end and Mission San José at the west, which makes his footsteps the length of this corridor. Gregory XVI declared his virtues heroic in 1836, and the Diocese of Tyler has reopened the cause with Sacred Heart in Nacogdoches, which is stop 6.',
+      es: 'El Venerable Antonio Margil de Jesús andaba descalzo. Fundó las misiones de Los Adaes, San Augustine y Nacogdoches en el extremo oriente y la Misión San José en el poniente, así que sus pasos cubren todo este corredor. Gregorio XVI declaró heroicas sus virtudes en 1836, y la Diócesis de Tyler ha reabierto la causa con Sacred Heart de Nacogdoches, que es la parada 6.',
+    },
+    source: {
+      href: 'https://caminosanantonio.org/the-life-and-legacy-of-venerable-antonio-margil-the-patron-saint-of-texas/',
+      label: 'El Camino de San Antonio Missions',
+    },
+  },
+  {
+    id: 'H3',
+    title: { en: 'Three missions already walked it', es: 'Tres misiones ya lo caminaron' },
+    body: {
+      en: 'Espada began in 1690 at Weches as San Francisco de los Tejas, Concepción in 1711 among the Hainai, San Juan in 1716 among the Nazoni. All three moved to the San Antonio River in 1731. Stop 8 is the ground Espada was founded on and stop 17 is where it stands today, so this is not a route invented for the project. It is the one they took.',
+      es: 'Espada empezó en 1690 en Weches como San Francisco de los Tejas, Concepción en 1711 entre los hainai, San Juan en 1716 entre los nazoni. Las tres se trasladaron al río San Antonio en 1731. La parada 8 es el suelo donde se fundó Espada y la 17 es donde está hoy, así que no es una ruta inventada para el proyecto. Es la que ellas tomaron.',
+    },
+    source: {
+      href: 'https://www.nps.gov/saan/learn/historyculture/mission-espada.htm',
+      label: 'Mission Espada, National Park Service',
+    },
+  },
+  {
+    id: 'H4',
+    title: {
+      en: 'Two Catholic cultures meet at the east end',
+      es: 'Dos culturas católicas se encuentran al oriente',
+    },
+    body: {
+      en: 'Louis Juchereau de St. Denis founded Natchitoches in 1714, the oldest permanent settlement in the whole Louisiana Purchase. Spain answered with Los Adaes. By our own geocoded points the two sit 12.7 miles apart: French and Spanish Catholic settlement within a morning’s walk of each other.',
+      es: 'Louis Juchereau de St. Denis fundó Natchitoches en 1714, el asentamiento permanente más antiguo de toda la Compra de Luisiana. España respondió con Los Adaes. Según nuestros propios puntos geocodificados están a 12.7 millas: el poblamiento católico francés y el español a una mañana de camino uno del otro.',
+    },
+    source: {
+      href: 'https://www.britannica.com/place/Natchitoches',
+      label: 'Natchitoches, Britannica',
+    },
+  },
+  {
+    id: 'H5',
+    title: { en: 'The ending already counts', es: 'El final ya cuenta' },
+    body: {
+      en: 'The last thirteen miles are that pilgrimage, walked in its published order: Espada, San Juan, San José, Concepción, the cathedral. Four of those stops are a UNESCO World Heritage site. Fifteen Canary Island families founded the cathedral parish on 9 March 1731, the same year the three missions arrived, and it is the oldest parish community in Texas. The road ends where the city began.',
+      es: 'Las últimas trece millas son esa peregrinación, caminada en su orden publicado: Espada, San Juan, San José, Concepción, la catedral. Cuatro de esas paradas son Patrimonio de la Humanidad de la UNESCO. Quince familias de las Islas Canarias fundaron la parroquia de la catedral el 9 de marzo de 1731, el mismo año en que llegaron las tres misiones, y es la comunidad parroquial más antigua de Tejas. El camino termina donde empezó la ciudad.',
+    },
+    source: {
+      href: 'https://caminosanantonio.org/plan-your-pilgrimage/self-guided/',
+      label: 'El Camino de San Antonio Missions',
+    },
+  },
+  {
+    id: 'H6',
+    title: {
+      en: 'The state is named for a welcome',
+      es: 'El estado lleva el nombre de una bienvenida',
+    },
+    body: {
+      en: 'Fray Damián Massanet founded San Francisco de los Tejas in 1690 and wrote down the greeting the Caddo gave him: táysha, friend. Spanish spelled it Tejas and English made it Texas. The friar who gave the state its name founded the mission at stop 8, and the name itself means hospitality to a stranger.',
+      es: 'Fray Damián Massanet fundó San Francisco de los Tejas en 1690 y anotó el saludo que le dieron los caddo: táysha, amigo. El español lo escribió Tejas y el inglés lo hizo Texas. El fraile que le dio nombre al estado fundó la misión de la parada 8, y el nombre mismo significa hospitalidad al forastero.',
+    },
+    source: {
+      href: 'https://www.texasbeyondhistory.net/tejas/voices/homeland.html',
+      label: 'Texas Beyond History, UT Austin',
+    },
   },
 ];
 
@@ -822,15 +952,15 @@ export type Figure = {
 export const IMPACT: Figure[] = [
   {
     id: 'I1',
-    figure: '450',
+    figure: '330',
     label: { en: 'households', es: 'hogares' },
     body: {
-      en: 'Fifteen villages of thirty families: about 2,250 people and some 1,350 children raised on farms, in parish schools, and in trades. Fifteen, not twenty, because only fifteen of the twenty stops have a church. The other five are state historic sites and a crossroads, and requirement P1 will not let a village start where there is no parish to join.',
-      es: 'Quince aldeas de treinta familias: unas 2,250 personas y unos 1,350 niños criados en granjas, escuelas parroquiales y oficios. Quince, no veinte, porque sólo quince de las veinte paradas tienen iglesia. Las otras cinco son sitios históricos estatales y un cruce de caminos, y el requisito P1 no deja empezar una aldea donde no hay parroquia a la cual unirse.',
+      en: 'Eleven villages of thirty families: about 1,650 people and nearly a thousand children raised on farms, in parish schools and in trades. Eleven and not twenty-one, because a village needs two things, a parish to form around and farmland it can afford. Sixteen of the twenty-one stops have a church, and five of those sixteen are inside San Antonio, where the land is a city. Those five are the destination.',
+      es: 'Once aldeas de treinta familias: unas 1,650 personas y casi mil niños criados en granjas, escuelas parroquiales y oficios. Once y no veintiuna, porque una aldea necesita dos cosas, una parroquia alrededor de la cual formarse y tierra que pueda pagar. Dieciséis de las veintiuna paradas tienen iglesia, y cinco de esas dieciséis están dentro de San Antonio, donde la tierra es ciudad. Esas cinco son el destino.',
     },
     basis: {
-      en: 'Five people a household, against a US average of 2.5. A bet on large families, and the figure most worth stating as a bet. The village count is a hard ceiling until a new parish or mission opens somewhere along the five stops that have none.',
-      es: 'Cinco personas por hogar, frente a un promedio de 2.5 en EE. UU. Una apuesta por familias grandes, y la cifra que más conviene declarar como apuesta. El número de aldeas es un techo duro hasta que abra una parroquia o misión en alguna de las cinco paradas que no tienen ninguna.',
+      en: 'Five people a household, against a US average of 2.5. A bet on large families, and the figure most worth stating as a bet. Eleven is a ceiling until a parish opens at one of the five stops that has none.',
+      es: 'Cinco personas por hogar, frente a un promedio de 2.5 en EE. UU. Una apuesta por familias grandes, y la cifra que más conviene declarar como apuesta. Once es un techo hasta que abra una parroquia en alguna de las cinco paradas que no tienen ninguna.',
     },
   },
   {
@@ -838,8 +968,8 @@ export const IMPACT: Figure[] = [
     figure: '2 a year',
     label: { en: 'families a village', es: 'familias por aldea' },
     body: {
-      en: 'This is the growth rate the plan should assume. Clear Creek Abbey in Oklahoma, the strongest American precedent, drew roughly thirty-five families in its first decade and dozens since — on the order of two a year, with a monastery and a Latin Mass as the draw. The corridor gets its speed from running twenty villages at once, not from hurrying one.',
-      es: 'Este es el ritmo de crecimiento que el plan debe suponer. La abadía de Clear Creek, en Oklahoma, el precedente estadounidense más fuerte, atrajo unas treinta y cinco familias en su primera década y decenas desde entonces: del orden de dos al año, con un monasterio y la Misa tradicional como atractivo. El corredor gana velocidad llevando veinte aldeas a la vez, no apurando una.',
+      en: 'This is the growth rate the plan should assume. Clear Creek Abbey in Oklahoma, the strongest American precedent, drew roughly thirty-five families in its first decade and dozens since — on the order of two a year, with a monastery and a Latin Mass as the draw. The corridor gets its speed from running eleven villages at once, not from hurrying one.',
+      es: 'Este es el ritmo de crecimiento que el plan debe suponer. La abadía de Clear Creek, en Oklahoma, el precedente estadounidense más fuerte, atrajo unas treinta y cinco familias en su primera década y decenas desde entonces: del orden de dos al año, con un monasterio y la Misa tradicional como atractivo. El corredor gana velocidad llevando once aldeas a la vez, no apurando una.',
     },
     basis: {
       en: 'Thirty families a village at two a year is fifteen years per village. The corridor is a generation of work, and saying so is more persuasive than pretending otherwise.',
@@ -883,12 +1013,12 @@ export const IMPACT: Figure[] = [
     figure: '5%',
     label: { en: 'of US beef processing', es: 'del sacrificio de res en EE. UU.' },
     body: {
-      en: 'Four companies hold about 80% of American beef processing and only about 5% sits in small and very small plants. Ranchers drive one to two hours to reach a USDA-inspected floor, and in bad years book a year ahead. A village cannot build one alone; twenty villages can, and every one of them needs it. This is the clearest candidate for the first thing the corridor builds together, and the USDA is currently putting money toward exactly this gap.',
-      es: 'Cuatro empresas tienen cerca del 80% del sacrificio de res en Estados Unidos y s\u00f3lo un 5% est\u00e1 en plantas peque\u00f1as. Los ganaderos manejan una o dos horas para llegar a una planta con inspecci\u00f3n federal, y en a\u00f1os malos reservan con un a\u00f1o de anticipaci\u00f3n. Una aldea no puede construir una sola; veinte s\u00ed, y todas la necesitan. Es el candidato m\u00e1s claro para lo primero que el corredor construya junto, y el USDA est\u00e1 poniendo dinero justo en ese hueco.',
+      en: 'Four companies hold about 80% of American beef processing and only about 5% sits in small and very small plants. Ranchers drive one to two hours to reach a USDA-inspected floor, and in bad years book a year ahead. A village cannot build one alone; eleven villages can, and every one of them needs it. This is the clearest candidate for the first thing the corridor builds together, and the USDA is currently putting money toward exactly this gap.',
+      es: 'Cuatro empresas tienen cerca del 80% del sacrificio de res en Estados Unidos y sólo un 5% está en plantas pequeñas. Los ganaderos manejan una o dos horas para llegar a una planta con inspección federal, y en años malos reservan con un año de anticipación. Una aldea no puede construir una sola; once sí, y todas la necesitan. Es el candidato más claro para lo primero que el corredor construya junto, y el USDA está poniendo dinero justo en ese hueco.',
     },
     basis: {
       en: 'It is also principle 4 at corridor scale: a human need turned into an industry, taken back. And it is the anchor employer requirement M1 with a specific business attached.',
-      es: 'Es tambi\u00e9n el principio 4 a escala de corredor: una necesidad humana vuelta industria, recuperada. Y es el requisito M1 del empleador ancla con un negocio concreto detr\u00e1s.',
+      es: 'Es también el principio 4 a escala de corredor: una necesidad humana vuelta industria, recuperada. Y es el requisito M1 del empleador ancla con un negocio concreto detrás.',
     },
     source: {
       href: 'https://tscra.org/texas-ranchers-are-seeing-the-effects-of-decreased-capacity-in-meat-processing-plants/',
@@ -900,8 +1030,8 @@ export const IMPACT: Figure[] = [
     figure: '$4,827',
     label: { en: 'an acre, Texas average', es: 'por acre, promedio de Tejas' },
     body: {
-      en: 'And $11,369 through the Gulf Coast–Brazos Bottom, which is the Bryan and Caldwell stretch of this road and the most expensive rural market in the state. Twenty thousand acres is therefore roughly $96M at the state average and over $200M through the Bottom. Buying that outright is not the plan and never could be.',
-      es: 'Y $11,369 en la región Gulf Coast–Brazos Bottom, que es el tramo de Bryan y Caldwell de este camino y el mercado rural más caro del estado. Veinte mil acres son entonces unos $96M al promedio estatal y más de $200M por el Bottom. Comprarlo de golpe no es el plan y nunca podría serlo.',
+      en: 'And $11,369 through the Gulf Coast–Brazos Bottom, which is the Bryan and Caldwell stretch of this road and the most expensive rural market in the state. Eleven villages of thirty families at sixty acres apiece is about twenty thousand acres: roughly $96M at the state average and over $200M through the Bottom. Buying that outright is not the plan and never could be.',
+      es: 'Y $11,369 en la región Gulf Coast–Brazos Bottom, que es el tramo de Bryan y Caldwell de este camino y el mercado rural más caro del estado. Once aldeas de treinta familias a sesenta acres cada una son unos veinte mil acres: cerca de $96M al promedio estatal y más de $200M por el Bottom. Comprarlo de golpe no es el plan y nunca podría serlo.',
     },
     basis: {
       en: 'Which is why the land is held in common and leased, not bought family by family. See below.',
@@ -945,7 +1075,7 @@ export const LAND_MODEL: {
     title: { en: 'Buy land that is already farmed', es: 'Comprar tierra que ya se trabaja' },
     body: {
       en: 'Texas taxes qualifying open-space land on what it produces rather than what it would sell for, and the saving is commonly 90% or more of taxable value. But the land must have been in agricultural use for five of the preceding seven years. Idle land loses the valuation and the trust pays full freight for years. So buy working ground, and make continuous agricultural use a condition of every lease.',
-      es: 'Tejas grava la tierra abierta que califica por lo que produce y no por lo que valdr\u00eda en venta, y el ahorro suele ser del 90% o m\u00e1s del valor gravable. Pero la tierra debe haber estado en uso agr\u00edcola cinco de los siete a\u00f1os anteriores. La tierra ociosa pierde la valuaci\u00f3n y el fideicomiso paga completo durante a\u00f1os. As\u00ed que comprar tierra en trabajo, y hacer del uso agr\u00edcola continuo una condici\u00f3n de cada arriendo.',
+      es: 'Tejas grava la tierra abierta que califica por lo que produce y no por lo que valdría en venta, y el ahorro suele ser del 90% o más del valor gravable. Pero la tierra debe haber estado en uso agrícola cinco de los siete años anteriores. La tierra ociosa pierde la valuación y el fideicomiso paga completo durante años. Así que comprar tierra en trabajo, y hacer del uso agrícola continuo una condición de cada arriendo.',
     },
     source: {
       href: 'https://comptroller.texas.gov/taxes/property-tax/ag-timber/',
@@ -973,8 +1103,8 @@ export const PRECEDENTS: {
       es: 'Las familias de verdad cruzan el país y se asientan alrededor de una casa de oración. Un censo informal contó treinta y cinco familias, 145 personas y 96 niños; han llegado decenas más desde entonces, de California, Tejas y Kansas. El modelo del corazón primero no es teórico.',
     },
     warns: {
-      en: 'It took a quarter of a century, with a monastery as the draw. Two families a year is the real rate. Any plan promising forty a year across a corridor is promising twenty Clear Creeks running at once.',
-      es: 'Tardó un cuarto de siglo, con un monasterio como atractivo. Dos familias al año es el ritmo real. Cualquier plan que prometa cuarenta al año en un corredor está prometiendo veinte Clear Creeks a la vez.',
+      en: 'It took a quarter of a century, with a monastery as the draw. Two families a year is the real rate. Any plan promising twenty-two families a year across the corridor is promising eleven Clear Creeks running at once.',
+      es: 'Tardó un cuarto de siglo, con un monasterio como atractivo. Dos familias al año es el ritmo real. Cualquier plan que prometa veintidós familias al año en el corredor está prometiendo once Clear Creeks a la vez.',
     },
     source: { href: 'https://en.wikipedia.org/wiki/Clear_Creek_Abbey', label: 'Clear Creek Abbey' },
   },
@@ -986,7 +1116,7 @@ export const PRECEDENTS: {
       es: 'Un pueblo rural puede revertir su declive. St. Marys pasó de unos 1,800 habitantes a cerca de 2,800, un alza del 50%, mientras los condados rurales alrededor se vaciaban. La masa crítica es real y es medible.',
     },
     warns: {
-      en: 'It is also the clearest picture of the failure mode. The newcomers became a majority and reporting from the town records longtime residents who feel pushed to the edge of their own place. The group there is canonically irregular besides, which is not this movement\u2019s position. Read St. Marys as the enclave warning, not as the model.',
+      en: 'It is also the clearest picture of the failure mode. The newcomers became a majority and reporting from the town records longtime residents who feel pushed to the edge of their own place. The group there is canonically irregular besides, which is not this movement’s position. Read St. Marys as the enclave warning, not as the model.',
       es: 'También es el retrato más claro del modo de fracaso. Los recién llegados se volvieron mayoría, y la prensa local recoge a vecinos de toda la vida que se sienten empujados al margen de su propio pueblo. El grupo de allí además es canónicamente irregular, que no es la posición de este movimiento. Leer St. Marys como la advertencia del enclave, no como el modelo.',
     },
     source: {
@@ -998,7 +1128,7 @@ export const PRECEDENTS: {
     name: 'Amish daughter settlements',
     where: { en: 'North America, three centuries', es: 'Norteamérica, tres siglos' },
     proves: {
-      en: 'Planting new settlements is a solved problem with a written sequence: scouts go first, the character of the place is agreed before any land is looked at, five to ten families commit, and no fewer than three households arrive together, close enough to gather for worship. Most of the chapter\u2019s founding requirements are lifted straight from it.',
+      en: 'Planting new settlements is a solved problem with a written sequence: scouts go first, the character of the place is agreed before any land is looked at, five to ten families commit, and no fewer than three households arrive together, close enough to gather for worship. Most of the chapter’s founding requirements are lifted straight from it.',
       es: 'Plantar asentamientos nuevos es un problema resuelto, con una secuencia escrita: primero van exploradores, se acuerda el carácter del lugar antes de mirar tierra, se comprometen de cinco a diez familias, y llegan juntos no menos de tres hogares, lo bastante cerca para rezar juntos. Casi todos los requisitos de fundación del capítulo vienen de ahí.',
     },
     warns: {

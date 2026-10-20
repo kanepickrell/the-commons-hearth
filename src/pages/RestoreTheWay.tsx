@@ -21,7 +21,7 @@ import { createElement, lazy, Suspense } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
 import {
-  GAPS, GROUND, IMPACT, LAND_MODEL, MEASURES, PHASES, PRECEDENTS, PRINCIPLES,
+  GAPS, GROUND, HERITAGE, IMPACT, LAND_MODEL, MEASURES, PHASES, PRECEDENTS, PRINCIPLES,
   STAGES, STOPS, THESIS,
   TOTAL_MILES, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
 } from '@/content/camino';
@@ -53,8 +53,8 @@ export default function RestoreTheWay() {
         </h1>
         <p className="mx-auto mt-6 max-w-2xl font-serif text-lg leading-relaxed text-mesquite/85">
           {es
-            ? 'Una cadena de aldeas del Movimiento Católico de la Tierra, a un día de camino unas de otras, a lo largo del camino histórico de los Tejas. Veinte paradas, de Natchitoches a la Misión Espada.'
-            : 'A string of Catholic Land Movement villages, a day’s walk apart, along the historic road of the Tejas. Twenty stops, from Natchitoches to Mission Espada.'}
+            ? 'Una cadena de aldeas del Movimiento Católico de la Tierra, a un día de camino unas de otras, a lo largo del camino histórico de los Tejas. Veintiuna paradas, de Natchitoches a la Catedral de San Fernando.'
+            : 'A string of Catholic Land Movement villages, a day’s walk apart, along the historic road of the Tejas. Twenty-one stops, from Natchitoches to San Fernando Cathedral.'}
         </p>
 
         {/* The three numbers that make the case in one line: this is the
@@ -133,8 +133,8 @@ export default function RestoreTheWay() {
 
         <p className="mx-auto mt-4 max-w-2xl text-center font-serif text-xs italic text-piedra/80">
           {es
-            ? 'Coordenadas geocodificadas contra OpenStreetMap. Dieciocho de veinte dieron en la dirección o el sitio; faltan dos, Chireno y la misión de Alto. Las distancias siguen siendo por etapa, no por tramo.'
-            : 'Coordinates geocoded against OpenStreetMap. Eighteen of twenty resolved to the address or the site; two are still outstanding, Chireno and the Margil mission at Alto. Distances are still by stage, not by leg.'}
+            ? 'Coordenadas geocodificadas contra OpenStreetMap. Diecinueve de veintiuna dieron en la dirección o el sitio; faltan dos, Chireno y la misión de Alto. Las distancias siguen siendo por etapa, no por tramo.'
+            : 'Coordinates geocoded against OpenStreetMap. Nineteen of twenty-one resolved to the address or the site; two are still outstanding, Chireno and the Margil mission at Alto. Distances are still by stage, not by leg.'}
         </p>
       </section>
 
@@ -277,6 +277,41 @@ export default function RestoreTheWay() {
       </section>
 
       {/* ---------------------------------------------------------------- */}
+      {/* Why this road                                                     */}
+      {/*                                                                   */}
+      {/* Six facts, each with a source, and they are load-bearing rather   */}
+      {/* than decorative: three of the San Antonio missions were founded   */}
+      {/* in East Texas and walked here, which is why the corridor is the   */}
+      {/* route it is. H6 is the closer on purpose.                         */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'POR QUÉ ESTE CAMINO' : 'WHY THIS ROAD'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es
+            ? 'El camino ya es católico. Lo que falta son los que se quedan.'
+            : 'The road is already Catholic. What it lacks is people who stay.'}
+        </h2>
+        <ol className="mt-8 space-y-7">
+          {HERITAGE.map((h) => (
+            <li key={h.id} className="border-l-2 border-ocre/40 pl-4">
+              <h3 className="font-heading text-lg leading-snug text-mesquite">{t(h.title)}</h3>
+              <p className="prose-body mt-2 text-base leading-relaxed text-mesquite/85">
+                {t(h.body)}
+              </p>
+              <a
+                className="mt-2 inline-block font-caps text-[9px] tracking-[0.15em] text-ocre underline decoration-ocre/40 underline-offset-4 hover:text-rojo"
+                href={h.source.href}
+                rel="noreferrer noopener"
+                target="_blank"
+              >
+                {h.source.label.toUpperCase()}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
       {/* The charter                                                       */}
       {/*                                                                   */}
       {/* Requirements, not an essay. Each is a thing a village either does */}
@@ -340,11 +375,11 @@ export default function RestoreTheWay() {
       {/* What it adds up to                                                */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-narrow py-12">
-        <Eyebrow>{es ? 'A CU\u00c1NTO LLEGA' : 'WHAT IT ADDS UP TO'}</Eyebrow>
+        <Eyebrow>{es ? 'A CUÁNTO LLEGA' : 'WHAT IT ADDS UP TO'}</Eyebrow>
         <h2 className="mt-3 font-heading text-3xl text-mesquite">
           {es
-            ? 'Una granja ayuda a una familia. Veinte aldeas son una cultura.'
-            : 'One homestead helps one family. Twenty villages are a culture.'}
+            ? 'Una granja ayuda a una familia. Once aldeas son una cultura.'
+            : 'One homestead helps one family. Eleven villages are a culture.'}
         </h2>
         <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
           {es
@@ -389,7 +424,7 @@ export default function RestoreTheWay() {
       {/* thing it builds.                                                  */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-narrow py-12">
-        <Eyebrow>{es ? 'C\u00d3MO SE TIENE LA TIERRA' : 'HOW THE LAND IS HELD'}</Eyebrow>
+        <Eyebrow>{es ? 'CÓMO SE TIENE LA TIERRA' : 'HOW THE LAND IS HELD'}</Eyebrow>
         <h2 className="mt-3 font-heading text-3xl text-mesquite">
           {es
             ? 'La aldea tiene la tierra. La familia tiene la casa.'
@@ -431,7 +466,7 @@ export default function RestoreTheWay() {
         </h2>
         <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
           {es
-            ? 'Cada uno le\u00eddo por lo que demuestra y por c\u00f3mo falla. Un precedente usado s\u00f3lo por su mitad buena es un anuncio.'
+            ? 'Cada uno leído por lo que demuestra y por cómo falla. Un precedente usado sólo por su mitad buena es un anuncio.'
             : 'Each read for what it proves and for how it fails. A precedent used only for its good half is an advertisement.'}
         </p>
 
@@ -449,7 +484,7 @@ export default function RestoreTheWay() {
               </p>
 
               <p className="mt-4 font-caps text-[9px] tracking-[0.18em] text-rojo">
-                {es ? 'DE QU\u00c9 ADVIERTE' : 'WHAT IT WARNS'}
+                {es ? 'DE QUÉ ADVIERTE' : 'WHAT IT WARNS'}
               </p>
               <p className="prose-body mt-1 text-sm leading-relaxed text-mesquite/80">
                 {t(pc.warns)}
@@ -518,8 +553,8 @@ export default function RestoreTheWay() {
 
             <p className="mt-8 font-serif text-sm italic leading-relaxed text-piedra">
               {es
-                ? 'Lo que falta: los números de peregrinos del Centro Padre Margil, el padrón de hogares de las veinte parroquias, y un precio por acre por condado. Tres llamadas.'
-                : 'Still missing: the pilgrim numbers from the Padre Margil centre, the registered-household count for each of the twenty parishes, and a price per acre by county. Three phone calls.'}
+                ? 'Lo que falta: los números de peregrinos del Centro Padre Margil, el padrón de hogares de las dieciséis parroquias, y un precio por acre por condado. Tres llamadas.'
+                : 'Still missing: the pilgrim numbers from the Padre Margil centre, the registered-household count for each of the sixteen parishes, and a price per acre by county. Three phone calls.'}
             </p>
           </div>
         </div>
