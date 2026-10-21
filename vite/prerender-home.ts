@@ -62,6 +62,10 @@ const shell = () => {
 <p style="${BODY}">${esc(homeCopy.approach.en)}</p>
 <h2 style="${H2}">Our Roots</h2>
 <p style="${BODY}">${esc(homeCopy.roots.en)}</p>
+<h2 style="${H2}">${esc(homeCopy.realHeading.en)}</h2>
+<p style="${BODY}">${esc(homeCopy.realBody.en)}</p>
+<p style="${BODY}">${esc(homeCopy.realStep.en)}</p>
+<p style="${BODY}">${esc(homeCopy.realClose.en)}</p>
 <h2 style="${H2}">Our Mission</h2>
 <ul style="${BODY}list-style:none;padding:0">${mission}</ul>
 </div>`;

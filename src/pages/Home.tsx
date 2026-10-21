@@ -5,10 +5,12 @@
 //   1. Hero — who we are, what the movement is for, and the two next steps
 //   2. Why this matters — the ache, then the answer; with our roots folded
 //      away underneath for anyone who asks where this came from
-//   3. Our Mission — Resettlement, Education, Fellowship, Glorification
-//   4. Meet your neighbors — the chapter map and parish list
-//   5. Next Gathering — the one dated thing, read from the /workshops data
-//   6. The patron — the closing note
+//   3. Restore the Real — the campaign, and the one step we ask for; with
+//      the three figures behind it folded away underneath
+//   4. Our Mission — Resettlement, Education, Fellowship, Glorification
+//   5. Meet your neighbors — the chapter map and parish list
+//   6. Next Gathering — the one dated thing, read from the /workshops data
+//   7. The patron — the closing note
 //
 // Notes:
 //   - The words live in src/content/home.ts, not inline here, because
@@ -30,6 +32,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { NextGathering } from '@/components/NextGathering';
 import { RootsNote } from '@/components/RootsNote';
+import { CaseNote } from '@/components/CaseNote';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { buildPath } from '@/i18n/routes';
@@ -123,7 +126,46 @@ const Home = () => {
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 3. Our Mission                                                   */}
+      {/* 3. Restore the Real — the campaign                               */}
+      {/*                                                                  */}
+      {/* Between the ache and the pillars, because it is the one thing    */}
+      {/* the page actually asks of a reader: take a step. The pillars     */}
+      {/* below organise the work; this is what the work is for, and a     */}
+      {/* visitor who reads nothing else should read this.                 */}
+      {/*                                                                  */}
+      {/* Tinted and centred so the campaign reads as its own ground       */}
+      {/* rather than as a third paragraph of the section above it.        */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="bg-mesquite/[0.03] py-20">
+        <div className="container-prose text-center">
+          <p className="display-caps text-sm font-semibold tracking-[0.3em] text-ocre md:text-base">
+            {t(homeCopy.realEyebrow)}
+          </p>
+          <h2 className="mt-4 font-heading text-4xl text-mesquite md:text-5xl">
+            {t(homeCopy.realHeading)}
+          </h2>
+          <div className="mx-auto mt-9 max-w-xl space-y-6 text-left">
+            <p className="prose-body text-lg leading-relaxed text-mesquite/90">
+              {t(homeCopy.realBody)}
+            </p>
+            <p className="prose-body text-lg leading-relaxed text-mesquite/90">
+              {t(homeCopy.realStep)}
+            </p>
+            <p className="font-heading text-xl leading-relaxed text-mesquite">
+              {t(homeCopy.realClose)}
+            </p>
+
+            {/* The evidence, folded away. Opened it answers "says who?";
+                closed it keeps the campaign a plea rather than a report. */}
+            <CaseNote />
+          </div>
+        </div>
+      </section>
+
+      <div className="rule container-prose" />
+
+      {/* ---------------------------------------------------------------- */}
+      {/* 4. Our Mission                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-wide py-20">
         <header className="mb-14 text-center">
@@ -154,7 +196,7 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 4. Meet your neighbors                                           */}
+      {/* 5. Meet your neighbors                                           */}
       {/*                                                                  */}
       {/* The chapter's ecclesiastical recognition used to sit under this   */}
       {/* header. It reads as provenance rather than as an introduction to  */}
@@ -192,14 +234,14 @@ const Home = () => {
       <div className="rule container-wide" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 5. Next gathering                                                */}
+      {/* 6. Next gathering                                                */}
       {/* ---------------------------------------------------------------- */}
       <NextGathering />
 
       <div className="rule container-prose" />
 
       {/* ---------------------------------------------------------------- */}
-      {/* 6. The patron — the closing note                                 */}
+      {/* 7. The patron — the closing note                                 */}
       {/*                                                                   */}
       {/* Nothing else on the site says "this is a CATHOLIC land movement"  */}
       {/* as immediately as Isidore does, and the page that carries him —   */}

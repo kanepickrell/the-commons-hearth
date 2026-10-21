@@ -63,13 +63,14 @@ export default function Vision() {
     {
       roman: 'III',
       name: { en: 'Fellowship', es: 'Compañerismo' },
-      // NOTE: the source feedback truncated this line at "support within".
-      // Completed as "within the chapter" to match the field-manual cadence
-      // of the other three pillars. Verify against the field manual before
-      // publishing.
+      // This line used to end "within the chapter", a guess made when the
+      // source feedback truncated at "support within". The national strategy
+      // gives the real ending, and it is a different claim: the network runs
+      // between homesteads that exist and households that want one, which is
+      // the direction the help actually travels.
       verse: {
-        en: 'Cultivate a network of practical, intellectual, and spiritual support within the chapter.',
-        es: 'Cultivar una red de apoyo práctico, intelectual, y espiritual dentro del capítulo.',
+        en: 'Cultivate a network of practical, spiritual, and intellectual support between established Catholic homesteads and those seeking to establish one.',
+        es: 'Cultivar una red de apoyo práctico, espiritual, e intelectual entre los hogares católicos ya establecidos y quienes buscan establecer el suyo.',
       },
       practice: {
         en: 'When the call goes out to raise the barn, we go out to raise the barn. Mutual aid days, shared harvests, lending a hand and lending a tool. This is what makes a homestead, and a chapter, survive.',
@@ -86,6 +87,41 @@ export default function Vision() {
       practice: {
         en: 'Christ placed a meal at the center of His Church. The seed, the soil, the harvest, the table: all of it is ordered toward worship. Our labor is an offering.',
         es: 'Cristo puso una comida en el centro de Su Iglesia. La semilla, el suelo, la cosecha, la mesa: todo está ordenado hacia la adoración. Nuestra labor es una ofrenda.',
+      },
+    },
+  ];
+
+  // The national chapter-growth plan. `here` marks the phase this chapter is
+  // actually in: founded 2025, so the first one.
+  const phases = [
+    {
+      roman: 'I',
+      here: true,
+      years: { en: 'YEARS 0 TO 2', es: 'AÑOS 0 A 2' },
+      name: { en: 'An informal community', es: 'Una comunidad informal' },
+      body: {
+        en: 'Get started and build relationships. Gatherings, workshops, and a roster of people who know each other by name. Nothing here needs a bank account or a charter, which is why it is the phase a chapter can begin in a living room.',
+        es: 'Empezar y construir relaciones. Reuniones, talleres, y una lista de personas que se conocen por su nombre. Nada de esto necesita cuenta bancaria ni estatutos, por eso es la fase que un capítulo puede empezar en una sala.',
+      },
+    },
+    {
+      roman: 'II',
+      here: false,
+      years: { en: 'YEARS 2 TO 5', es: 'AÑOS 2 A 5' },
+      name: { en: 'A formalized entity', es: 'Una entidad formal' },
+      body: {
+        en: 'The chapter becomes a civic institution: a charter, a local bank account, and the standing to own, invest, and lead. Members can run buying co-ops and raise money for local projects rather than only gathering.',
+        es: 'El capítulo se vuelve una institución civil: estatutos, cuenta bancaria local, y la capacidad de poseer, invertir, y dirigir. Los miembros pueden formar cooperativas de compra y recaudar para proyectos locales, no sólo reunirse.',
+      },
+    },
+    {
+      roman: 'III',
+      here: false,
+      years: { en: 'YEARS 5 TO 10', es: 'AÑOS 5 A 10' },
+      name: { en: 'A localized economy', es: 'Una economía local' },
+      body: {
+        en: 'A regional center of work and formation, where these principles are lived and taught rather than discussed. Jobs are created, farms are launched, and the chapter hosts staff, volunteers, and retreatants in hands-on agrarian training.',
+        es: 'Un centro regional de trabajo y formación, donde estos principios se viven y se enseñan en vez de discutirse. Se crean empleos, se lanzan granjas, y el capítulo recibe personal, voluntarios, y retirantes en formación agraria práctica.',
       },
     },
   ];
@@ -160,12 +196,20 @@ export default function Vision() {
                   </p>
                   {p.roman === 'I' && (
                     <blockquote className="mt-6 border-l-2 border-ocre/40 pl-5 font-serif italic leading-relaxed text-mesquite/70">
+                      {/* The widely quoted short form drops three words that
+                          are in the original, so this is the Vatican text as
+                          delivered, and dated. Pentecost 1941 was the fiftieth
+                          anniversary of Rerum Novarum, which is why the Pope
+                          was talking about holdings at all. */}
                       {t({
-                        en: '"Only the stability which is rooted in one\'s own holding makes of the family the most perfect cell of society."',
-                        es: '«Sólo la estabilidad que echa raíces en la propiedad hace de la familia la célula más perfecta de la sociedad.»',
+                        en: '"Only that stability which is rooted in one\'s own holding makes of the family the most vital and most perfect and fecund cell of society."',
+                        es: '«Sólo aquella estabilidad que echa raíces en la propiedad hace de la familia la célula más vital, más perfecta y fecunda de la sociedad.»',
                       })}
                       <footer className="mt-2 text-sm not-italic text-mesquite/50">
-                        — {t({ en: 'Pope Pius XII', es: 'Papa Pío XII' })}
+                        — {t({
+                          en: 'Pope Pius XII, Pentecost radio message, 1 June 1941',
+                          es: 'Papa Pío XII, radiomensaje de Pentecostés, 1 de junio de 1941',
+                        })}
                       </footer>
                     </blockquote>
                   )}
@@ -173,6 +217,61 @@ export default function Vision() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Where this goes                                                  */}
+      {/*                                                                  */}
+      {/* The national office plans a chapter's life in three phases. It   */}
+      {/* is worth having on our own page for one reason: it lets us say   */}
+      {/* out loud which phase we are in. A visitor deciding whether to     */}
+      {/* come to a gathering is better served by "we are a year old and   */}
+      {/* building relationships" than by a page that implies more.        */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="border-t border-mesquite/10 py-16 md:py-20">
+        <div className="container-narrow">
+          <div className="mb-12 text-center">
+            <p className="display-caps mb-3 text-xs tracking-[0.2em] text-ocre">
+              {t({ en: 'WHERE THIS GOES', es: 'A DÓNDE VA ESTO' })}
+            </p>
+            <h2 className="mb-6 font-heading text-4xl text-mesquite md:text-5xl">
+              {t({ en: 'A chapter in three phases', es: 'Un capítulo en tres fases' })}
+            </h2>
+            <p className="mx-auto max-w-2xl font-serif italic leading-relaxed text-mesquite/70">
+              {t({
+                en: 'This is how the movement plans the life of a chapter. We are in the first phase, and saying so is more useful than implying otherwise.',
+                es: 'Así planea el movimiento la vida de un capítulo. Estamos en la primera fase, y decirlo sirve más que insinuar otra cosa.',
+              })}
+            </p>
+          </div>
+
+          <ol className="space-y-8">
+            {phases.map((p) => (
+              <li
+                key={p.roman}
+                className={`border-l-2 pl-5 ${p.here ? 'border-ocre' : 'border-mesquite/15'}`}
+              >
+                <p className="display-caps text-[10px] tracking-[0.2em] text-ocre">
+                  {p.roman} · {t(p.years)}
+                  {p.here && (
+                    <span className="ml-2 text-rojo">
+                      {t({ en: 'WE ARE HERE', es: 'AQUÍ ESTAMOS' })}
+                    </span>
+                  )}
+                </p>
+                <h3 className="mt-2 font-heading text-2xl text-mesquite">{t(p.name)}</h3>
+                <p className="mt-2 font-serif leading-relaxed text-mesquite/80">{t(p.body)}</p>
+              </li>
+            ))}
+          </ol>
+
+          <p className="mt-10 border-t border-mesquite/15 pt-6 text-center font-serif italic leading-relaxed text-mesquite/70">
+            {t({
+              en: 'Nationally the aim is a Catholic Land Movement chapter in every diocese, and five demonstration farms, by 2030.',
+              es: 'A nivel nacional, la meta es un capítulo del Movimiento Católico de la Tierra en cada diócesis, y cinco granjas de demostración, para 2030.',
+            })}
+          </p>
         </div>
       </section>
 

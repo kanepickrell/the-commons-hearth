@@ -111,6 +111,57 @@ export const homeCopy = {
   } satisfies Bilingual,
 
   // ---------------------------------------------------------------------
+  // 4. Restore the Real — the campaign
+  //
+  // The national office's framing, put into this chapter's voice. Their deck
+  // says "This is not just about moving to the countryside. It's about
+  // recovering what was lost", which is the isn't-X-it's-Y shape we cut from
+  // the rest of the site, so the same idea is carried by the closing pair of
+  // sentences instead.
+  //
+  // It sits after "Why this matters" and before the pillars on purpose: the
+  // ache is named, then the one thing we actually ask for, and only then the
+  // four pillars that organise the work.
+  // ---------------------------------------------------------------------
+  realEyebrow: {
+    en: 'THE CAMPAIGN',
+    es: 'LA CAMPAÑA',
+  } satisfies Bilingual,
+
+  realHeading: {
+    en: 'Restore the Real',
+    es: 'Restaurar lo Real',
+  } satisfies Bilingual,
+
+  realBody: {
+    en: 'Most of us already know what we want. A garden that feeds somebody. Neighbors who show up when the work is hard. Children who know where food comes from. The hard part is the first step.',
+    es: 'La mayoría ya sabemos lo que queremos. Una huerta que alimente a alguien. Vecinos que llegan cuando el trabajo es duro. Hijos que saben de dónde viene la comida. Lo difícil es el primer paso.',
+  } satisfies Bilingual,
+
+  realStep: {
+    en: 'So we ask for one real step, taken from where you are, with what you already have. Plant a tree with a neighbor. Share a meal around a fire. Learn to put up what you grow. Land, community, and God come back together this way, slowly, in small things done with great love.',
+    es: 'Así que pedimos un paso real, dado desde donde estás, con lo que ya tienes. Planta un árbol con un vecino. Comparte una comida junto al fuego. Aprende a conservar lo que cultivas. La tierra, la comunidad, y Dios se vuelven a unir así, despacio, en cosas pequeñas hechas con gran amor.',
+  } satisfies Bilingual,
+
+  realClose: {
+    en: 'You do not have to move to the country to begin. You have to begin.',
+    es: 'No hace falta mudarse al campo para empezar. Hace falta empezar.',
+  } satisfies Bilingual,
+
+  // ---------------------------------------------------------------------
+  // The case, in numbers — folded away under the campaign, see CaseNote
+  // ---------------------------------------------------------------------
+  caseEyebrow: {
+    en: 'THE CASE, IN NUMBERS',
+    es: 'EL CASO, EN CIFRAS',
+  } satisfies Bilingual,
+
+  caseLede: {
+    en: 'The land consolidated, the household thinned, and the move back has already started.',
+    es: 'La tierra se concentró, el hogar se adelgazó, y el regreso ya empezó.',
+  } satisfies Bilingual,
+
+  // ---------------------------------------------------------------------
   // 5. Our Mission
   // ---------------------------------------------------------------------
   pillarsEyebrow: {
@@ -225,6 +276,57 @@ export const pillars: {
     body: {
       en: 'Bringing the Mass, prayer, and the Church’s seasons back into agrarian life, and receiving the fruits of our labor as gifts from God.',
       es: 'Devolver la Misa, la oración, y las estaciones de la Iglesia a la vida agraria, y recibir los frutos de nuestro trabajo como dones de Dios.',
+    },
+  },
+];
+
+/**
+ * Three numbers, and only three.
+ *
+ * The national deck carries more of them. These are the ones that survived
+ * being checked against the body that published them, and two came back
+ * sharper than the deck had them: the 41% belongs specifically to farms of
+ * 2,000 acres or more, and Carsey's own brief says 59% of rural counties
+ * rather than 61%. The others in the deck (domestic skills, parental
+ * isolation, young adults wanting to move) could not be traced to a source,
+ * so they are not on this page.
+ */
+export const caseFigures: {
+  figure: string;
+  body: Bilingual;
+  source: { href: string; label: string };
+}[] = [
+  {
+    figure: '41%',
+    body: {
+      en: 'of American cropland is worked by farms of 2,000 acres or more, up from 36% five years earlier. Food has moved off the farm next door and onto operations that no household could start.',
+      es: 'de la tierra de cultivo estadounidense la trabajan granjas de 2,000 acres o más, frente al 36% cinco años antes. La comida se fue de la granja del vecino a operaciones que ningún hogar podría empezar.',
+    },
+    source: {
+      href: 'https://ers.usda.gov/amber-waves/2020/february/consolidation-in-u-s-agriculture-continues',
+      label: 'USDA Economic Research Service',
+    },
+  },
+  {
+    figure: '47%',
+    body: {
+      en: 'of American households are a married couple, down from 71% in 1970. The household that the Church calls the first cell of society is now a minority of households.',
+      es: 'de los hogares estadounidenses son un matrimonio, frente al 71% en 1970. El hogar que la Iglesia llama la primera célula de la sociedad es hoy una minoría de los hogares.',
+    },
+    source: {
+      href: 'https://www.census.gov/newsroom/press-releases/2024/families-living-arrangements.html',
+      label: 'U.S. Census Bureau',
+    },
+  },
+  {
+    figure: '59%',
+    body: {
+      en: 'of rural counties gained people through migration from 2020 to 2022. In the decade before, 33% did. Whatever is pulling families back to the country, it is already happening, and it is bigger than this movement.',
+      es: 'de los condados rurales ganaron población por migración entre 2020 y 2022. En la década anterior, lo hizo el 33%. Sea lo que sea que está llevando a las familias de vuelta al campo, ya está pasando, y es más grande que este movimiento.',
+    },
+    source: {
+      href: 'https://carsey.unh.edu/publication/migration-continues-sustain-population-gains-rural-america',
+      label: 'Carsey School, University of New Hampshire',
     },
   },
 ];
