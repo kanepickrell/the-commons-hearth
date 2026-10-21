@@ -367,16 +367,18 @@ export const WALK_DAYS_AT_20 = Math.round(TOTAL_MILES / 20);
 // farmers who stayed put and took care of their own.
 // ---------------------------------------------------------------------------
 /**
- * The campaign this belongs to.
+ * What the campaign asks for, and why this road carries its name.
  *
- * Restore The Real is the national framing: one real step, taken from where
- * you are, with what you have. Restore The Way is this chapter's largest
- * version of that step. The two names are meant to be read together, and
- * this page is the long end of a campaign whose short end is a tree planted
- * with a neighbour.
+ * There is no name field. The page is called Restore The Real, the h1 says
+ * so, and `why` holds the sentence that explains it: the
+ * road is already named Real, and both senses of the word are the point.
+ * Spanish keeps the pun without translation, since real IS the Spanish word.
  */
-export const CAMPAIGN: { name: Bilingual; body: Bilingual } = {
-  name: { en: 'Restore The Real', es: 'Restaurar lo Real' },
+export const CAMPAIGN: { why: Bilingual; body: Bilingual } = {
+  why: {
+    en: 'The road already carries the name. El Camino Real is the royal road, and real is also the word for what is actually there, in front of you, able to be touched. Both readings are the work.',
+    es: 'El camino ya lleva el nombre. El Camino Real es el camino del rey, y real es también lo que de veras está ahí, delante de ti, que se puede tocar. Las dos lecturas son el trabajo.',
+  },
   body: {
     en: 'The movement asks for one real step, taken from where you are, with what you already have. Most steps are small: a tree planted with a neighbour, a meal around a fire, a child who learns where food comes from. This road is the same step at the scale of a region, and it is still built out of the small ones.',
     es: 'El movimiento pide un paso real, dado desde donde estás, con lo que ya tienes. Casi todos los pasos son pequeños: un árbol plantado con un vecino, una comida junto al fuego, un hijo que aprende de dónde viene la comida. Este camino es el mismo paso a escala de una región, y sigue estando hecho de los pequeños.',
@@ -384,8 +386,8 @@ export const CAMPAIGN: { name: Bilingual; body: Bilingual } = {
 };
 
 export const THESIS: Bilingual = {
-  en: 'El Camino Real was opened by soldiers and friars passing through. The Way is restored by farmers who stay.',
-  es: 'El Camino Real lo abrieron soldados y frailes de paso. El Camino lo restauran los labradores que se quedan.',
+  en: 'El Camino Real was opened by soldiers and friars passing through. It is restored by farmers who stay.',
+  es: 'El Camino Real lo abrieron soldados y frailes de paso. Lo restauran los labradores que se quedan.',
 };
 
 // ---------------------------------------------------------------------------

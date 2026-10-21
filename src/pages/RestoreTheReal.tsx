@@ -1,4 +1,4 @@
-// src/pages/RestoreTheWay.tsx
+// src/pages/RestoreTheReal.tsx
 // A working page for a long idea: CLM villages planted a day's walk apart
 // along El Camino Real de los Tejas.
 //
@@ -9,8 +9,9 @@
 // it needs to be properly private, gate it on `isAdmin` and it disappears
 // for everyone else.
 //
-// The data lives in src/content/camino.ts, including the warning that every
-// coordinate is town-centre accurate and nothing here is survey grade.
+// The data lives in src/content/camino.ts. Coordinates are geocoded against
+// OpenStreetMap, except two that still need a field GPS point; distances are
+// the chapter's own estimates by stage, not measured leg by leg.
 //
 // What this page is for: holding the idea still long enough to be argued
 // with. The map is the part that earns its place — the gaps in the walking
@@ -36,16 +37,16 @@ const Eyebrow = ({ children }: { children: React.ReactNode }) => (
   <p className="display-caps text-xs tracking-[0.25em] text-ocre">{children}</p>
 );
 
-export default function RestoreTheWay() {
+export default function RestoreTheReal() {
   const { t, locale } = useLocale();
   const es = locale === 'es';
 
-  // Both names in the tab: the road, and the campaign it belongs to. The
-  // chapter comes last so the two project names survive a narrow tab.
+  // The project name in the tab, chapter last, so the name survives a
+  // narrow tab. index.html carries one <title> for the whole SPA.
   useDocumentTitle(
     es
-      ? 'Restaurar el Camino · Restaurar lo Real · CLM Centro de Tejas'
-      : 'Restore The Way · Restore The Real · Central Texas CLM',
+      ? 'Restaurar lo Real · CLM Centro de Tejas'
+      : 'Restore The Real · Central Texas CLM',
   );
 
   return (
@@ -59,7 +60,7 @@ export default function RestoreTheWay() {
         </p>
         <Eyebrow>{es ? 'EL CAMINO REAL DE LOS TEJAS' : 'EL CAMINO REAL DE LOS TEJAS'}</Eyebrow>
         <h1 className="mt-4 font-heading text-4xl leading-tight text-mesquite md:text-5xl">
-          {es ? 'Restaurar el Camino' : 'Restore The Way'}
+          {es ? 'Restaurar lo Real' : 'Restore The Real'}
         </h1>
         <p className="mx-auto mt-6 max-w-2xl font-serif text-lg leading-relaxed text-mesquite/85">
           {es
@@ -98,14 +99,15 @@ export default function RestoreTheWay() {
           </p>
         </blockquote>
 
-        {/* Where this sits in the movement. The two names are built to be
-            read together: Restore The Real is the campaign, Restore The Way
-            is this chapter's longest version of the step it asks for. */}
+        {/* What the campaign asks for, and why the road carries its name.
+            No heading repeating the name: the h1 above already said it. */}
         <div className="mx-auto mt-10 max-w-2xl text-left">
-          <Eyebrow>{es ? 'LA CAMPAÑA' : 'THE CAMPAIGN'}</Eyebrow>
-          <h2 className="mt-3 font-heading text-2xl text-mesquite">{t(CAMPAIGN.name)}</h2>
-          <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/85">
+          <Eyebrow>{es ? 'UN PASO REAL' : 'ONE REAL STEP'}</Eyebrow>
+          <p className="prose-body mt-4 text-base leading-relaxed text-mesquite/85">
             {t(CAMPAIGN.body)}
+          </p>
+          <p className="prose-body mt-4 text-base leading-relaxed text-mesquite/85">
+            {t(CAMPAIGN.why)}
           </p>
         </div>
       </section>
