@@ -20,6 +20,7 @@
 import { createElement, lazy, Suspense } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import {
   CAMPAIGN, GAPS, GROUND, HERITAGE, IMPACT, LAND_MODEL, MEASURES, NATIONAL_AIM, PHASES,
   PRECEDENTS, PRINCIPLES,
@@ -38,6 +39,14 @@ const Eyebrow = ({ children }: { children: React.ReactNode }) => (
 export default function RestoreTheWay() {
   const { t, locale } = useLocale();
   const es = locale === 'es';
+
+  // Both names in the tab: the road, and the campaign it belongs to. The
+  // chapter comes last so the two project names survive a narrow tab.
+  useDocumentTitle(
+    es
+      ? 'Restaurar el Camino · Restaurar lo Real · CLM Centro de Tejas'
+      : 'Restore The Way · Restore The Real · Central Texas CLM',
+  );
 
   return (
     <Layout>
@@ -90,7 +99,7 @@ export default function RestoreTheWay() {
         </blockquote>
 
         {/* Where this sits in the movement. The two names are built to be
-            read together: Restore the Real is the campaign, Restore The Way
+            read together: Restore The Real is the campaign, Restore The Way
             is this chapter's longest version of the step it asks for. */}
         <div className="mx-auto mt-10 max-w-2xl text-left">
           <Eyebrow>{es ? 'LA CAMPAÑA' : 'THE CAMPAIGN'}</Eyebrow>

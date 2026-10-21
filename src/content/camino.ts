@@ -369,14 +369,14 @@ export const WALK_DAYS_AT_20 = Math.round(TOTAL_MILES / 20);
 /**
  * The campaign this belongs to.
  *
- * Restore the Real is the national framing: one real step, taken from where
+ * Restore The Real is the national framing: one real step, taken from where
  * you are, with what you have. Restore The Way is this chapter's largest
  * version of that step. The two names are meant to be read together, and
  * this page is the long end of a campaign whose short end is a tree planted
  * with a neighbour.
  */
 export const CAMPAIGN: { name: Bilingual; body: Bilingual } = {
-  name: { en: 'Restore the Real', es: 'Restaurar lo Real' },
+  name: { en: 'Restore The Real', es: 'Restaurar lo Real' },
   body: {
     en: 'The movement asks for one real step, taken from where you are, with what you already have. Most steps are small: a tree planted with a neighbour, a meal around a fire, a child who learns where food comes from. This road is the same step at the scale of a region, and it is still built out of the small ones.',
     es: 'El movimiento pide un paso real, dado desde donde estás, con lo que ya tienes. Casi todos los pasos son pequeños: un árbol plantado con un vecino, una comida junto al fuego, un hijo que aprende de dónde viene la comida. Este camino es el mismo paso a escala de una región, y sigue estando hecho de los pequeños.',
