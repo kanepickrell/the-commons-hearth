@@ -11,7 +11,7 @@
 // stylesheet stays the one place the palette is defined — see :root in
 // index.css — and no hex ever gets copied into a component.
 
-export const BRAND_TOKENS = ['cal', 'mesquite', 'ocre', 'rojo', 'azul', 'piedra'] as const;
+export const BRAND_TOKENS = ['cal', 'mesquite', 'ocre', 'rojo', 'azul', 'piedra', 'verde'] as const;
 
 export type BrandToken = (typeof BRAND_TOKENS)[number];
 

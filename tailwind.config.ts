@@ -30,6 +30,7 @@ export default {
         rojo: "hsl(var(--rojo))",
         azul: "hsl(var(--azul))",
         piedra: "hsl(var(--piedra))",
+        verde: "hsl(var(--verde))",
         // Shadcn semantic
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

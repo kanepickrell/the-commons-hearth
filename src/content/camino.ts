@@ -294,24 +294,26 @@ export const GAPS: {
   to: string;
   miles: number;
   hostsNeeded: string;
+  /** Model year the gap is hosted end to end. Drives the timeline. */
+  closesInYear: number;
   why: Bilingual;
 }[] = [
   {
-    from: 'Crockett', to: 'Bryan', miles: 85, hostsNeeded: '3–4',
+    from: 'Crockett', to: 'Bryan', miles: 85, hostsNeeded: '3–4', closesInYear: 8,
     why: {
       en: 'Four to five days on TX-21 with no parish stop. The longest gap on the road, and the strongest case for the first anchor village.',
       es: 'Cuatro o cinco días por la TX-21 sin parroquia. El hueco más largo del camino, y el mejor argumento para la primera aldea ancla.',
     },
   },
   {
-    from: 'Rockdale', to: 'Bastrop', miles: 50, hostsNeeded: '1–2',
+    from: 'Rockdale', to: 'Bastrop', miles: 50, hostsNeeded: '1–2', closesInYear: 3,
     why: {
       en: 'Two to three days, and the approach to the Hill Country edge where land is still within reach.',
       es: 'Dos o tres días, y la entrada al borde de las colinas donde la tierra aún está al alcance.',
     },
   },
   {
-    from: 'Zwolle', to: 'San Augustine', miles: 50, hostsNeeded: '1',
+    from: 'Zwolle', to: 'San Augustine', miles: 50, hostsNeeded: '1', closesInYear: 4,
     why: {
       en: 'Includes the Sabine crossing. Needs a host and a bridge route a walker can actually use.',
       es: 'Incluye el cruce del Sabina. Necesita un anfitrión y un puente que un caminante pueda usar de verdad.',
@@ -849,6 +851,278 @@ export const GROUND: {
     href: 'https://caminosanantonio.org/plan-your-pilgrimage/self-guided/',
     label: 'Plan your pilgrimage',
   },
+];
+
+// ---------------------------------------------------------------------------
+// The chapters already on the road.
+//
+// This is the part of the plan that was not invented for it. Four Catholic
+// Land Movement chapters have formed within a day's drive of El Camino Real
+// without anyone putting them there, which turns the corridor from a thing
+// somebody might do into a thing four existing chapters already face.
+//
+// ⚠️ PLACEHOLDER NAMES AND APPROXIMATE POSITIONS. These were read off a My
+// Maps screenshot and are named by the nearest town, not by the chapter's
+// own name. Before any of this is shown outside the chapter, replace `name`
+// with what each chapter actually calls itself and `at` with where it
+// actually meets. The carries[] assignment is ours and is a proposal.
+//
+// `diocese` is the CHAPTER's diocese, which is not always the diocese of the
+// stops it carries. Woodville sits in Beaumont while its stops are in Tyler;
+// Montgomery sits in Galveston-Houston while its stops are in Tyler and
+// Austin. The road crosses four dioceses, but talking to the chapters means
+// talking to six chanceries, and that is worth knowing before anyone counts
+// bishops in a meeting.
+// ---------------------------------------------------------------------------
+export type ChapterId = 'nb' | 'lee' | 'mont' | 'wood';
+
+export const CHAPTERS: {
+  id: ChapterId;
+  /** Placeholder: the nearest town, not the chapter's own name. */
+  name: Bilingual;
+  at: [number, number];
+  /** Stops this chapter is nearest to, and would carry. A proposal. */
+  carries: number[];
+  diocese: string;
+}[] = [
+  {
+    id: 'wood',
+    name: { en: 'Woodville area', es: 'Zona de Woodville' },
+    at: [30.77, -94.42],
+    carries: [4, 5, 6, 7, 8],
+    diocese: 'Beaumont',
+  },
+  {
+    id: 'mont',
+    name: { en: 'Montgomery area', es: 'Zona de Montgomery' },
+    at: [30.37, -95.69],
+    carries: [9, 10],
+    diocese: 'Galveston-Houston',
+  },
+  {
+    id: 'lee',
+    name: { en: 'Lee County', es: 'Condado de Lee' },
+    at: [30.4, -97.01],
+    carries: [11, 12, 13, 14],
+    diocese: 'Austin',
+  },
+  {
+    id: 'nb',
+    name: { en: 'New Braunfels area', es: 'Zona de New Braunfels' },
+    at: [29.68, -98.12],
+    carries: [15, 16, 17, 18, 19, 20, 21],
+    diocese: 'San Antonio',
+  },
+];
+
+/** How far a chapter can reasonably carry, in miles. A day's drive and back. */
+export const CHAPTER_REACH_MILES = 60;
+
+/** The chapter that would carry a stop, or null where none does. */
+export const chapterFor = (n: number): ChapterId | null =>
+  CHAPTERS.find((c) => c.carries.includes(n))?.id ?? null;
+
+/** Great-circle miles between two [lat, lng] points. */
+export const milesBetween = (a: [number, number], b: [number, number]) => {
+  const R = 3958.8;
+  const r = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * r;
+  const dLng = (b[1] - a[1]) * r;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
+
+/**
+ * The anchor villages, and the year each begins.
+ *
+ * Five, not the eleven an earlier draft counted. Eleven came from asking
+ * which stops have a parish outside metro San Antonio. Five comes from
+ * asking which stops have a parish AND a mother chapter within reach, which
+ * is charter rule F1 and the harder test. The last two are proposed rather
+ * than planned: they need a chapter at that end of the road first, and there
+ * is none yet.
+ */
+export const ANCHORS: {
+  stop: number;
+  startYear: number;
+  name: string;
+  mother: ChapterId | null;
+  proposed: boolean;
+}[] = [
+  { stop: 13, startYear: 3, name: 'Rockdale', mother: 'lee', proposed: false },
+  { stop: 11, startYear: 6, name: 'Caldwell', mother: 'lee', proposed: false },
+  { stop: 9, startYear: 8, name: 'Crockett', mother: 'mont', proposed: false },
+  { stop: 4, startYear: 10, name: 'San Augustine', mother: 'wood', proposed: true },
+  { stop: 3, startYear: 12, name: 'Zwolle', mother: null, proposed: true },
+];
+
+/** The model's horizon, matching the longest corridor phase. */
+export const HORIZON_YEARS = 15;
+
+/**
+ * The assumptions every number on the timeline rests on, in one place so
+ * they can be argued with rather than reverse-engineered.
+ *
+ * FAMILIES_A_YEAR is the Clear Creek rate (see PRECEDENTS), VILLAGE_CAP and
+ * the three-household start are charter rules F4 and F5, and the pilgrim
+ * figures are the corrected ones from IMPACT I3.
+ */
+export const MODEL = {
+  startingHouseholds: 3,
+  familiesAYear: 2,
+  villageCap: 30,
+  peoplePerHousehold: 5,
+  pilgrimsAYear: 5000,
+  daysPerPilgrim: 10,
+  spendPerPilgrimDay: 50,
+  /** Years for pilgrim numbers to ramp to the full figure. */
+  pilgrimRampYears: 12,
+} as const;
+
+/**
+ * When a stop gets a parish host. Stops a chapter already carries can be
+ * asked in the first year; the rest wait on a chapter forming at that end,
+ * which is the Louisiana problem.
+ */
+export const hostedYear = (n: number) => (chapterFor(n) ? 1 : 4);
+
+/** Households resident in an anchor village in a given year. */
+export const householdsAt = (startYear: number, year: number) =>
+  year < startYear
+    ? 0
+    : Math.min(
+        MODEL.villageCap,
+        MODEL.startingHouseholds + MODEL.familiesAYear * (year - startYear),
+      );
+
+/** Everything the timeline shows, for one year. */
+export const stateAt = (year: number) => {
+  const hosted = STOPS.filter((s) => year >= hostedYear(s.n)).length;
+  const villages = ANCHORS.map((v) => ({ ...v, households: householdsAt(v.startYear, year) }));
+  const households = villages.reduce((t, v) => t + v.households, 0);
+  const pilgrims = Math.round(
+    MODEL.pilgrimsAYear * (hosted / STOPS.length) * Math.min(1, year / MODEL.pilgrimRampYears),
+  );
+  const pilgrimDays = pilgrims * MODEL.daysPerPilgrim;
+  return {
+    hosted,
+    villages,
+    living: villages.filter((v) => v.households > 0).length,
+    households,
+    people: Math.round(households * MODEL.peoplePerHousehold),
+    pilgrims,
+    pilgrimDays,
+    spend: pilgrimDays * MODEL.spendPerPilgrimDay,
+    gapsClosed: GAPS.filter((g) => year >= g.closesInYear).length,
+  };
+};
+
+// ---------------------------------------------------------------------------
+// Who carries which stretch, and what to ask them for first.
+//
+// The ask column is the point of the table. Every row is something a named
+// chapter could be asked for this year, before any land is discussed.
+// ---------------------------------------------------------------------------
+export const ROSTER: {
+  stretch: Bilingual;
+  stops: string;
+  chapter: ChapterId | null;
+  diocese: string;
+  ask: Bilingual;
+}[] = [
+  {
+    stretch: { en: 'Louisiana', es: 'Luisiana' },
+    stops: '1–3',
+    chapter: null,
+    diocese: 'Alexandria',
+    ask: {
+      en: 'No chapter in reach. Find or found one in the Diocese of Alexandria. Until then, ask the Natchitoches basilica to host the start and the blessing.',
+      es: 'Ningún capítulo al alcance. Encontrar o fundar uno en la Diócesis de Alexandria. Mientras tanto, pedir a la basílica de Natchitoches que reciba la salida y la bendición.',
+    },
+  },
+  {
+    stretch: { en: 'The East Texas missions', es: 'Las misiones del este de Tejas' },
+    stops: '4–8',
+    chapter: 'wood',
+    diocese: 'Tyler',
+    ask: {
+      en: 'Scout San Augustine, Chireno and Nacogdoches. Meet Sacred Heart, which already carries the Margil cause.',
+      es: 'Explorar San Augustine, Chireno y Nacogdoches. Visitar Sacred Heart, que ya lleva la causa de Margil.',
+    },
+  },
+  {
+    stretch: { en: 'The empty middle', es: 'El medio vacío' },
+    stops: '9–10',
+    chapter: 'mont',
+    diocese: 'Tyler / Austin',
+    ask: {
+      en: 'Walk TX-21 from Crockett to Bryan and come back with the three or four households that could host in the gap.',
+      es: 'Caminar la TX-21 de Crockett a Bryan y volver con los tres o cuatro hogares que podrían recibir en el hueco.',
+    },
+  },
+  {
+    stretch: { en: 'Caldwell to Bastrop', es: 'De Caldwell a Bastrop' },
+    stops: '11–14',
+    chapter: 'lee',
+    diocese: 'Austin',
+    ask: {
+      en: 'Mother chapter for the first village at Rockdale, about 18 miles away. Begin scouting Milam County now, which is charter rule F3.',
+      es: 'Capítulo madre de la primera aldea en Rockdale, a unas 18 millas. Empezar a explorar el condado de Milam ya, que es el requisito F3.',
+    },
+  },
+  {
+    stretch: { en: 'Hill Country to the cathedral', es: 'De las colinas a la catedral' },
+    stops: '15–21',
+    chapter: 'nb',
+    diocese: 'Austin / San Antonio',
+    ask: {
+      en: 'Extend the Camino de San Antonio passport north, stamp by stamp, and organise the first walk.',
+      es: 'Extender el pasaporte del Camino de San Antonio hacia el norte, sello por sello, y organizar la primera caminata.',
+    },
+  },
+];
+
+/** The milestones the timeline marks, in years. */
+export const MILESTONES: { year: number; text: Bilingual }[] = [
+  { year: 0, text: {
+    en: 'Four chapters already sit within a day’s drive of the road',
+    es: 'Cuatro capítulos ya están a un día de camino de la ruta',
+  } },
+  { year: 1, text: {
+    en: 'Passport extended north; a parish host asked for at every chapter stage',
+    es: 'Pasaporte extendido al norte; una parroquia anfitriona pedida en cada etapa con capítulo',
+  } },
+  { year: 2, text: {
+    en: 'The first walk, each chapter walking its own stages',
+    es: 'La primera caminata, cada capítulo caminando sus propias etapas',
+  } },
+  { year: 3, text: {
+    en: 'Rockdale: three households resident',
+    es: 'Rockdale: tres hogares residentes',
+  } },
+  { year: 4, text: {
+    en: 'A Louisiana chapter forms; stages 1 to 3 hosted',
+    es: 'Se forma un capítulo en Luisiana; etapas 1 a 3 con anfitrión',
+  } },
+  { year: 6, text: { en: 'Caldwell village begins', es: 'Empieza la aldea de Caldwell' } },
+  { year: 8, text: {
+    en: 'Crockett village begins, and the 85-mile gap is hosted',
+    es: 'Empieza la aldea de Crockett, y el hueco de 85 millas tiene anfitriones',
+  } },
+  { year: 10, text: {
+    en: 'San Augustine begins; three villages share a meat processor',
+    es: 'Empieza San Augustine; tres aldeas comparten una planta de carne',
+  } },
+  { year: 12, text: {
+    en: 'Zwolle begins; every stage has a village or a host',
+    es: 'Empieza Zwolle; cada etapa tiene aldea o anfitrión',
+  } },
+  { year: 15, text: {
+    en: 'A generation in: five villages growing',
+    es: 'Una generación después: cinco aldeas creciendo',
+  } },
 ];
 
 // ---------------------------------------------------------------------------
