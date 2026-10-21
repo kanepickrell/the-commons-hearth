@@ -366,6 +366,23 @@ export const WALK_DAYS_AT_20 = Math.round(TOTAL_MILES / 20);
 // Day that it was not warriors and frontiersmen who built the country but the
 // farmers who stayed put and took care of their own.
 // ---------------------------------------------------------------------------
+/**
+ * The campaign this belongs to.
+ *
+ * Restore the Real is the national framing: one real step, taken from where
+ * you are, with what you have. Restore The Way is this chapter's largest
+ * version of that step. The two names are meant to be read together, and
+ * this page is the long end of a campaign whose short end is a tree planted
+ * with a neighbour.
+ */
+export const CAMPAIGN: { name: Bilingual; body: Bilingual } = {
+  name: { en: 'Restore the Real', es: 'Restaurar lo Real' },
+  body: {
+    en: 'The movement asks for one real step, taken from where you are, with what you already have. Most steps are small: a tree planted with a neighbour, a meal around a fire, a child who learns where food comes from. This road is the same step at the scale of a region, and it is still built out of the small ones.',
+    es: 'El movimiento pide un paso real, dado desde donde estás, con lo que ya tienes. Casi todos los pasos son pequeños: un árbol plantado con un vecino, una comida junto al fuego, un hijo que aprende de dónde viene la comida. Este camino es el mismo paso a escala de una región, y sigue estando hecho de los pequeños.',
+  },
+};
+
 export const THESIS: Bilingual = {
   en: 'El Camino Real was opened by soldiers and friars passing through. The Way is restored by farmers who stay.',
   es: 'El Camino Real lo abrieron soldados y frailes de paso. El Camino lo restauran los labradores que se quedan.',
@@ -831,6 +848,66 @@ export const GROUND: {
     label: 'Plan your pilgrimage',
   },
 ];
+
+// ---------------------------------------------------------------------------
+// What a village becomes.
+//
+// These are not the corridor's phases. PHASES above is what this PROJECT
+// does over fifteen years. This is the national office's plan for the life
+// of any one chapter, and the two run on the same clock: 0–2, 2–5, then the
+// long stretch. A village on this road is a chapter in miniature, so the
+// corridor's real job is to carry eleven of them from I to III.
+//
+// It is worth having here for one reason beyond tidiness. Phase III is what
+// the national office calls a demonstration farm, and it has committed to
+// five of them by 2030. The anchor villages on this road are candidates for
+// that money, which makes this page a funding case rather than a daydream.
+// ---------------------------------------------------------------------------
+export const VILLAGE_PHASES: {
+  roman: string;
+  years: Bilingual;
+  /** True for the phase this chapter is actually in. Founded 2025. */
+  here: boolean;
+  name: Bilingual;
+  body: Bilingual;
+}[] = [
+  {
+    roman: 'I',
+    years: { en: 'YEARS 0 TO 2', es: 'AÑOS 0 A 2' },
+    here: true,
+    name: { en: 'An informal community', es: 'Una comunidad informal' },
+    body: {
+      en: 'Get started and build relationships. Gatherings, workshops, and a roster of people who know each other by name. Nothing here needs a bank account or a charter, which is why it is the phase a village can begin in a parish hall.',
+      es: 'Empezar y construir relaciones. Reuniones, talleres, y una lista de personas que se conocen por su nombre. Nada de esto necesita cuenta bancaria ni estatutos, por eso es la fase que una aldea puede empezar en un salón parroquial.',
+    },
+  },
+  {
+    roman: 'II',
+    years: { en: 'YEARS 2 TO 5', es: 'AÑOS 2 A 5' },
+    here: false,
+    name: { en: 'A formalized entity', es: 'Una entidad formal' },
+    body: {
+      en: 'The village becomes a civic institution: a charter, a local bank account, and the standing to own, invest, and lead. This is the phase that can hold land, which is where requirement S1 and the ground lease finally have something to attach to.',
+      es: 'La aldea se vuelve una institución civil: estatutos, cuenta bancaria local, y la capacidad de poseer, invertir, y dirigir. Es la fase que puede tener tierra, y donde el requisito S1 y el arriendo por fin tienen a qué sujetarse.',
+    },
+  },
+  {
+    roman: 'III',
+    years: { en: 'YEARS 5 TO 10', es: 'AÑOS 5 A 10' },
+    here: false,
+    name: { en: 'A localized economy', es: 'Una economía local' },
+    body: {
+      en: 'A regional centre of work and formation, where these principles are lived and taught rather than discussed. Jobs are created, farms are launched, and the village hosts staff, volunteers, and retreatants. The national office calls this a demonstration farm and has committed to five by 2030.',
+      es: 'Un centro regional de trabajo y formación, donde estos principios se viven y se enseñan en vez de discutirse. Se crean empleos, se lanzan granjas, y la aldea recibe personal, voluntarios, y retirantes. La oficina nacional llama a esto una granja de demostración y se ha comprometido a cinco para 2030.',
+    },
+  },
+];
+
+/** The national aims this corridor would be serving, in their own terms. */
+export const NATIONAL_AIM: Bilingual = {
+  en: 'Nationally the aim is a Catholic Land Movement chapter in every diocese, and five demonstration farms, by 2030. This road crosses four dioceses and wants eleven villages.',
+  es: 'A nivel nacional, la meta es un capítulo del Movimiento Católico de la Tierra en cada diócesis, y cinco granjas de demostración, para 2030. Este camino cruza cuatro diócesis y quiere once aldeas.',
+};
 
 // ---------------------------------------------------------------------------
 // Why this road and not another one.

@@ -21,8 +21,9 @@ import { createElement, lazy, Suspense } from 'react';
 import { Layout } from '@/components/Layout';
 import { useLocale } from '@/i18n/LocaleProvider';
 import {
-  GAPS, GROUND, HERITAGE, IMPACT, LAND_MODEL, MEASURES, PHASES, PRECEDENTS, PRINCIPLES,
-  STAGES, STOPS, THESIS,
+  CAMPAIGN, GAPS, GROUND, HERITAGE, IMPACT, LAND_MODEL, MEASURES, NATIONAL_AIM, PHASES,
+  PRECEDENTS, PRINCIPLES,
+  STAGES, STOPS, THESIS, VILLAGE_PHASES,
   TOTAL_MILES, WALK_DAYS_AT_15, WALK_DAYS_AT_20,
 } from '@/content/camino';
 
@@ -87,6 +88,17 @@ export default function RestoreTheWay() {
             {t(THESIS)}
           </p>
         </blockquote>
+
+        {/* Where this sits in the movement. The two names are built to be
+            read together: Restore the Real is the campaign, Restore The Way
+            is this chapter's longest version of the step it asks for. */}
+        <div className="mx-auto mt-10 max-w-2xl text-left">
+          <Eyebrow>{es ? 'LA CAMPAÑA' : 'THE CAMPAIGN'}</Eyebrow>
+          <h2 className="mt-3 font-heading text-2xl text-mesquite">{t(CAMPAIGN.name)}</h2>
+          <p className="prose-body mt-3 text-base leading-relaxed text-mesquite/85">
+            {t(CAMPAIGN.body)}
+          </p>
+        </div>
       </section>
 
       {/* ---------------------------------------------------------------- */}
@@ -507,7 +519,59 @@ export default function RestoreTheWay() {
       </section>
 
       {/* ---------------------------------------------------------------- */}
+      {/* What a village becomes                                            */}
+      {/*                                                                   */}
+      {/* The national office's three phases for the life of a chapter,     */}
+      {/* which are NOT the corridor's phases below. A village on this road */}
+      {/* is a chapter in miniature, and the two plans run on the same      */}
+      {/* clock. Phase III is what the national office calls a              */}
+      {/* demonstration farm and it has committed to five by 2030, so this  */}
+      {/* is the section that turns the page into a funding case.           */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="container-narrow py-12">
+        <Eyebrow>{es ? 'EN QUÉ SE CONVIERTE UNA ALDEA' : 'WHAT A VILLAGE BECOMES'}</Eyebrow>
+        <h2 className="mt-3 font-heading text-3xl text-mesquite">
+          {es ? 'Una aldea es un capítulo en pequeño.' : 'A village is a chapter in miniature.'}
+        </h2>
+        <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
+          {es
+            ? 'Así planea el movimiento la vida de un capítulo. Este capítulo está en la primera fase, y decirlo sirve más que insinuar otra cosa. El trabajo del corredor es llevar once aldeas de la I a la III.'
+            : 'This is how the movement plans the life of a chapter. This chapter is in the first phase, and saying so is more useful than implying otherwise. The corridor’s work is carrying eleven villages from I to III.'}
+        </p>
+
+        <ol className="mt-8 space-y-8">
+          {VILLAGE_PHASES.map((v) => (
+            <li
+              key={v.roman}
+              className={`border-l-2 pl-5 ${v.here ? 'border-ocre' : 'border-mesquite/15'}`}
+            >
+              <p className="font-caps text-[10px] tracking-[0.2em] text-ocre">
+                {v.roman} · {t(v.years)}
+                {v.here && (
+                  <span className="ml-2 text-rojo">
+                    {es ? 'AQUÍ ESTAMOS' : 'WE ARE HERE'}
+                  </span>
+                )}
+              </p>
+              <h3 className="mt-2 font-heading text-2xl text-mesquite">{t(v.name)}</h3>
+              <p className="prose-body mt-2 text-base leading-relaxed text-mesquite/80">
+                {t(v.body)}
+              </p>
+            </li>
+          ))}
+        </ol>
+
+        <p className="mt-10 border-t border-mesquite/15 pt-6 font-serif italic leading-relaxed text-piedra">
+          {t(NATIONAL_AIM)}
+        </p>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
       {/* Phasing + what to measure                                         */}
+      {/*                                                                   */}
+      {/* These are the CORRIDOR's phases, not a village's. Same clock,     */}
+      {/* different subject: above is what one village becomes, this is     */}
+      {/* what the project does.                                            */}
       {/* ---------------------------------------------------------------- */}
       <section className="container-narrow py-12 pb-20">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
