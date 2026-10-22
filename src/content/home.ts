@@ -36,12 +36,17 @@ export const homeCopy = {
   // rural-resettlement/first-loaf pairing in `approach` below already does
   // that job, and the page shouldn't make the same move twice.
   //
-  // "Here in Central Texas" came out with it. The geography isn't lost: the
-  // approach paragraph still ends "across every parish from Austin to San
-  // Antonio", which places the chapter more concretely than the region name.
+  // "We exist" rather than naming the movement again: the heading directly
+  // above already says who we are, so repeating it here made the first two
+  // lines of the page introduce the same subject twice.
+  //
+  // The region is back in this sentence. It had been cut on the grounds that
+  // the approach paragraph places the chapter more concretely, which it
+  // does, but that paragraph is four screens of reading away from a visitor
+  // who only reads the top. Both can say it.
   lede: {
-    en: 'The Catholic Land Movement exists to help families resettle onto productive land they own. We offer the network, vision, and support to help make it a reality.',
-    es: 'El Movimiento Católico de la Tierra existe para ayudar a las familias a reasentarse en tierra productiva que sea suya. Ofrecemos la red, la visión, y el apoyo para hacerlo realidad.',
+    en: 'We exist to help families in Central Texas resettle onto productive land they own. We offer the network, vision, and support to help make it a reality.',
+    es: 'Existimos para ayudar a las familias del centro de Texas a reasentarse en tierra productiva que sea suya. Ofrecemos la red, la visión, y el apoyo para hacerlo realidad.',
   } satisfies Bilingual,
 
   ctaGathering: {
