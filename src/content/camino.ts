@@ -874,7 +874,7 @@ export const GROUND: {
 // talking to six chanceries, and that is worth knowing before anyone counts
 // bishops in a meeting.
 // ---------------------------------------------------------------------------
-export type ChapterId = 'nb' | 'lee' | 'mont' | 'wood';
+export type ChapterId = 'nb' | 'lee' | 'mont' | 'wood' | 'milton';
 
 export const CHAPTERS: {
   id: ChapterId;
@@ -884,7 +884,23 @@ export const CHAPTERS: {
   /** Stops this chapter is nearest to, and would carry. A proposal. */
   carries: number[];
   diocese: string;
+  /** Why a chapter carries nothing, where that needs saying. */
+  note?: Bilingual;
 }[] = [
+  {
+    // Too far south to host a stage, and kept on the map for exactly that
+    // reason: the Louisiana end of the road has no chapter near it, and the
+    // nearest one being 129 miles away is the clearest way to show it.
+    id: 'milton',
+    name: { en: 'Milton, Louisiana', es: 'Milton, Luisiana' },
+    at: [30.1038, -92.0765],
+    carries: [],
+    diocese: 'Lafayette',
+    note: {
+      en: 'About 129 miles south of the nearest stop, and in a different diocese, so it cannot host a stage. It is still the closest Catholic Land Movement body to the Louisiana end, which makes it the first call: it may know families near the road, and under rule F1 a chapter founded up there would be sent out from somewhere, most plausibly here.',
+      es: 'A unas 129 millas al sur de la parada más cercana, y en otra diócesis, así que no puede recibir una etapa. Sigue siendo el cuerpo del Movimiento Católico de la Tierra más cercano al extremo de Luisiana, y por eso es la primera llamada: puede conocer familias cerca del camino, y según el requisito F1 un capítulo fundado allá tendría que salir de algún lado, lo más probable de aquí.',
+    },
+  },
   {
     id: 'wood',
     name: { en: 'Woodville area', es: 'Zona de Woodville' },
@@ -1035,11 +1051,11 @@ export const ROSTER: {
   {
     stretch: { en: 'Louisiana', es: 'Luisiana' },
     stops: '1–3',
-    chapter: null,
+    chapter: 'milton',
     diocese: 'Alexandria',
     ask: {
-      en: 'No chapter in reach. Find or found one in the Diocese of Alexandria. Until then, ask the Natchitoches basilica to host the start and the blessing.',
-      es: 'Ningún capítulo al alcance. Encontrar o fundar uno en la Diócesis de Alexandria. Mientras tanto, pedir a la basílica de Natchitoches que reciba la salida y la bendición.',
+      en: 'Milton is the only Louisiana chapter and it is too far south to host a stage, so this stretch still needs one of its own in the Diocese of Alexandria. Call Milton first: ask whether they know families near the road, and whether they would be the mother chapter for one. Meanwhile ask the Natchitoches basilica to host the start and the blessing.',
+      es: 'Milton es el único capítulo de Luisiana y queda demasiado al sur para recibir una etapa, así que este tramo todavía necesita uno propio en la Diócesis de Alexandria. Llamar primero a Milton: preguntar si conocen familias cerca del camino, y si serían el capítulo madre de uno. Mientras tanto, pedir a la basílica de Natchitoches que reciba la salida y la bendición.',
     },
   },
   {
@@ -1103,8 +1119,8 @@ export const MILESTONES: { year: number; text: Bilingual }[] = [
     es: 'Rockdale: tres hogares residentes',
   } },
   { year: 4, text: {
-    en: 'A Louisiana chapter forms; stages 1 to 3 hosted',
-    es: 'Se forma un capítulo en Luisiana; etapas 1 a 3 con anfitrión',
+    en: 'A chapter forms near the road in Louisiana, sent out from Milton; stages 1 to 3 hosted',
+    es: 'Se forma un capítulo junto al camino en Luisiana, enviado desde Milton; etapas 1 a 3 con anfitrión',
   } },
   { year: 6, text: { en: 'Caldwell village begins', es: 'Empieza la aldea de Caldwell' } },
   { year: 8, text: {

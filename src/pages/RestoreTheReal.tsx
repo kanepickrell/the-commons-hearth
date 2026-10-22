@@ -295,8 +295,8 @@ export default function RestoreTheReal() {
         </h2>
         <p className="prose-body mt-4 max-w-2xl text-base leading-relaxed text-mesquite/85">
           {es
-            ? 'Cuatro capítulos del Movimiento Católico de la Tierra se formaron a lo largo del Camino Real sin que nadie los pusiera ahí. Cada aldea sale de un capítulo madre, que es el requisito F1, así que este es el capítulo más cercano a cada tramo y lo primero que habría que pedirle.'
-            : 'Four Catholic Land Movement chapters formed along El Camino Real without anyone putting them there. Every village is sent out from a mother chapter, which is charter rule F1, so this is the nearest chapter to each stretch and the first thing to ask of it.'}
+            ? 'Cuatro capítulos del Movimiento Católico de la Tierra se formaron a lo largo del Camino Real sin que nadie los pusiera ahí, y un quinto, Milton, está más al sur en Luisiana. Cada aldea sale de un capítulo madre, que es el requisito F1, así que este es el capítulo más cercano a cada tramo y lo primero que habría que pedirle.'
+            : 'Four Catholic Land Movement chapters formed along El Camino Real without anyone putting them there, and a fifth, Milton, sits further south in Louisiana. Every village is sent out from a mother chapter, which is charter rule F1, so this is the nearest chapter to each stretch and the first thing to ask of it.'}
         </p>
 
         <div className="mt-8 overflow-x-auto rounded border border-mesquite/20">

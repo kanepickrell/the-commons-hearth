@@ -205,10 +205,21 @@ const ChapterLayer = ({ year }: { year: number }) => {
               <p className="font-serif text-xs italic text-piedra">
                 {t({ en: 'Diocese of', es: 'Diócesis de' })} {c.diocese}
               </p>
-              <p className="mt-2 font-serif text-xs leading-snug text-mesquite/80">
-                {t({ en: 'Carries stops', es: 'Lleva las paradas' })}{' '}
-                {c.carries[0]}–{c.carries[c.carries.length - 1]}
-              </p>
+              {c.carries.length ? (
+                <p className="mt-2 font-serif text-xs leading-snug text-mesquite/80">
+                  {t({ en: 'Carries stops', es: 'Lleva las paradas' })}{' '}
+                  {c.carries[0]}–{c.carries[c.carries.length - 1]}
+                </p>
+              ) : (
+                <p className="mt-2 font-serif text-xs leading-snug text-rojo">
+                  {t({ en: 'Carries no stage', es: 'No lleva ninguna etapa' })}
+                </p>
+              )}
+              {c.note && (
+                <p className="mt-2 font-serif text-xs leading-snug text-mesquite/80">
+                  {t(c.note)}
+                </p>
+              )}
               <p className="mt-2 font-serif text-[11px] italic text-piedra/80">
                 {t({
                   en: 'Placeholder name and approximate position.',
@@ -364,7 +375,13 @@ export const CaminoMap = ({
   /** Model year. Drives hosted stops, villages, and which gaps are shut. */
   year?: number;
 }) => {
-  const points = useMemo(() => STOPS.map((s) => s.at), []);
+  // Chapters are in the fit, not just stops. Milton sits a degree east of
+  // the last stop, and cropping it would hide the thing it is here to
+  // show: how far the Louisiana end is from any chapter at all.
+  const points = useMemo(
+    () => [...STOPS.map((s) => s.at), ...CHAPTERS.map((c) => c.at)],
+    [],
+  );
 
   // One polyline per stage, so each leg carries its own colour. Each starts
   // at the previous stage's last stop, or the line would break at the seams.
