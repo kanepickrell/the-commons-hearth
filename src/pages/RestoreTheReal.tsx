@@ -409,48 +409,7 @@ export default function RestoreTheReal() {
               : 'Four of the eighteen assigned stops fall outside their own chapter’s sixty-mile reach: Alto and Mission Tejas at 72 miles from Woodville, Nacogdoches right on the line, and Crockett at 67 from Montgomery. That is the same stretch that holds the 85-mile gap with no parish. The weakest part of the road is weak twice over, which makes a new chapter near Nacogdoches or Crockett the most useful ask on this page.'}
           </p>
         </div>
-
-        <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {[
-            {
-              h: { en: 'Who would actually do this', es: 'Quién haría esto de verdad' },
-              b: {
-                en: 'The weak point in any regional vision is that it belongs to one person. This one belongs to chapters that already have members, leaders and charters. The plan asks them to face a road, not to start from nothing.',
-                es: 'El punto débil de cualquier visión regional es que pertenece a una sola persona. Esta pertenece a capítulos que ya tienen miembros, líderes y estatutos. El plan les pide mirar hacia un camino, no empezar de cero.',
-              },
-            },
-            {
-              h: { en: 'A network, not one chapter’s project', es: 'Una red, no el proyecto de un capítulo' },
-              b: {
-                en: 'Each chapter already has its own bishop and its own parishes. No single chancery carries the whole road, and none of them can stop it either.',
-                es: 'Cada capítulo ya tiene su obispo y sus parroquias. Ninguna cancillería lleva el camino entero, y ninguna puede detenerlo.',
-              },
-            },
-            {
-              h: { en: 'A cast for the first walk', es: 'Un reparto para la primera caminata' },
-              b: {
-                en: 'Each chapter finds a parish host for its own stages and walks them with the pilgrims. That is a concrete ask that can go out this year, before any land is discussed.',
-                es: 'Cada capítulo busca una parroquia anfitriona para sus etapas y las camina con los peregrinos. Es una petición concreta que puede salir este año, antes de hablar de tierra.',
-              },
-            },
-            {
-              h: { en: 'Start where a mother chapter exists', es: 'Empezar donde ya hay capítulo madre' },
-              b: {
-                en: 'The Crockett to Bryan gap makes the strongest case, but Rockdale is about eighteen miles from the Lee County chapter and is the strongest place to start. The plan uses both: the gap is the argument, Rockdale is the first step.',
-                es: 'El hueco de Crockett a Bryan es el mejor argumento, pero Rockdale está a unas dieciocho millas del capítulo del condado de Lee y es el mejor lugar para empezar. El plan usa los dos: el hueco es el argumento, Rockdale es el primer paso.',
-              },
-            },
-          ].map((x) => (
-            <div key={x.h.en} className="border-l-2 border-verde pl-4">
-              <h3 className="font-heading text-lg leading-snug text-mesquite">{t(x.h)}</h3>
-              <p className="prose-body mt-2 text-base leading-relaxed text-mesquite/80">
-                {t(x.b)}
-              </p>
-            </div>
-          ))}
-        </div>
       </section>
-
 
       {/* ---------------------------------------------------------------- */}
       {/* Where the road breaks — and where the villages go                 */}
