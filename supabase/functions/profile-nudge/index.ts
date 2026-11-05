@@ -140,17 +140,24 @@ function render(c: Candidate): { subject: string; html: string; text: string } {
   };
 }
 
-async function logEmail(recipient: string, subject: string, status: 'sent' | 'failed', error?: string) {
+// The log is what caps each member at two nudges, so a write that fails
+// matters more here than in the other functions: an unlogged send looks like
+// no send, and the member would be emailed again tomorrow. Report it, and the
+// caller stops the run.
+async function logEmail(recipient: string, subject: string, status: 'sent' | 'failed', error?: string): Promise<boolean> {
   try {
-    await admin.rpc('log_gathering_email', {
+    const { error: rpcErr } = await admin.rpc('log_gathering_email', {
       p_kind: 'profile_nudge',
       p_recipient: recipient,
       p_subject: subject,
       p_status: status,
       p_error: error ?? null,
     });
+    if (rpcErr) throw rpcErr;
+    return true;
   } catch (e) {
     console.error('email_log write failed:', e);
+    return false;
   }
 }
 
@@ -190,6 +197,8 @@ Deno.serve(async (req: Request) => {
   for (const [i, c] of due.entries()) {
     if (i > 0) await new Promise((r) => setTimeout(r, SEND_GAP_MS));
     const { subject, html, text } = render(c);
+    let sent = false;
+    let logged: boolean;
     try {
       const resp = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -204,16 +213,23 @@ Deno.serve(async (req: Request) => {
       });
       if (!resp.ok) {
         const errText = await resp.text();
-        await logEmail(c.email, subject, 'failed', errText);
+        logged = await logEmail(c.email, subject, 'failed', errText);
         results[c.email] = 'failed';
       } else {
-        await logEmail(c.email, subject, 'sent');
+        sent = true;
+        logged = await logEmail(c.email, subject, 'sent');
         results[c.email] = 'sent';
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      await logEmail(c.email, subject, 'failed', msg);
+      logged = await logEmail(c.email, subject, 'failed', msg);
       results[c.email] = 'failed';
+    }
+    if (!logged) {
+      return new Response(JSON.stringify({
+        error: 'email_log write failed; stopped so no one is emailed twice',
+        unlogged: c.email, unlogged_was_sent: sent, results,
+      }), { status: 500, headers: JSON_HEADERS });
     }
   }
 
