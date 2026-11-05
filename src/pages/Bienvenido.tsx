@@ -28,6 +28,7 @@ import { buildPath } from '@/i18n/routes';
 import { uiStrings } from '@/lib/fixtures/uiStrings';
 import { Layout } from '@/components/Layout';
 import { Icon } from '@/components/Icon';
+import { SignInModal } from '@/components/SignInModal';
 import type { Database, CraftSlug } from '@/lib/database.types';
 import type { IconSlug } from '@/lib/types';
 import { ILLUSTRATED_CRAFTS, SIGNUP_MORE_CRAFTS, markableCrafts, resolveMark } from '@/lib/crafts';
@@ -76,12 +77,6 @@ export default function Bienvenido() {
 
   const s = uiStrings.onboarding;
   const nav = uiStrings.nav;
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate(buildPath('home', locale));
-    }
-  }, [authLoading, user, navigate, locale]);
 
   // If already onboarded and not explicitly redoing, jump to profile
   useEffect(() => {
@@ -260,6 +255,26 @@ export default function Bienvenido() {
 
   const canAdvanceFromStep1 = displayName.trim().length >= 2 && parishId !== '';
   const canAdvanceFromStep2 = bio.trim().length >= 10;
+
+  // Signed out: ask them to sign in here rather than bouncing them home. The
+  // profile-nudge email links straight to this page, and most of the people
+  // it reaches have never signed in. Both sign-in paths return to /bienvenido.
+  if (!authLoading && !user) {
+    return (
+      <Layout>
+        <div className="container-narrow py-16" />
+        <SignInModal
+          open
+          onClose={() => navigate(buildPath('home', locale))}
+          title={{ en: 'Finish your profile', es: 'Completa tu perfil' }}
+          subtitle={{
+            en: 'Sign in and we will pick up where you left off. If we emailed you, use that address.',
+            es: 'Inicia sesión y seguiremos donde te quedaste. Si te escribimos, usa ese correo.',
+          }}
+        />
+      </Layout>
+    );
+  }
 
   if (authLoading || parishLoading) {
     return (

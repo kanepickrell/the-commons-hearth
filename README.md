@@ -121,6 +121,23 @@ supabase functions deploy member-notify
 Secrets each function expects are listed at the top of its `index.ts`
 (`RESEND_API_KEY`, `FROM_EMAIL`, `REPLY_TO`, `DISCORD_INVITE_URL`, …).
 
+## Profile nudges
+
+`supabase/functions/profile-nudge` emails approved members who have no parish
+or no bio, linking them to `/welcome` (which asks them to sign in if they
+aren't). pg_cron runs it daily at 15:00 UTC; `profiles_needing_nudge()` picks
+who's due — signed up 2+ days ago, at most two nudges, ten days apart, 20 per
+run. Sends are logged to `email_log` as `profile_nudge`. Setup is in
+`supabase/sql/2026-11-05_profile_nudge.sql`.
+
+```sh
+bunx supabase secrets set NUDGE_SECRET=... NUDGE_BCC=you@example.com SITE_URL=https://www.centraltexasclm.org
+bunx supabase functions deploy profile-nudge
+# see who would be emailed, without sending:
+curl -X POST https://ppzgdwjojztugeyqvbdi.supabase.co/functions/v1/profile-nudge \
+  -H "x-nudge-secret: $NUDGE_SECRET" -d '{"dry_run":true}'
+```
+
 ## Chester (chat guide)
 
 `supabase/functions/chester` streams answers from Claude (`claude-opus-5`) about
