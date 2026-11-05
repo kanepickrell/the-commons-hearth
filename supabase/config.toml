@@ -60,3 +60,13 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/chester/deno.json"
 entrypoint = "./functions/chester/index.ts"
+
+[functions.profile-nudge]
+enabled = true
+# Called daily by pg_cron (supabase/sql/2026-11-05_profile_nudge.sql), never
+# from the browser. Gateway JWT verification is OFF so the job works with
+# either API key format; the function checks x-nudge-secret against
+# NUDGE_SECRET instead.
+verify_jwt = false
+import_map = "./functions/profile-nudge/deno.json"
+entrypoint = "./functions/profile-nudge/index.ts"
